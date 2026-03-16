@@ -1,3 +1,4 @@
+import "dotenv/config";
 import bcrypt from "bcryptjs";
 import connectToDatabase from "../lib/db.js";
 import {
@@ -16,6 +17,7 @@ import {
   ShopModel,
   TagModel,
 } from "../lib/models/index.js";
+
 async function main() {
   await connectToDatabase();
   await Promise.all([
@@ -524,5 +526,15 @@ async function main() {
       metadataJson: JSON.stringify({ status: "ARCHIVED" }),
     },
   ]);
+  console.log("Seed completed.");
+  console.log("Admin email: admin@sectionhub.com");
+  console.log("Admin password: admin12345");
 }
-main().finally(() => process.exit(0));
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error("Seed failed.");
+    console.error(error);
+    process.exit(1);
+  });
