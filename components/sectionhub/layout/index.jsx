@@ -211,7 +211,7 @@ export function AuthShell({ title, subtitle, children, footer }) {
               SectionHub
             </div>
             <div className="text-[12px] text-[var(--text-tertiary)]">
-              Restricted access Ãƒâ€šÃ‚Â· Admin only
+              Restricted access · Admin only
             </div>
           </div>
         </div>

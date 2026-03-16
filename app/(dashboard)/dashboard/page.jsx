@@ -5,7 +5,7 @@ export default async function DashboardPage() {
     const data = await getDashboardData();
     return (<div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <SectionTitle title="Good morning, Admin" subtitle="Mon, Mar 16 2026 Ãƒâ€šÃ‚Â· Review catalog health, installs, and commercial performance."/>
+        <SectionTitle title="Good morning, Admin" subtitle="Mon, Mar 16 2026 · Review catalog health, installs, and commercial performance."/>
         <div className="flex gap-2">
           <Link href="/sections/new" className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white">
             Upload Section
@@ -117,7 +117,7 @@ export default async function DashboardPage() {
               Recent activity
             </div>
             <div className="space-y-4">
-              {data.activity.map((item) => (<div key={`${item.actor}-${item.time}`} className="text-[13px] text-[var(--text-secondary)]">
+              {data.activity.map((item, index) => (<div key={`${item.actor}-${item.target}-${item.time}-${index}`} className="text-[13px] text-[var(--text-secondary)]">
                   <span className="font-medium text-[var(--text-primary)]">
                     {item.actor}
                   </span>{" "}

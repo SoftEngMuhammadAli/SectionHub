@@ -10,7 +10,7 @@ This file documents the current auth flow, local credentials, and how to use the
 - Auth style: email/password
 - Session type: cookie session
 - Session cookie: `sectionhub_session`
-- Auth code: `lib/auth/server.ts`
+- Auth code: `lib/auth/server.js`
 
 ## Local development credentials
 
@@ -73,12 +73,12 @@ These credentials are documented here only. They are no longer prefilled in the 
 
 ## Main auth files
 
-- `app/(auth)/login/page.tsx`
-- `app/(auth)/forgot-password/page.tsx`
-- `app/(auth)/reset-password/page.tsx`
-- `components/sectionhub/forms/login-form.tsx`
-- `lib/auth/server.ts`
-- `app/actions.ts`
+- `app/(auth)/login/page.jsx`
+- `app/(auth)/forgot-password/page.jsx`
+- `app/(auth)/reset-password/page.jsx`
+- `components/sectionhub/forms/login-form.jsx`
+- `lib/auth/server.js`
+- `app/actions.js`
 
 ## Current limitations
 

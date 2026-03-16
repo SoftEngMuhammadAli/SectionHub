@@ -12,7 +12,7 @@ export default async function ForgotPasswordPage({ searchParams }) {
         </Link>
         <label className="block space-y-2">
           <span className="text-[12px] font-medium">Email address</span>
-          <input name="email" type="email" autoComplete="email" placeholder="admin@sectionhub.com" className="sectionhub-input"/>
+          <input name="email" type="email" autoComplete="email" placeholder="Enter your email address" required className="sectionhub-input"/>
         </label>
         <button type="submit" className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white">
           Send reset link
