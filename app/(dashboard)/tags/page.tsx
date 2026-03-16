@@ -1,6 +1,6 @@
 import { saveTagAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getTags } from "@/features/tags/service";
+import { getTags } from "@/lib/sectionhub/tags/service";
 
 export default async function TagsPage() {
   const tags = await getTags();

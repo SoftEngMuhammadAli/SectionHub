@@ -1,6 +1,6 @@
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getAnalyticsData } from "@/features/analytics/service";
-import { formatPrice } from "@/features/shared/format";
+import { getAnalyticsData } from "@/lib/sectionhub/analytics/service";
+import { formatPrice } from "@/lib/sectionhub/shared/format";
 
 export default async function AnalyticsPage() {
   const data = await getAnalyticsData();

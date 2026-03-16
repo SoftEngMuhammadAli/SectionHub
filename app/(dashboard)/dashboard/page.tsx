@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Badge, Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getDashboardData } from "@/features/dashboard/service";
+import { getDashboardData } from "@/lib/sectionhub/dashboard/service";
 
 export default async function DashboardPage() {
   const data = await getDashboardData();
@@ -8,7 +8,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <SectionTitle title="Good morning, Admin" subtitle="Mon, Mar 16 2026 Ã‚Â· Review catalog health, installs, and commercial performance." />
+        <SectionTitle title="Good morning, Admin" subtitle="Mon, Mar 16 2026 Ãƒâ€šÃ‚Â· Review catalog health, installs, and commercial performance." />
         <div className="flex gap-2">
           <Link href="/sections/new" className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white">Upload Section</Link>
         </div>

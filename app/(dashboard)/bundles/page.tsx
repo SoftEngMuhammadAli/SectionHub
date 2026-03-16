@@ -1,7 +1,7 @@
 import { saveBundleAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getBundles } from "@/features/bundles/service";
-import { getSections } from "@/features/sections/service";
+import { getBundles } from "@/lib/sectionhub/bundles/service";
+import { getSections } from "@/lib/sectionhub/sections/service";
 
 export default async function BundlesPage() {
   const [bundles, sections] = await Promise.all([getBundles(), getSections()]);

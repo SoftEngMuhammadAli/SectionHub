@@ -2,13 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getCurrentUser, issuePasswordReset, loginWithPassword, logout, resetPassword } from "@/features/auth/server";
-import { createActivityLog } from "@/features/activity/service";
-import { upsertBundle } from "@/features/bundles/service";
-import { upsertCategory } from "@/features/categories/service";
-import { createOrUpdateSection, publishSection } from "@/features/sections/service";
-import { updateSettings } from "@/features/settings/service";
-import { upsertTag } from "@/features/tags/service";
+import { getCurrentUser, issuePasswordReset, loginWithPassword, logout, resetPassword } from "@/lib/auth/server";
+import { createActivityLog } from "@/lib/sectionhub/activity/service";
+import { upsertBundle } from "@/lib/sectionhub/bundles/service";
+import { upsertCategory } from "@/lib/sectionhub/categories/service";
+import { createOrUpdateSection, publishSection } from "@/lib/sectionhub/sections/service";
+import { updateSettings } from "@/lib/sectionhub/settings/service";
+import { upsertTag } from "@/lib/sectionhub/tags/service";
 
 function asBool(value: FormDataEntryValue | null) {
   return value === "on" || value === "true";

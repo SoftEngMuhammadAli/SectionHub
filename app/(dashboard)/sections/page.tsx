@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getCategories } from "@/features/categories/service";
-import { getSections } from "@/features/sections/service";
-import { getTags } from "@/features/tags/service";
+import { getCategories } from "@/lib/sectionhub/categories/service";
+import { getSections } from "@/lib/sectionhub/sections/service";
+import { getTags } from "@/lib/sectionhub/tags/service";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -87,7 +87,7 @@ export default async function SectionsPage({ searchParams }: { searchParams: Pro
             </div>
             <div className="mt-4 space-y-2 text-[13px] text-[var(--text-secondary)]">
               <div className="flex justify-between gap-3"><span>Category</span><span className="text-right">{section.category}</span></div>
-              <div className="flex justify-between gap-3"><span>Tags</span><span className="text-right">{section.tags.join(", ") || "Ã¢â‚¬â€"}</span></div>
+              <div className="flex justify-between gap-3"><span>Tags</span><span className="text-right">{section.tags.join(", ") || "ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â"}</span></div>
               <div className="flex justify-between gap-3"><span>Price</span><span className="font-mono">{section.price}</span></div>
               <div className="flex justify-between gap-3"><span>Version</span><span className="font-mono">{section.version}</span></div>
               <div className="flex justify-between gap-3"><span>Installs</span><span className="font-mono">{section.installs}</span></div>

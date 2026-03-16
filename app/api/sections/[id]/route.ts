@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSectionFormData } from "@/features/sections/service";
+import { getSectionFormData } from "@/lib/sectionhub/sections/service";
 
 type RouteContext = { params: Promise<{ id: string }> };
 

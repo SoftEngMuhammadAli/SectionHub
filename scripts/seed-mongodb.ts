@@ -15,7 +15,7 @@ import {
   SettingModel,
   ShopModel,
   TagModel,
-} from "@/models";
+} from "@/lib/models";
 
 async function main() {
   await connectToDatabase();

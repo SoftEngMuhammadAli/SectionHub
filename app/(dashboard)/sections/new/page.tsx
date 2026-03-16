@@ -1,7 +1,7 @@
 import { saveSectionAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getCategories } from "@/features/categories/service";
-import { getTags } from "@/features/tags/service";
+import { getCategories } from "@/lib/sectionhub/categories/service";
+import { getTags } from "@/lib/sectionhub/tags/service";
 
 export default async function NewSectionPage() {
   const [categories, tags] = await Promise.all([getCategories(), getTags()]);

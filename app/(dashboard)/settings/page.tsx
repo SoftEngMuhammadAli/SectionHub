@@ -1,6 +1,6 @@
 import { saveSettingsAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getSettingsData } from "@/features/settings/service";
+import { getSettingsData } from "@/lib/sectionhub/settings/service";
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;

@@ -1,5 +1,5 @@
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getOrders } from "@/features/orders/service";
+import { getOrders } from "@/lib/sectionhub/orders/service";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

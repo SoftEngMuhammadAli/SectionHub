@@ -1,4 +1,4 @@
-import type { SectionItem } from "@/data/sectionhub/types";
+import type { SectionItem } from "@/lib/data/sectionhub/types";
 
 export const sectionRows: SectionItem[] = [
   {

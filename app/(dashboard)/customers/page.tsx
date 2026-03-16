@@ -1,5 +1,5 @@
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getCustomers } from "@/features/customers/service";
+import { getCustomers } from "@/lib/sectionhub/customers/service";
 
 export default async function CustomersPage() {
   const customers = await getCustomers();

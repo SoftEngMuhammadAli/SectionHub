@@ -4,7 +4,7 @@ import {
   SectionDocumentationSchema,
   SectionPreviewSchema,
   SectionVersionSchema,
-} from "@/models/shared/subdocuments";
+} from "@/lib/models/shared/subdocuments";
 
 const objectId = Schema.Types.ObjectId;
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { publishSection } from "@/features/sections/service";
+import { publishSection } from "@/lib/sectionhub/sections/service";
 
 type RouteContext = { params: Promise<{ id: string }> };
 

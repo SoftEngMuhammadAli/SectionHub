@@ -1,6 +1,6 @@
 import { saveCategoryAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getCategories } from "@/features/categories/service";
+import { getCategories } from "@/lib/sectionhub/categories/service";
 
 export default async function CategoriesPage() {
   const categories = await getCategories();

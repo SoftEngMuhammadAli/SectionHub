@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resetPassword } from "@/features/auth/server";
+import { resetPassword } from "@/lib/auth/server";
 
 export async function POST(request: Request) {
   const body = await request.json();

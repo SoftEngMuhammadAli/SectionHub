@@ -1,8 +1,8 @@
 import { publishSectionAction, saveSectionAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
-import { getCategories } from "@/features/categories/service";
-import { getSectionFormData } from "@/features/sections/service";
-import { getTags } from "@/features/tags/service";
+import { getCategories } from "@/lib/sectionhub/categories/service";
+import { getSectionFormData } from "@/lib/sectionhub/sections/service";
+import { getTags } from "@/lib/sectionhub/tags/service";
 import { notFound } from "next/navigation";
 
 export default async function EditSectionPage({ params }: { params: Promise<{ id: string }> }) {

@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { OrderItemSchema } from "@/models/shared/subdocuments";
+import { OrderItemSchema } from "@/lib/models/shared/subdocuments";
 
 const objectId = Schema.Types.ObjectId;
 
