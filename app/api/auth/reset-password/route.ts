@@ -1,2 +1,8 @@
 import { NextResponse } from "next/server";
-export async function POST() { return NextResponse.json({ success: true, message: "Password updated" }); }
+import { resetPassword } from "@/features/auth/server";
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const result = await resetPassword(String(body.token ?? ""), String(body.password ?? ""));
+  return NextResponse.json(result, { status: result.ok ? 200 : 400 });
+}

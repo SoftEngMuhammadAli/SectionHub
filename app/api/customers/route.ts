@@ -1,3 +1,3 @@
 import { NextResponse } from "next/server";
-import { customers } from "@/lib/sectionhub-data";
-export async function GET() { return NextResponse.json({ items: customers, total: customers.length }); }
+import { getCustomers } from "@/features/customers/service";
+export async function GET() { return NextResponse.json({ items: await getCustomers() }); }

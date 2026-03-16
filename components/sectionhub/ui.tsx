@@ -7,6 +7,10 @@ export function cn(...values: Array<string | false | null | undefined>) {
 export function Icon({ name, className = "h-4 w-4" }: { name: string; className?: string }) {
   const common = { className, fill: "none", stroke: "currentColor", strokeWidth: "1.7", viewBox: "0 0 24 24" };
   switch (name) {
+    case "menu": return <svg {...common}><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></svg>;
+    case "close": return <svg {...common}><path d="m6 6 12 12" /><path d="M18 6 6 18" /></svg>;
+    case "chevron-right": return <svg {...common}><path d="m9 6 6 6-6 6" /></svg>;
+    case "filter": return <svg {...common}><path d="M4 6h16" /><path d="M7 12h10" /><path d="M10 18h4" /></svg>;
     case "home": return <svg {...common}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></svg>;
     case "layers": return <svg {...common}><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5" /><path d="m3 16 9 5 9-5" /></svg>;
     case "upload": return <svg {...common}><path d="M12 16V4" /><path d="m7 9 5-5 5 5" /><path d="M4 20h16" /></svg>;
@@ -26,14 +30,14 @@ export function Icon({ name, className = "h-4 w-4" }: { name: string; className?
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) { return <div className={cn("sectionhub-card", className)}>{children}</div>; }
-export function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) { return <div className="space-y-1"><h1 className="text-[24px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{title}</h1>{subtitle ? <p className="text-[14px] text-[var(--text-secondary)]">{subtitle}</p> : null}</div>; }
+export function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) { return <div className="space-y-1"><h1 className="text-[20px] font-semibold tracking-[-0.02em] text-[var(--text-primary)] sm:text-[24px]">{title}</h1>{subtitle ? <p className="text-[13px] text-[var(--text-secondary)] sm:text-[14px]">{subtitle}</p> : null}</div>; }
 export function Badge({ label, tone = "default" }: { label: string; tone?: "default" | "success" | "warning" | "danger" | "info" | "violet" }) {
   const tones = { default: "bg-[#F4F5FA] text-[var(--text-secondary)]", success: "bg-[var(--success-light)] text-[var(--success)]", warning: "bg-[var(--warning-light)] text-[var(--warning)]", danger: "bg-[var(--danger-light)] text-[var(--danger)]", info: "bg-[var(--info-light)] text-[var(--info)]", violet: "bg-[var(--primary-light)] text-[var(--primary-light-text)]" };
   return <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium", tones[tone])}>{label}</span>;
 }
 export function Button({ children, variant = "primary", className = "" }: { children: ReactNode; variant?: "primary" | "secondary" | "ghost" | "danger"; className?: string }) {
   const variants = { primary: "bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)]", secondary: "border border-[var(--border)] bg-white text-[var(--text-primary)] hover:bg-[var(--page-bg)]", ghost: "bg-transparent text-[var(--primary)] hover:bg-[var(--primary-light)]", danger: "border border-[var(--danger)]/20 bg-white text-[var(--danger)] hover:bg-[var(--danger-light)]" };
-  return <button className={cn("inline-flex min-h-11 items-center justify-center rounded-[8px] px-4 text-[13px] font-medium transition-colors", variants[variant], className)}>{children}</button>;
+  return <button type="button" className={cn("inline-flex min-h-11 items-center justify-center rounded-[8px] px-4 text-[13px] font-medium transition-colors", variants[variant], className)}>{children}</button>;
 }
 export function Field({ label, helper, children }: { label: string; helper?: string; children: ReactNode }) {
   return <label className="block space-y-2"><div><div className="text-[12px] font-medium text-[var(--text-primary)]">{label}</div>{helper ? <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">{helper}</div> : null}</div>{children}</label>;

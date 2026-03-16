@@ -2,23 +2,153 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navGroups } from "@/lib/sectionhub-data";
+import { useMemo, useState } from "react";
+import { navGroups } from "@/data/navigation/sectionhub-nav";
 import { Badge, Button, Card, Icon, cn } from "@/components/sectionhub/ui";
 
 export function DashboardShell({ children }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const pageTitle = useMemo(() => {
+    const match = navGroups
+      .flatMap((group) => group.items)
+      .find((item) => pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href)));
+    return match?.label ?? "SectionHub";
+  }, [pathname]);
+
+  const searchHref = search.trim() ? `/sections?search=${encodeURIComponent(search.trim())}` : "/sections";
+
+  const navContent = (
+    <>
+      <div className="flex h-[60px] items-center gap-3 px-5">
+        <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-[var(--primary)] text-white">
+          <Icon name="grid" className="h-4 w-4" />
+        </div>
+        <div>
+          <div className="text-[14px] font-semibold">SectionHub</div>
+          <div className="flex items-center gap-2 text-[11px] text-[var(--sidebar-inactive-text)]">
+            <span>Admin</span>
+            <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] uppercase tracking-[0.08em]">Internal</span>
+          </div>
+        </div>
+      </div>
+      <div className="sectionhub-scrollbar flex-1 space-y-6 overflow-y-auto px-3 py-4">
+        {navGroups.map((group) => (
+          <div key={group.label} className="space-y-2">
+            <div className="px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--sidebar-section-label)]">{group.label}</div>
+            <div className="space-y-1">
+              {group.items.map((item) => {
+                const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setDrawerOpen(false)}
+                    className={cn(
+                      "flex h-[38px] items-center gap-3 rounded-[10px] border-l-2 px-3 text-[13px] transition-colors",
+                      active
+                        ? "border-[var(--sidebar-active-border)] bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]"
+                        : "border-transparent text-[var(--sidebar-inactive-text)] hover:bg-[var(--sidebar-hover)] hover:text-white",
+                    )}
+                  >
+                    <Icon name={item.icon} className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-white/8 p-4">
+        <div className="flex items-center gap-3 rounded-[12px] bg-white/4 p-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary-light)] font-semibold text-[var(--primary-light-text)]">AR</div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13px] font-medium text-white">Alex Rivera</div>
+            <div className="truncate text-[11px] text-[var(--sidebar-inactive-text)]">admin@sectionhub.com</div>
+          </div>
+          <Badge label="Admin" tone="violet" />
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="flex min-h-screen bg-[var(--app-bg)] text-[var(--text-primary)]">
-      <aside className="hidden w-[232px] shrink-0 flex-col bg-[var(--sidebar-bg)] text-white lg:flex">
-        <div className="flex h-[60px] items-center gap-3 px-5"><div className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-[var(--primary)] text-white"><Icon name="grid" className="h-4 w-4" /></div><div><div className="text-[14px] font-semibold">SectionHub</div><div className="flex items-center gap-2 text-[11px] text-[var(--sidebar-inactive-text)]"><span>Admin</span><span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] uppercase tracking-[0.08em]">Internal</span></div></div></div>
-        <div className="sectionhub-scrollbar flex-1 space-y-6 overflow-y-auto px-3 py-4">{navGroups.map((group) => <div key={group.label} className="space-y-2"><div className="px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--sidebar-section-label)]">{group.label}</div><div className="space-y-1">{group.items.map((item) => { const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href)); return <Link key={item.href} href={item.href} className={cn("flex h-[38px] items-center gap-3 rounded-[10px] border-l-2 px-3 text-[13px] transition-colors", active ? "border-[var(--sidebar-active-border)] bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]" : "border-transparent text-[var(--sidebar-inactive-text)] hover:bg-[var(--sidebar-hover)] hover:text-white")}><Icon name={item.icon} className="h-4 w-4" /><span>{item.label}</span></Link>; })}</div></div>)}</div>
-        <div className="border-t border-white/8 p-4"><div className="flex items-center gap-3 rounded-[12px] bg-white/4 p-3"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary-light)] text-[var(--primary-light-text)] font-semibold">AR</div><div className="min-w-0 flex-1"><div className="truncate text-[13px] font-medium text-white">Alex Rivera</div><div className="truncate text-[11px] text-[var(--sidebar-inactive-text)]">admin@sectionhub.com</div></div><Badge label="Admin" tone="violet" /></div></div>
+      <aside className="hidden w-[232px] shrink-0 flex-col bg-[var(--sidebar-bg)] text-white md:flex">{navContent}</aside>
+      {drawerOpen ? (
+        <button
+          type="button"
+          aria-label="Close navigation"
+          className="fixed inset-0 z-30 bg-[#0b1020]/50 md:hidden"
+          onClick={() => setDrawerOpen(false)}
+        />
+      ) : null}
+      <aside className={cn("fixed inset-y-0 left-0 z-40 flex w-[280px] max-w-[85vw] flex-col bg-[var(--sidebar-bg)] text-white shadow-xl transition-transform md:hidden", drawerOpen ? "translate-x-0" : "-translate-x-full")}>
+        <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
+          <div className="text-[14px] font-semibold text-white">Navigation</div>
+          <button type="button" className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-white/10 text-white" onClick={() => setDrawerOpen(false)}>
+            <Icon name="close" />
+          </button>
+        </div>
+        {navContent}
       </aside>
-      <div className="flex min-h-screen flex-1 flex-col"><header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-[var(--border)] bg-white px-4 md:px-6"><div><div className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">SectionHub / Admin</div><div className="text-[15px] font-semibold text-[var(--text-primary)]">Premium section operations</div></div><div className="flex items-center gap-2 md:gap-3"><div className="hidden min-w-[320px] items-center gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--page-bg)] px-3 py-2 md:flex"><Icon name="search" className="h-4 w-4 text-[var(--text-tertiary)]" /><span className="text-[13px] text-[var(--text-tertiary)]">Search sections, bundles, shops...</span></div><button className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)]"><Icon name="bell" /></button><button className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)]"><Icon name="help" /></button><Button className="hidden md:inline-flex">Save Changes</Button></div></header><main className="flex-1 px-4 py-5 md:px-6 md:py-6">{children}</main></div>
+      <div className="flex min-h-screen flex-1 flex-col">
+        <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-white">
+          <div className="flex min-h-14 items-center justify-between gap-3 px-4 md:px-6">
+            <div className="flex items-center gap-3">
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)] md:hidden" onClick={() => setDrawerOpen(true)}>
+                <Icon name="menu" />
+              </button>
+              <div>
+                <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">SectionHub / Admin</div>
+                <div className="text-[15px] font-semibold text-[var(--text-primary)]">{pageTitle}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="hidden min-w-[280px] items-center gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--page-bg)] px-3 py-2 md:flex">
+                <Icon name="search" className="h-4 w-4 text-[var(--text-tertiary)]" />
+                <input value={search} onChange={(event) => setSearch(event.target.value)} className="w-full bg-transparent text-[13px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]" placeholder="Search sections, bundles, shops..." />
+              </div>
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)]"><Icon name="bell" /></button>
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)]"><Icon name="help" /></button>
+              <Link href={searchHref} className="hidden min-h-11 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white md:inline-flex">Go</Link>
+            </div>
+          </div>
+          <div className="px-4 pb-3 md:hidden">
+            <div className="flex items-center gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--page-bg)] px-3 py-2">
+              <Icon name="search" className="h-4 w-4 text-[var(--text-tertiary)]" />
+              <input value={search} onChange={(event) => setSearch(event.target.value)} className="w-full bg-transparent text-[13px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]" placeholder="Search catalog..." />
+              <Link href={searchHref} className="text-[12px] font-medium text-[var(--primary)]">Go</Link>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 px-4 py-5 md:px-6 md:py-6">{children}</main>
+      </div>
     </div>
   );
 }
 
 export function AuthShell({ title, subtitle, children, footer }: { title: string; subtitle: string; children: React.ReactNode; footer?: React.ReactNode }) {
-  return <div className="sectionhub-dot-grid flex min-h-screen items-center justify-center px-4 py-10"><Card className="w-full max-w-[420px] rounded-[16px] p-10"><div className="mb-8 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[var(--primary)] text-white"><Icon name="grid" className="h-5 w-5" /></div><div><div className="text-[18px] font-semibold tracking-[-0.02em]">SectionHub</div><div className="text-[12px] text-[var(--text-tertiary)]">Restricted access · Admin only</div></div></div><div className="mb-6 space-y-1"><h1 className="text-[24px] font-semibold tracking-[-0.03em]">{title}</h1><p className="text-[14px] text-[var(--text-secondary)]">{subtitle}</p></div>{children}<div className="mt-8 text-center text-[11px] text-[var(--text-tertiary)]">{footer ?? "SectionHub v1.0 · Internal use only © 2026"}</div></Card></div>;
+  return (
+    <div className="sectionhub-dot-grid flex min-h-screen items-center justify-center px-4 py-8 sm:py-10">
+      <Card className="w-full max-w-[420px] rounded-[16px] p-6 sm:p-10">
+        <div className="mb-8 flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[var(--primary)] text-white"><Icon name="grid" className="h-5 w-5" /></div>
+          <div>
+            <div className="text-[18px] font-semibold tracking-[-0.02em]">SectionHub</div>
+            <div className="text-[12px] text-[var(--text-tertiary)]">Restricted access Ã‚Â· Admin only</div>
+          </div>
+        </div>
+        <div className="mb-6 space-y-1">
+          <h1 className="text-[22px] font-semibold tracking-[-0.03em] sm:text-[24px]">{title}</h1>
+          <p className="text-[14px] text-[var(--text-secondary)]">{subtitle}</p>
+        </div>
+        {children}
+        <div className="mt-8 text-center text-[11px] text-[var(--text-tertiary)]">{footer ?? "SectionHub v1.0 Ã‚Â· Internal use only Ã‚Â© 2026"}</div>
+      </Card>
+    </div>
+  );
 }

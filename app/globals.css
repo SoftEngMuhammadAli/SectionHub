@@ -54,6 +54,8 @@ body {
 
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+input::placeholder, textarea::placeholder { color: var(--text-tertiary); }
 
 .sectionhub-dot-grid {
   background-color: var(--app-bg);
@@ -84,3 +86,7 @@ button, input, textarea, select { font: inherit; }
 .sectionhub-textarea { min-height: 110px; resize: vertical; }
 .sectionhub-scrollbar::-webkit-scrollbar { width: 10px; height: 10px; }
 .sectionhub-scrollbar::-webkit-scrollbar-thumb { background: #d8dced; border-radius: 999px; }
+.sectionhub-mobile-list {
+  display: grid;
+  gap: 12px;
+}
