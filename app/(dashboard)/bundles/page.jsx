@@ -1,0 +1,63 @@
+import { saveBundleAction } from "@/app/actions";
+import { Card, SectionTitle } from "@/components/sectionhub/ui";
+import { getBundles } from "@/lib/sectionhub/bundles/service";
+import { getSections } from "@/lib/sectionhub/sections/service";
+export default async function BundlesPage() {
+    const [bundles, sections] = await Promise.all([getBundles(), getSections()]);
+    return (<div className="space-y-6">
+      <SectionTitle title="Bundles" subtitle="Dynamic bundle catalog with persistent sections and pricing."/>
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_360px]">
+        <div className="space-y-4">
+          {bundles.map((bundle) => (<Card key={bundle.id} className="p-5">
+              <div className="text-[15px] font-semibold">{bundle.name}</div>
+              <div className="mt-1 text-[13px] text-[var(--text-secondary)]">
+                {bundle.shortDescription}
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {bundle.sections.map((section) => (<span key={section} className="rounded-full bg-[var(--primary-light)] px-3 py-1 text-[11px] text-[var(--primary-light-text)]">
+                    {section}
+                  </span>))}
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3 text-[13px]">
+                <span className="font-mono">{bundle.price}</span>
+                <span>{bundle.status}</span>
+              </div>
+            </Card>))}
+        </div>
+        <form action={saveBundleAction}>
+          <Card className="p-5">
+            <div className="space-y-4">
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Name</span>
+                <input name="name" className="sectionhub-input"/>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Slug</span>
+                <input name="slug" className="sectionhub-input font-mono"/>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Price</span>
+                <input name="price" type="number" step="0.01" className="sectionhub-input"/>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Compare At</span>
+                <input name="compareAtPrice" type="number" step="0.01" className="sectionhub-input"/>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">
+                  Section IDs (comma separated)
+                </span>
+                <input name="sectionIds" defaultValue={sections
+            .slice(0, 3)
+            .map((item) => item.id)
+            .join(",")} className="sectionhub-input font-mono"/>
+              </label>
+              <button type="submit" className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white">
+                Save Bundle
+              </button>
+            </div>
+          </Card>
+        </form>
+      </div>
+    </div>);
+}
