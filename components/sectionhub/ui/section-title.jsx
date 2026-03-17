@@ -1,6 +1,11 @@
-export function SectionTitle({ title, subtitle }) {
-    return (<div className="space-y-1">
-      <h1 className="text-[20px] font-semibold tracking-[-0.02em] text-[var(--text-primary)] sm:text-[24px]">{title}</h1>
-      {subtitle ? <p className="text-[13px] text-[var(--text-secondary)] sm:text-[14px]">{subtitle}</p> : null}
-    </div>);
+import React from "react";
+import { cn } from "@/lib/utils";
+
+export function SectionTitle({ title, subtitle, className }) {
+  return (
+    <div className={cn("space-y-1", className)}>
+      <h1 className="sh-page-title">{title}</h1>
+      {subtitle ? <p className="text-[14px] text-[var(--text-secondary)]">{subtitle}</p> : null}
+    </div>
+  );
 }

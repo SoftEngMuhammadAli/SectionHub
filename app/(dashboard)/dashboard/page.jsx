@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Badge, Card, SectionTitle } from "@/components/sectionhub/ui";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { SectionTitle } from "@/components/sectionhub/ui/section-title";
 import { getDashboardData } from "@/lib/sectionhub/dashboard/service";
 export default async function DashboardPage() {
     const data = await getDashboardData();

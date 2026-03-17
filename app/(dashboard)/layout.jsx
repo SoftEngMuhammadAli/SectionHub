@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth/server";
-import { DashboardShell } from "@/components/sectionhub/layout";
+import { AppShell } from "@/components/shared/layout/app-shell";
 export default async function AdminLayout({ children, }) {
     await requireAdmin();
-    return <DashboardShell>{children}</DashboardShell>;
+    return <AppShell>{children}</AppShell>;
 }

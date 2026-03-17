@@ -1,5 +1,6 @@
 import { saveSectionAction } from "@/app/actions";
-import { Card, SectionTitle } from "@/components/sectionhub/ui";
+import { Card } from "@/components/ui/card";
+import { SectionTitle } from "@/components/sectionhub/ui/section-title";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getTags } from "@/lib/sectionhub/tags/service";
 export default async function NewSectionPage() {

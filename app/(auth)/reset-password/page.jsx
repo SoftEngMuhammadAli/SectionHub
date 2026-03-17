@@ -1,4 +1,4 @@
-import { AuthShell } from "@/components/sectionhub/layout";
+import { AuthShell } from "@/components/shared/layout/auth-shell";
 import { resetPasswordAction } from "@/app/actions";
 export default async function ResetPasswordPage({ searchParams, }) {
     const params = await searchParams;

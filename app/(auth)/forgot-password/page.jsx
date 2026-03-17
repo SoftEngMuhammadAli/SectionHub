@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AuthShell } from "@/components/sectionhub/layout";
+import { AuthShell } from "@/components/shared/layout/auth-shell";
 import { forgotPasswordAction } from "@/app/actions";
 export default async function ForgotPasswordPage({ searchParams }) {
     const params = await searchParams;

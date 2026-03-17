@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Card, SectionTitle } from "@/components/sectionhub/ui";
+import { Card } from "@/components/ui/card";
+import { SectionTitle } from "@/components/sectionhub/ui/section-title";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getSections } from "@/lib/sectionhub/sections/service";
 import { getTags } from "@/lib/sectionhub/tags/service";
