@@ -68,10 +68,15 @@ export default async function DashboardPage() {
       <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
         <div className="space-y-4">
           <Card className="p-4 sm:p-5">
-            <div className="mb-4 text-[15px] font-semibold">Installs this week</div>
+            <div className="mb-4 text-[15px] font-semibold">
+              Installs this week
+            </div>
             <div className="grid h-[180px] grid-cols-7 items-end gap-2 sm:h-[220px] sm:gap-3">
               {data.installsByDay.map((item) => (
-                <div key={item.label} className="flex flex-col items-center gap-2 sm:gap-3">
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center gap-2 sm:gap-3"
+                >
                   <div
                     className="w-full rounded-t-[8px] bg-[var(--color-primary-light)]"
                     style={{ height: `${item.value * 1.4}px` }}
@@ -86,10 +91,15 @@ export default async function DashboardPage() {
 
           <div className="grid gap-4 xl:grid-cols-2">
             <Card className="p-4 sm:p-5">
-              <div className="mb-4 text-[15px] font-semibold">Top sections by installs</div>
+              <div className="mb-4 text-[15px] font-semibold">
+                Top sections by installs
+              </div>
               <div className="space-y-4">
                 {data.topSections.map((item, index) => (
-                  <div key={item.slug} className="flex items-center justify-between gap-3">
+                  <div
+                    key={item.slug}
+                    className="flex items-center justify-between gap-3"
+                  >
                     <div className="min-w-0">
                       <div className="truncate text-[13px] font-medium">
                         {index + 1}. {item.name}
@@ -107,12 +117,19 @@ export default async function DashboardPage() {
             </Card>
 
             <Card className="p-4 sm:p-5">
-              <div className="mb-4 text-[15px] font-semibold">Latest uploaded sections</div>
+              <div className="mb-4 text-[15px] font-semibold">
+                Latest uploaded sections
+              </div>
               <div className="space-y-4">
                 {data.recentSections.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between gap-3">
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between gap-3"
+                  >
                     <div className="min-w-0">
-                      <div className="truncate text-[13px] font-medium">{item.name}</div>
+                      <div className="truncate text-[13px] font-medium">
+                        {item.name}
+                      </div>
                       <div className="truncate font-mono text-[11px] text-[var(--text-tertiary)]">
                         {item.version}
                       </div>
@@ -136,17 +153,25 @@ export default async function DashboardPage() {
 
         <div className="space-y-4">
           <Card className="p-4 sm:p-5">
-            <div className="mb-4 text-[15px] font-semibold">Recent activity</div>
+            <div className="mb-4 text-[15px] font-semibold">
+              Recent activity
+            </div>
             <div className="space-y-4">
               {data.activity.map((item, index) => (
                 <div
                   key={`${item.actor}-${item.target}-${item.time}-${index}`}
                   className="text-[13px] text-[var(--text-secondary)]"
                 >
-                  <span className="font-medium text-[var(--text-primary)]">{item.actor}</span>{" "}
+                  <span className="font-medium text-[var(--text-primary)]">
+                    {item.actor}
+                  </span>{" "}
                   {item.action}{" "}
-                  <span className="font-medium text-[var(--text-primary)]">{item.target}</span>
-                  <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">{item.time}</div>
+                  <span className="font-medium text-[var(--text-primary)]">
+                    {item.target}
+                  </span>
+                  <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
+                    {item.time}
+                  </div>
                 </div>
               ))}
             </div>
@@ -166,7 +191,10 @@ export default async function DashboardPage() {
             <div className="mb-4 text-[15px] font-semibold">Top categories</div>
             <div className="space-y-3">
               {data.categories.map((item) => (
-                <div key={item.name} className="flex items-center justify-between text-[13px]">
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between text-[13px]"
+                >
                   <span>{item.name}</span>
                   <span className="font-mono">{item.count}</span>
                 </div>

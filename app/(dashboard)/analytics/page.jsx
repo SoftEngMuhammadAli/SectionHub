@@ -2,10 +2,14 @@ import { Card, SectionTitle } from "@/components/sectionhub/ui";
 import { getAnalyticsData } from "@/lib/sectionhub/analytics/service";
 import { formatPrice } from "@/lib/sectionhub/shared/format";
 export default async function AnalyticsPage() {
-    const data = await getAnalyticsData();
-    return (<div className="space-y-6">
+  const data = await getAnalyticsData();
+  return (
+    <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <SectionTitle title="Analytics" subtitle="Database-backed install, revenue, category, bundle, and customer performance."/>
+        <SectionTitle
+          title="Analytics"
+          subtitle="Database-backed install, revenue, category, bundle, and customer performance."
+        />
         <div className="font-mono text-[13px] text-[var(--text-secondary)]">
           Revenue {formatPrice(data.revenue)}
         </div>
@@ -46,21 +50,32 @@ export default async function AnalyticsPage() {
         <Card className="p-5">
           <div className="mb-4 text-[15px] font-semibold">Sections</div>
           <div className="space-y-3">
-            {data.sections.slice(0, 6).map((item) => (<div key={item.id} className="flex items-center justify-between text-[13px]">
+            {data.sections.slice(0, 6).map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between text-[13px]"
+              >
                 <span>{item.name}</span>
                 <span className="font-mono">{item.installs}</span>
-              </div>))}
+              </div>
+            ))}
           </div>
         </Card>
         <Card className="p-5">
           <div className="mb-4 text-[15px] font-semibold">Bundles</div>
           <div className="space-y-3">
-            {data.bundles.map((item) => (<div key={item.id} className="flex items-center justify-between text-[13px]">
+            {data.bundles.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between text-[13px]"
+              >
                 <span>{item.name}</span>
                 <span className="font-mono">{item.price}</span>
-              </div>))}
+              </div>
+            ))}
           </div>
         </Card>
       </div>
-    </div>);
+    </div>
+  );
 }

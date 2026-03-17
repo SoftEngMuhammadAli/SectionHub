@@ -1,400 +1,547 @@
 "use server";
+import crypto from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getCurrentUser, issuePasswordReset, loginWithPassword, logout, resetPassword, } from "@/lib/auth/server";
+import {
+  getCurrentUser,
+  issuePasswordReset,
+  loginWithPassword,
+  logout,
+  resetPassword,
+} from "@/lib/auth/server";
 import { createActivityLog } from "@/lib/sectionhub/activity/service";
-import { upsertBundle } from "@/lib/sectionhub/bundles/service";
+import {
+  setBundleStatus,
+  upsertBundle,
+} from "@/lib/sectionhub/bundles/service";
 import { upsertCategory } from "@/lib/sectionhub/categories/service";
-import { createOrUpdateSection, publishSection, } from "@/lib/sectionhub/sections/service";
-import { createApiCredential, createTeamMember, regenerateApiCredentialSecret, runDatabaseMaintenance, toggleTeamMemberStatus, updateAdvancedSettings, updateNotificationSettings, updateSettings, } from "@/lib/sectionhub/settings/service";
+import {
+  createOrUpdateSection,
+  deleteSection,
+  publishSection,
+} from "@/lib/sectionhub/sections/service";
+import {
+  createApiCredential,
+  createTeamMember,
+  regenerateApiCredentialSecret,
+  runDatabaseMaintenance,
+  toggleTeamMemberStatus,
+  updateAdvancedSettings,
+  updateNotificationSettings,
+  updateSettings,
+} from "@/lib/sectionhub/settings/service";
 import { upsertTag } from "@/lib/sectionhub/tags/service";
 function asBool(value) {
-    return value === "on" || value === "true";
+  return value === "on" || value === "true";
+}
+
+const MAX_LOGO_SIZE_BYTES = 2 * 1024 * 1024;
+const ALLOWED_LOGO_EXTENSIONS = new Set([
+  ".svg",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+]);
+
+function sanitizeFileName(name) {
+  return String(name ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60);
+}
+
+async function persistSiteLogo(file) {
+  if (!file || typeof file === "string" || file.size <= 0) {
+    return "";
+  }
+
+  const extension = path.extname(file.name ?? "").toLowerCase();
+  if (!ALLOWED_LOGO_EXTENSIONS.has(extension)) {
+    throw new Error("Invalid logo format. Upload SVG, PNG, JPG, or WEBP.");
+  }
+
+  if (file.size > MAX_LOGO_SIZE_BYTES) {
+    throw new Error("Logo file is too large. Maximum size is 2MB.");
+  }
+
+  const baseName =
+    sanitizeFileName(path.basename(file.name, extension)) || "site-logo";
+  const fileName = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}-${baseName}${extension}`;
+  const uploadDirectory = path.join(process.cwd(), "public", "uploads");
+  const filePath = path.join(uploadDirectory, fileName);
+  const bytes = Buffer.from(await file.arrayBuffer());
+
+  await mkdir(uploadDirectory, { recursive: true });
+  await writeFile(filePath, bytes);
+
+  return `/uploads/${fileName}`;
 }
 export async function loginAction(formData) {
-    const email = String(formData.get("email") ?? "").trim();
-    const password = String(formData.get("password") ?? "");
-    const result = await loginWithPassword(email, password);
-    if (!result.ok)
-        redirect(`/login?error=${encodeURIComponent(result.error)}`);
-    redirect("/dashboard");
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const result = await loginWithPassword(email, password);
+  if (!result.ok) redirect(`/login?error=${encodeURIComponent(result.error)}`);
+  redirect("/dashboard");
 }
 export async function loginActionState(_, formData) {
-    const email = String(formData.get("email") ?? "").trim();
-    const password = String(formData.get("password") ?? "");
-    const result = await loginWithPassword(email, password);
-    if (!result.ok) {
-        return { error: result.error };
-    }
-    redirect("/dashboard");
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const result = await loginWithPassword(email, password);
+  if (!result.ok) {
+    return { error: result.error };
+  }
+  redirect("/dashboard");
 }
 export async function logoutAction() {
-    await logout();
-    redirect("/login");
+  await logout();
+  redirect("/login");
 }
 export async function forgotPasswordAction(formData) {
-    const email = String(formData.get("email") ?? "").trim();
-    const result = await issuePasswordReset(email);
-    redirect(`/forgot-password?sent=1${result.token ? `&token=${result.token}` : ""}`);
+  const email = String(formData.get("email") ?? "").trim();
+  const result = await issuePasswordReset(email);
+  redirect(
+    `/forgot-password?sent=1${result.token ? `&token=${result.token}` : ""}`,
+  );
 }
 export async function resetPasswordAction(formData) {
-    const token = String(formData.get("token") ?? "");
-    const password = String(formData.get("password") ?? "");
-    const confirmPassword = String(formData.get("confirmPassword") ?? "");
-    if (password.length < 8 || password !== confirmPassword)
-        redirect("/reset-password?error=Password+validation+failed");
-    const result = await resetPassword(token, password);
-    if (!result.ok)
-        redirect(`/reset-password?error=${encodeURIComponent(result.error)}`);
-    redirect("/reset-password?success=1");
+  const token = String(formData.get("token") ?? "");
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+  if (password.length < 8 || password !== confirmPassword)
+    redirect("/reset-password?error=Password+validation+failed");
+  const result = await resetPassword(token, password);
+  if (!result.ok)
+    redirect(`/reset-password?error=${encodeURIComponent(result.error)}`);
+  redirect("/reset-password?success=1");
 }
 export async function saveCategoryAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    const category = await upsertCategory({
-        id: String(formData.get("id") || "") || undefined,
-        name: String(formData.get("name") || ""),
-        slug: String(formData.get("slug") || ""),
-        description: String(formData.get("description") || ""),
-        icon: String(formData.get("icon") || "LayoutGrid"),
-        sortOrder: Number(formData.get("sortOrder") || 0),
-        visibility: String(formData.get("visibility") || "MARKETPLACE"),
-        featured: asBool(formData.get("featured")),
-        status: String(formData.get("status") || "Active"),
-    });
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: category?.createdAt?.getTime?.() === category?.updatedAt?.getTime?.()
-            ? "created"
-            : "updated",
-        entityType: "category",
-        entityId: String(category?._id),
-        entityLabel: category?.name ?? "Category",
-    });
-    revalidatePath("/categories");
-    redirect("/categories?saved=1");
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const category = await upsertCategory({
+    id: String(formData.get("id") || "") || undefined,
+    name: String(formData.get("name") || ""),
+    slug: String(formData.get("slug") || ""),
+    description: String(formData.get("description") || ""),
+    icon: String(formData.get("icon") || "LayoutGrid"),
+    sortOrder: Number(formData.get("sortOrder") || 0),
+    visibility: String(formData.get("visibility") || "MARKETPLACE"),
+    featured: asBool(formData.get("featured")),
+    status: String(formData.get("status") || "Active"),
+  });
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action:
+      category?.createdAt?.getTime?.() === category?.updatedAt?.getTime?.()
+        ? "created"
+        : "updated",
+    entityType: "category",
+    entityId: String(category?._id),
+    entityLabel: category?.name ?? "Category",
+  });
+  revalidatePath("/categories");
+  redirect("/categories?saved=1");
 }
 export async function saveTagAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    const tag = await upsertTag({
-        id: String(formData.get("id") || "") || undefined,
-        name: String(formData.get("name") || ""),
-        slug: String(formData.get("slug") || ""),
-        color: String(formData.get("color") || "violet"),
-    });
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "saved",
-        entityType: "tag",
-        entityId: String(tag?._id),
-        entityLabel: tag?.name ?? "Tag",
-    });
-    revalidatePath("/tags");
-    redirect("/tags?saved=1");
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const tag = await upsertTag({
+    id: String(formData.get("id") || "") || undefined,
+    name: String(formData.get("name") || ""),
+    slug: String(formData.get("slug") || ""),
+    color: String(formData.get("color") || "violet"),
+  });
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action: "saved",
+    entityType: "tag",
+    entityId: String(tag?._id),
+    entityLabel: tag?.name ?? "Tag",
+  });
+  revalidatePath("/tags");
+  redirect("/tags?saved=1");
 }
 export async function saveBundleAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    const sectionIds = String(formData.get("sectionIds") || "")
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean);
-    const bundle = await upsertBundle({
-        id: String(formData.get("id") || "") || undefined,
-        name: String(formData.get("name") || ""),
-        slug: String(formData.get("slug") || ""),
-        shortDescription: String(formData.get("shortDescription") || ""),
-        niche: String(formData.get("niche") || ""),
-        accessType: String(formData.get("accessType") || "BUNDLE"),
-        visibility: String(formData.get("visibility") || "MARKETPLACE"),
-        status: String(formData.get("status") || "DRAFT"),
-        priceCents: Math.round(Number(formData.get("price") || 0) * 100),
-        compareAtPriceCents: Math.round(Number(formData.get("compareAtPrice") || 0) * 100),
-        sectionIds,
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const sectionIds = String(formData.get("sectionIds") || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const bundle = await upsertBundle({
+    id: String(formData.get("id") || "") || undefined,
+    name: String(formData.get("name") || ""),
+    slug: String(formData.get("slug") || ""),
+    shortDescription: String(formData.get("shortDescription") || ""),
+    niche: String(formData.get("niche") || ""),
+    accessType: String(formData.get("accessType") || "BUNDLE"),
+    visibility: String(formData.get("visibility") || "MARKETPLACE"),
+    status: String(formData.get("status") || "DRAFT"),
+    priceCents: Math.round(Number(formData.get("price") || 0) * 100),
+    compareAtPriceCents: Math.round(
+      Number(formData.get("compareAtPrice") || 0) * 100,
+    ),
+    sectionIds,
+  });
+  if (bundle)
+    await createActivityLog({
+      actorId: String(user._id),
+      actorName: user.name,
+      action: "saved",
+      entityType: "bundle",
+      entityId: String(bundle._id),
+      entityLabel: bundle.name,
     });
-    if (bundle)
-        await createActivityLog({
-            actorId: String(user._id),
-            actorName: user.name,
-            action: "saved",
-            entityType: "bundle",
-            entityId: String(bundle._id),
-            entityLabel: bundle.name,
-        });
+  revalidatePath("/bundles");
+  redirect("/bundles?saved=1");
+}
+
+export async function setBundleStatusAction(formData) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
+  const id = String(formData.get("id") || "");
+  const status = String(formData.get("status") || "DRAFT");
+
+  if (!id) {
+    redirect("/bundles?error=Bundle+id+is+required");
+  }
+
+  try {
+    const bundle = await setBundleStatus(id, status);
+    await createActivityLog({
+      actorId: String(user._id),
+      actorName: user.name,
+      action: status === "ACTIVE" ? "published" : "updated",
+      entityType: "bundle",
+      entityId: String(bundle._id),
+      entityLabel: bundle.name,
+      metadata: { status },
+    });
     revalidatePath("/bundles");
     redirect("/bundles?saved=1");
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to update bundle status.";
+    redirect(`/bundles?error=${encodeURIComponent(message)}`);
+  }
 }
 export async function saveSettingsAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    await updateSettings({
-        siteName: String(formData.get("siteName") || "SectionHub Enterprise"),
-        defaultCurrency: String(formData.get("defaultCurrency") || "USD"),
-        maintenanceMode: asBool(formData.get("maintenanceMode")),
-        siteLogo: String(formData.get("siteLogo") || ""),
-        updatedById: String(user._id),
-    });
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "updated",
-        entityType: "setting",
-        entityId: "global",
-        entityLabel: "System Settings",
-    });
-    revalidatePath("/settings");
-    redirect("/settings?tab=general&saved=1");
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
+  let siteLogo = String(formData.get("siteLogo") || "");
+  const siteLogoFile = formData.get("siteLogoFile");
+
+  if (
+    siteLogoFile &&
+    typeof siteLogoFile !== "string" &&
+    siteLogoFile.size > 0
+  ) {
+    try {
+      siteLogo = await persistSiteLogo(siteLogoFile);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to upload site logo.";
+      redirect(`/settings?tab=general&error=${encodeURIComponent(message)}`);
+    }
+  }
+
+  await updateSettings({
+    siteName: String(formData.get("siteName") || "SectionHub Enterprise"),
+    defaultCurrency: String(formData.get("defaultCurrency") || "USD"),
+    maintenanceMode: asBool(formData.get("maintenanceMode")),
+    siteLogo,
+    updatedById: String(user._id),
+  });
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action: "updated",
+    entityType: "setting",
+    entityId: "global",
+    entityLabel: "System Settings",
+  });
+  revalidatePath("/settings");
+  redirect("/settings?tab=general&saved=1");
 }
 export async function saveNotificationSettingsAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    await updateNotificationSettings({
-        emailCritical: asBool(formData.get("emailCritical")),
-        emailDigest: asBool(formData.get("emailDigest")),
-        slackEnabled: asBool(formData.get("slackEnabled")),
-        productAlerts: asBool(formData.get("productAlerts")),
-        updatedById: String(user._id),
-    });
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "updated",
-        entityType: "setting",
-        entityId: "notifications",
-        entityLabel: "Notification Settings",
-    });
-    revalidatePath("/settings");
-    redirect("/settings?tab=notifications&saved=1");
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  await updateNotificationSettings({
+    emailCritical: asBool(formData.get("emailCritical")),
+    emailDigest: asBool(formData.get("emailDigest")),
+    slackEnabled: asBool(formData.get("slackEnabled")),
+    productAlerts: asBool(formData.get("productAlerts")),
+    updatedById: String(user._id),
+  });
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action: "updated",
+    entityType: "setting",
+    entityId: "notifications",
+    entityLabel: "Notification Settings",
+  });
+  revalidatePath("/settings");
+  redirect("/settings?tab=notifications&saved=1");
 }
 export async function saveAdvancedSettingsAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    await updateAdvancedSettings({
-        strictMode: asBool(formData.get("strictMode")),
-        allowPublicApiDocs: asBool(formData.get("allowPublicApiDocs")),
-        auditRetentionDays: Number(formData.get("auditRetentionDays") || 90),
-        updatedById: String(user._id),
-    });
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "updated",
-        entityType: "setting",
-        entityId: "advanced",
-        entityLabel: "Advanced Settings",
-    });
-    revalidatePath("/settings");
-    redirect("/settings?tab=advanced&saved=1");
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  await updateAdvancedSettings({
+    strictMode: asBool(formData.get("strictMode")),
+    allowPublicApiDocs: asBool(formData.get("allowPublicApiDocs")),
+    auditRetentionDays: Number(formData.get("auditRetentionDays") || 90),
+    updatedById: String(user._id),
+  });
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action: "updated",
+    entityType: "setting",
+    entityId: "advanced",
+    entityLabel: "Advanced Settings",
+  });
+  revalidatePath("/settings");
+  redirect("/settings?tab=advanced&saved=1");
 }
 export async function addTeamMemberAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    try {
-        const member = await createTeamMember({
-            name: String(formData.get("name") || ""),
-            email: String(formData.get("email") || ""),
-            role: String(formData.get("role") || "EDITOR"),
-        });
-        await createActivityLog({
-            actorId: String(user._id),
-            actorName: user.name,
-            action: "invited",
-            entityType: "team_member",
-            entityId: String(member.id),
-            entityLabel: member.email,
-            metadata: { role: member.role },
-        });
-        revalidatePath("/settings");
-        redirect(`/settings?tab=team&memberAdded=1&memberEmail=${encodeURIComponent(member.email)}`);
-    }
-    catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to add team member.";
-        redirect(`/settings?tab=team&error=${encodeURIComponent(message)}`);
-    }
-}
-export async function toggleTeamMemberStatusAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    try {
-        const member = await toggleTeamMemberStatus({
-            id: String(formData.get("id") || ""),
-            isActive: asBool(formData.get("isActive")),
-        });
-        await createActivityLog({
-            actorId: String(user._id),
-            actorName: user.name,
-            action: member.isActive ? "activated" : "deactivated",
-            entityType: "team_member",
-            entityId: member.id,
-            entityLabel: member.email,
-        });
-        revalidatePath("/settings");
-        redirect("/settings?tab=team&memberUpdated=1");
-    }
-    catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to update member.";
-        redirect(`/settings?tab=team&error=${encodeURIComponent(message)}`);
-    }
-}
-export async function createApiCredentialAction() {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    try {
-        const credential = await createApiCredential({ updatedById: String(user._id) });
-        await createActivityLog({
-            actorId: String(user._id),
-            actorName: user.name,
-            action: "created",
-            entityType: "api_credential",
-            entityId: String(credential?.id ?? "api-key"),
-            entityLabel: "API Credential",
-            metadata: { clientId: credential?.clientId ?? "" },
-        });
-        revalidatePath("/settings");
-        redirect("/settings?tab=api-keys&keyCreated=1");
-    }
-    catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to create API key.";
-        redirect(`/settings?tab=api-keys&error=${encodeURIComponent(message)}`);
-    }
-}
-export async function regenerateApiCredentialAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    const id = String(formData.get("id") || "");
-    if (!id)
-        redirect("/settings");
-    try {
-        const credential = await regenerateApiCredentialSecret(id);
-        await createActivityLog({
-            actorId: String(user._id),
-            actorName: user.name,
-            action: "regenerated",
-            entityType: "api_credential",
-            entityId: id,
-            entityLabel: "API Credential",
-            metadata: { clientId: credential.clientId },
-        });
-        revalidatePath("/settings");
-        redirect("/settings?tab=api-keys&keyRotated=1");
-    }
-    catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to rotate API key.";
-        redirect(`/settings?tab=api-keys&error=${encodeURIComponent(message)}`);
-    }
-}
-export async function runDatabaseMaintenanceAction() {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    const result = await runDatabaseMaintenance();
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  try {
+    const member = await createTeamMember({
+      name: String(formData.get("name") || ""),
+      email: String(formData.get("email") || ""),
+      role: String(formData.get("role") || "EDITOR"),
+    });
     await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "optimized",
-        entityType: "database",
-        entityId: "maintenance",
-        entityLabel: "Database Maintenance",
-        metadata: result,
+      actorId: String(user._id),
+      actorName: user.name,
+      action: "invited",
+      entityType: "team_member",
+      entityId: String(member.id),
+      entityLabel: member.email,
+      metadata: { role: member.role },
     });
     revalidatePath("/settings");
-    redirect("/settings?tab=advanced&maintenanceRun=1");
+    redirect(
+      `/settings?tab=team&memberAdded=1&memberEmail=${encodeURIComponent(member.email)}`,
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to add team member.";
+    redirect(`/settings?tab=team&error=${encodeURIComponent(message)}`);
+  }
+}
+export async function toggleTeamMemberStatusAction(formData) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  try {
+    const member = await toggleTeamMemberStatus({
+      id: String(formData.get("id") || ""),
+      isActive: asBool(formData.get("isActive")),
+    });
+    await createActivityLog({
+      actorId: String(user._id),
+      actorName: user.name,
+      action: member.isActive ? "activated" : "deactivated",
+      entityType: "team_member",
+      entityId: member.id,
+      entityLabel: member.email,
+    });
+    revalidatePath("/settings");
+    redirect("/settings?tab=team&memberUpdated=1");
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update member.";
+    redirect(`/settings?tab=team&error=${encodeURIComponent(message)}`);
+  }
+}
+export async function createApiCredentialAction() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  try {
+    const credential = await createApiCredential({
+      updatedById: String(user._id),
+    });
+    await createActivityLog({
+      actorId: String(user._id),
+      actorName: user.name,
+      action: "created",
+      entityType: "api_credential",
+      entityId: String(credential?.id ?? "api-key"),
+      entityLabel: "API Credential",
+      metadata: { clientId: credential?.clientId ?? "" },
+    });
+    revalidatePath("/settings");
+    redirect("/settings?tab=api-keys&keyCreated=1");
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to create API key.";
+    redirect(`/settings?tab=api-keys&error=${encodeURIComponent(message)}`);
+  }
+}
+export async function regenerateApiCredentialAction(formData) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) redirect("/settings");
+  try {
+    const credential = await regenerateApiCredentialSecret(id);
+    await createActivityLog({
+      actorId: String(user._id),
+      actorName: user.name,
+      action: "regenerated",
+      entityType: "api_credential",
+      entityId: id,
+      entityLabel: "API Credential",
+      metadata: { clientId: credential.clientId },
+    });
+    revalidatePath("/settings");
+    redirect("/settings?tab=api-keys&keyRotated=1");
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to rotate API key.";
+    redirect(`/settings?tab=api-keys&error=${encodeURIComponent(message)}`);
+  }
+}
+export async function runDatabaseMaintenanceAction() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const result = await runDatabaseMaintenance();
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action: "optimized",
+    entityType: "database",
+    entityId: "maintenance",
+    entityLabel: "Database Maintenance",
+    metadata: result,
+  });
+  revalidatePath("/settings");
+  redirect("/settings?tab=advanced&maintenanceRun=1");
 }
 export async function saveSectionAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    const id = String(formData.get("id") || "") || undefined;
-    const tagIds = String(formData.get("tagIds") || "")
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean);
-    const previewUrl = String(formData.get("previewUrl") || "").trim();
-    const section = await createOrUpdateSection({
-        id,
-        name: String(formData.get("name") || ""),
-        slug: String(formData.get("slug") || ""),
-        shortDescription: String(formData.get("shortDescription") || ""),
-        fullDescription: String(formData.get("fullDescription") || ""),
-        categoryId: String(formData.get("categoryId") || "") || null,
-        subcategory: String(formData.get("subcategory") || ""),
-        status: String(formData.get("status") || "DRAFT"),
-        visibility: String(formData.get("visibility") || "INTERNAL"),
-        featured: asBool(formData.get("featured")),
-        pricingType: String(formData.get("pricingType") || "PAID"),
-        priceCents: Math.round(Number(formData.get("price") || 0) * 100),
-        compareAtPriceCents: Math.round(Number(formData.get("compareAtPrice") || 0) * 100) || null,
-        accessType: String(formData.get("accessType") || "SINGLE"),
-        licenseType: String(formData.get("licenseType") || "SINGLE_STORE"),
-        authorId: String(user._id),
-        version: String(formData.get("version") || "v1.0.0"),
-        changelog: String(formData.get("changelog") || ""),
-        metaTitle: String(formData.get("metaTitle") || ""),
-        metaDescription: String(formData.get("metaDescription") || ""),
-        internalKeywords: String(formData.get("internalKeywords") || ""),
-        marketplaceSubtitle: String(formData.get("marketplaceSubtitle") || ""),
-        calloutBadgeText: String(formData.get("calloutBadgeText") || ""),
-        installationSteps: String(formData.get("installationSteps") || ""),
-        usageNotes: String(formData.get("usageNotes") || ""),
-        merchantInstructions: String(formData.get("merchantInstructions") || ""),
-        supportNotes: String(formData.get("supportNotes") || ""),
-        compatibilityTheme: String(formData.get("compatibilityTheme") || ""),
-        os20Compatible: asBool(formData.get("os20Compatible")),
-        appBlockSupport: asBool(formData.get("appBlockSupport")),
-        dependencies: String(formData.get("dependencies") || ""),
-        testedEnvironments: String(formData.get("testedEnvironments") || ""),
-        tagIds,
-        previews: previewUrl
-            ? [
-                {
-                    type: "IMAGE",
-                    url: previewUrl,
-                    title: String(formData.get("name") || "Preview"),
-                    altText: String(formData.get("name") || "Preview"),
-                    isThumbnail: true,
-                    sortOrder: 1,
-                },
-            ]
-            : [],
-    });
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: id ? "updated" : "created",
-        entityType: "section",
-        entityId: String(section?._id),
-        entityLabel: section?.name ?? "Section",
-    });
-    revalidatePath("/sections");
-    redirect(`/sections/${section?._id}/edit?saved=1`);
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "") || undefined;
+  const tagIds = String(formData.get("tagIds") || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const previewUrl = String(formData.get("previewUrl") || "").trim();
+  const section = await createOrUpdateSection({
+    id,
+    name: String(formData.get("name") || ""),
+    slug: String(formData.get("slug") || ""),
+    shortDescription: String(formData.get("shortDescription") || ""),
+    fullDescription: String(formData.get("fullDescription") || ""),
+    categoryId: String(formData.get("categoryId") || "") || null,
+    subcategory: String(formData.get("subcategory") || ""),
+    status: String(formData.get("status") || "DRAFT"),
+    visibility: String(formData.get("visibility") || "INTERNAL"),
+    featured: asBool(formData.get("featured")),
+    pricingType: String(formData.get("pricingType") || "PAID"),
+    priceCents: Math.round(Number(formData.get("price") || 0) * 100),
+    compareAtPriceCents:
+      Math.round(Number(formData.get("compareAtPrice") || 0) * 100) || null,
+    accessType: String(formData.get("accessType") || "SINGLE"),
+    licenseType: String(formData.get("licenseType") || "SINGLE_STORE"),
+    authorId: String(user._id),
+    version: String(formData.get("version") || "v1.0.0"),
+    changelog: String(formData.get("changelog") || ""),
+    metaTitle: String(formData.get("metaTitle") || ""),
+    metaDescription: String(formData.get("metaDescription") || ""),
+    internalKeywords: String(formData.get("internalKeywords") || ""),
+    marketplaceSubtitle: String(formData.get("marketplaceSubtitle") || ""),
+    calloutBadgeText: String(formData.get("calloutBadgeText") || ""),
+    installationSteps: String(formData.get("installationSteps") || ""),
+    usageNotes: String(formData.get("usageNotes") || ""),
+    merchantInstructions: String(formData.get("merchantInstructions") || ""),
+    supportNotes: String(formData.get("supportNotes") || ""),
+    compatibilityTheme: String(formData.get("compatibilityTheme") || ""),
+    os20Compatible: asBool(formData.get("os20Compatible")),
+    appBlockSupport: asBool(formData.get("appBlockSupport")),
+    dependencies: String(formData.get("dependencies") || ""),
+    testedEnvironments: String(formData.get("testedEnvironments") || ""),
+    tagIds,
+    previews: previewUrl
+      ? [
+          {
+            type: "IMAGE",
+            url: previewUrl,
+            title: String(formData.get("name") || "Preview"),
+            altText: String(formData.get("name") || "Preview"),
+            isThumbnail: true,
+            sortOrder: 1,
+          },
+        ]
+      : [],
+  });
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action: id ? "updated" : "created",
+    entityType: "section",
+    entityId: String(section?._id),
+    entityLabel: section?.name ?? "Section",
+  });
+  revalidatePath("/sections");
+  redirect(`/sections/${section?._id}/edit?saved=1`);
 }
-export async function publishSectionAction(formData) {
-    const user = await getCurrentUser();
-    if (!user)
-        redirect("/login");
-    const id = String(formData.get("id") || "");
-    const section = await publishSection(id);
+
+export async function deleteSectionAction(formData) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
+  const id = String(formData.get("id") || "");
+  if (!id) {
+    redirect("/sections?error=Section+id+is+required");
+  }
+
+  try {
+    const section = await deleteSection(id);
     await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "published",
-        entityType: "section",
-        entityId: String(section?._id),
-        entityLabel: section?.name ?? "Section",
+      actorId: String(user._id),
+      actorName: user.name,
+      action: "deleted",
+      entityType: "section",
+      entityId: String(section?._id),
+      entityLabel: section?.name ?? "Section",
     });
     revalidatePath("/sections");
-    redirect(`/sections/${section?._id}/edit?published=1`);
+    revalidatePath("/bundles");
+    revalidatePath("/analytics");
+    redirect("/sections?deleted=1");
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to delete section.";
+    redirect(`/sections?error=${encodeURIComponent(message)}`);
+  }
+}
+
+export async function publishSectionAction(formData) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  const section = await publishSection(id);
+  await createActivityLog({
+    actorId: String(user._id),
+    actorName: user.name,
+    action: "published",
+    entityType: "section",
+    entityId: String(section?._id),
+    entityLabel: section?.name ?? "Section",
+  });
+  revalidatePath("/sections");
+  redirect("/sections?published=1");
 }

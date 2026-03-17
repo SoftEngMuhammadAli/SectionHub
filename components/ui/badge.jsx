@@ -7,17 +7,23 @@ const Badge = React.forwardRef(
     ref,
   ) => {
     const toneClass = {
-      default: "border border-[var(--border-default)] bg-[var(--surface-soft)] text-[var(--text-secondary)]",
-      success: "border border-transparent bg-[var(--color-success-light)] text-[var(--color-success)]",
-      warning: "border border-transparent bg-[var(--color-warning-light)] text-[var(--color-warning)]",
-      danger: "border border-transparent bg-[var(--color-danger-light)] text-[var(--color-danger)]",
+      default:
+        "border border-[var(--border-default)] bg-[var(--surface-soft)] text-[var(--text-secondary)]",
+      success:
+        "border border-transparent bg-[var(--color-success-light)] text-[var(--color-success)]",
+      warning:
+        "border border-transparent bg-[var(--color-warning-light)] text-[var(--color-warning)]",
+      danger:
+        "border border-transparent bg-[var(--color-danger-light)] text-[var(--color-danger)]",
       info: "border border-transparent bg-[var(--color-info-light)] text-[var(--color-info)]",
-      violet: "border border-transparent bg-[var(--color-primary-light)] text-[var(--color-primary-text-light)]",
+      violet:
+        "border border-transparent bg-[var(--color-primary-light)] text-[var(--color-primary-text-light)]",
     };
 
     const variantClass = {
       default: "border border-transparent bg-[var(--color-primary)] text-white",
-      outline: "border border-[var(--border-strong)] text-[var(--text-primary)]",
+      outline:
+        "border border-[var(--border-strong)] text-[var(--text-primary)]",
       success: toneClass.success,
       warning: toneClass.warning,
       danger: toneClass.danger,

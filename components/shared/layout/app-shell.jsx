@@ -15,10 +15,14 @@ export function AppShell({ children }) {
   return (
     <div className="flex min-h-screen bg-[var(--background-app)] text-[var(--text-primary)] font-sans">
       <AppSidebar drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
-      
+
       <div className="flex min-w-0 flex-1 flex-col">
-        <AppHeader setDrawerOpen={setDrawerOpen} search={search} setSearch={setSearch} />
-        
+        <AppHeader
+          setDrawerOpen={setDrawerOpen}
+          search={search}
+          setSearch={setSearch}
+        />
+
         {/* Mobile search bar block */}
         <div className="border-b border-[var(--border-default)] bg-white px-4 py-3 md:hidden">
           <SearchBox

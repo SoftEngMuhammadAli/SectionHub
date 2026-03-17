@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap");
 
 @import "tailwindcss";
 
@@ -15,47 +15,47 @@
   --font-mono: "JetBrains Mono", monospace;
 
   /* Core surfaces */
-  --background-app: #F7F7FB;
-  --background-page: #FCFCFF;
-  --surface-card: #FFFFFF;
-  --surface-muted: #F3F2FF;
-  --surface-soft: #EFEFFF;
+  --background-app: #f7f7fb;
+  --background-page: #fcfcff;
+  --surface-card: #ffffff;
+  --surface-muted: #f3f2ff;
+  --surface-soft: #efefff;
 
   /* Brand */
-  --color-primary: #6D4CFF;
-  --color-primary-hover: #5838E8;
-  --color-primary-pressed: #472EC7;
-  --color-primary-light: #EEE9FF;
-  --color-primary-text-light: #4B32C3;
+  --color-primary: #6d4cff;
+  --color-primary-hover: #5838e8;
+  --color-primary-pressed: #472ec7;
+  --color-primary-light: #eee9ff;
+  --color-primary-text-light: #4b32c3;
 
   /* Sidebar */
-  --sidebar-bg: #0B1020;
-  --sidebar-hover: #12182B;
+  --sidebar-bg: #0b1020;
+  --sidebar-hover: #12182b;
   --sidebar-active-bg: rgba(109, 76, 255, 0.18);
-  --sidebar-active-border: #6D4CFF;
-  --sidebar-active-text: #FFFFFF;
-  --sidebar-text: #8E95B5;
-  --sidebar-section-label: #66708F;
+  --sidebar-active-border: #6d4cff;
+  --sidebar-active-text: #ffffff;
+  --sidebar-text: #8e95b5;
+  --sidebar-section-label: #66708f;
 
   /* Borders */
-  --border-default: #E6E8F2;
-  --border-strong: #D9DDF0;
+  --border-default: #e6e8f2;
+  --border-strong: #d9ddf0;
 
   /* Text */
-  --text-primary: #0E1324;
-  --text-secondary: #5F6785;
-  --text-tertiary: #8B91A8;
-  --text-faint: #A8AEC2;
+  --text-primary: #0e1324;
+  --text-secondary: #5f6785;
+  --text-tertiary: #8b91a8;
+  --text-faint: #a8aec2;
 
   /* Semantic */
-  --color-success: #16A34A;
-  --color-success-light: #DCFCE7;
-  --color-warning: #D97706;
-  --color-warning-light: #FEF3C7;
-  --color-danger: #DC2626;
-  --color-danger-light: #FEE2E2;
-  --color-info: #2563EB;
-  --color-info-light: #DBEAFE;
+  --color-success: #16a34a;
+  --color-success-light: #dcfce7;
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-light: #fee2e2;
+  --color-info: #2563eb;
+  --color-info-light: #dbeafe;
 
   /* Radius */
   --radius-card: 10px;
@@ -152,7 +152,9 @@ textarea::placeholder {
   padding: 10px 14px;
   outline: none;
   min-height: 44px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .sh-input:focus {
   border-color: var(--color-primary);
@@ -168,7 +170,9 @@ textarea::placeholder {
   padding: 10px 14px;
   outline: none;
   min-height: 44px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sectionhub-input:focus {
@@ -187,14 +191,18 @@ textarea::placeholder {
   color: var(--text-primary);
   padding: 10px 38px 10px 14px;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   background-image:
     linear-gradient(45deg, transparent 50%, var(--text-tertiary) 50%),
     linear-gradient(135deg, var(--text-tertiary) 50%, transparent 50%);
   background-position:
     calc(100% - 18px) calc(50% - 3px),
     calc(100% - 13px) calc(50% - 3px);
-  background-size: 5px 5px, 5px 5px;
+  background-size:
+    5px 5px,
+    5px 5px;
   background-repeat: no-repeat;
 }
 
@@ -215,7 +223,9 @@ textarea::placeholder {
   outline: none;
   min-height: 110px;
   resize: vertical;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sh-textarea:focus,

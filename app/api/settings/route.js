@@ -27,7 +27,8 @@ export async function PATCH(request) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to save settings.",
+        error:
+          error instanceof Error ? error.message : "Failed to save settings.",
       },
       { status: 400 },
     );
@@ -65,7 +66,8 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Settings operation failed.",
+        error:
+          error instanceof Error ? error.message : "Settings operation failed.",
       },
       { status: 400 },
     );

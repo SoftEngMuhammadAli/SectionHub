@@ -30,7 +30,7 @@ const TabsList = ({ className, children, activeTab, onTabChange }) => (
   <div
     className={cn(
       "inline-flex h-9 items-center justify-center rounded-[var(--radius-button)] bg-[var(--surface-soft)] p-1 text-[var(--text-secondary)]",
-      className
+      className,
     )}
   >
     {React.Children.map(children, (child) => {
@@ -64,7 +64,7 @@ const TabsTrigger = ({
         isActive
           ? "bg-[var(--surface-card)] text-[var(--text-primary)] shadow-[var(--shadow-soft)]"
           : "hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]",
-        className
+        className,
       )}
     >
       {children}
@@ -78,7 +78,7 @@ const TabsContent = ({ className, value, children, activeTab }) => {
     <div
       className={cn(
         "mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]",
-        className
+        className,
       )}
     >
       {children}

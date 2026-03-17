@@ -41,7 +41,9 @@ function SectionTitle({ title, description }) {
       <h2 className="text-[40px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
         {title}
       </h2>
-      <p className="mt-1 text-[15px] text-[var(--text-secondary)]">{description}</p>
+      <p className="mt-1 text-[15px] text-[var(--text-secondary)]">
+        {description}
+      </p>
     </div>
   );
 }
@@ -66,8 +68,12 @@ export default async function SettingsPage({ searchParams }) {
   return (
     <div className="space-y-8">
       {saved ? <Notice>Settings updated.</Notice> : null}
-      {keyCreated ? <Notice tone="info">New API credential created.</Notice> : null}
-      {keyRotated ? <Notice tone="info">Client secret regenerated.</Notice> : null}
+      {keyCreated ? (
+        <Notice tone="info">New API credential created.</Notice>
+      ) : null}
+      {keyRotated ? (
+        <Notice tone="info">Client secret regenerated.</Notice>
+      ) : null}
       {maintenanceRun ? (
         <Notice tone="info">Database maintenance completed.</Notice>
       ) : null}
@@ -76,7 +82,9 @@ export default async function SettingsPage({ searchParams }) {
           Team member added{memberEmail ? `: ${memberEmail}` : ""}.
         </Notice>
       ) : null}
-      {memberUpdated ? <Notice tone="info">Team member status updated.</Notice> : null}
+      {memberUpdated ? (
+        <Notice tone="info">Team member status updated.</Notice>
+      ) : null}
       {errorMessage ? (
         <div className="rounded-[10px] border border-[var(--danger)]/15 bg-[var(--danger-light)] px-4 py-3 text-[13px] text-[var(--danger)]">
           {errorMessage}
@@ -121,7 +129,9 @@ export default async function SettingsPage({ searchParams }) {
                   <span className="text-[12px] font-semibold text-[var(--text-primary)]">
                     Site Logo
                   </span>
-                  <SettingsLogoUpload initialLogo={String(settings.siteLogo ?? "")} />
+                  <SettingsLogoUpload
+                    initialLogo={String(settings.siteLogo ?? "")}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -134,8 +144,8 @@ export default async function SettingsPage({ searchParams }) {
                         Maintenance Mode
                       </div>
                       <p className="mt-1 text-[14px] leading-6 text-[var(--text-secondary)]">
-                        Prevent non-admin users from accessing the platform while
-                        updating.
+                        Prevent non-admin users from accessing the platform
+                        while updating.
                       </p>
                     </div>
                     <span className="relative mt-1 inline-flex items-center">
@@ -195,9 +205,15 @@ export default async function SettingsPage({ searchParams }) {
                 <div className="text-[30px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                   Client Secret
                 </div>
-                <CredentialSecretValue secret={settings.apiCredential?.secret ?? ""} />
+                <CredentialSecretValue
+                  secret={settings.apiCredential?.secret ?? ""}
+                />
                 <form action={regenerateApiCredentialAction}>
-                  <input type="hidden" name="id" value={settings.apiCredential?.id ?? ""} />
+                  <input
+                    type="hidden"
+                    name="id"
+                    value={settings.apiCredential?.id ?? ""}
+                  />
                   <button
                     type="submit"
                     disabled={!settings.apiCredential?.id}
@@ -211,8 +227,9 @@ export default async function SettingsPage({ searchParams }) {
 
             <div className="flex items-start gap-3 bg-[var(--surface-soft)] px-6 py-4 text-[13px] text-[var(--text-secondary)]">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-primary)]" />
-              Regeneration will immediately invalidate the current secret. Ensure
-              connected applications are updated with the new credentials.
+              Regeneration will immediately invalidate the current secret.
+              Ensure connected applications are updated with the new
+              credentials.
             </div>
           </Card>
         </section>
@@ -231,7 +248,11 @@ export default async function SettingsPage({ searchParams }) {
                 <span className="text-[12px] font-semibold text-[var(--text-primary)]">
                   Name
                 </span>
-                <input name="name" className="sectionhub-input" placeholder="Alex Rivera" />
+                <input
+                  name="name"
+                  className="sectionhub-input"
+                  placeholder="Alex Rivera"
+                />
               </label>
               <label className="block space-y-2">
                 <span className="text-[12px] font-semibold text-[var(--text-primary)]">
@@ -249,7 +270,11 @@ export default async function SettingsPage({ searchParams }) {
                 <span className="text-[12px] font-semibold text-[var(--text-primary)]">
                   Role
                 </span>
-                <select name="role" defaultValue="EDITOR" className="sectionhub-select">
+                <select
+                  name="role"
+                  defaultValue="EDITOR"
+                  className="sectionhub-select"
+                >
                   <option value="EDITOR">Editor</option>
                   <option value="ADMIN">Admin</option>
                 </select>
@@ -276,9 +301,15 @@ export default async function SettingsPage({ searchParams }) {
                   key={member.id}
                   className="grid grid-cols-[1.2fr_1.4fr_140px_140px] items-center gap-2 px-6 py-4 text-[14px]"
                 >
-                  <span className="font-medium text-[var(--text-primary)]">{member.name}</span>
-                  <span className="text-[var(--text-secondary)]">{member.email}</span>
-                  <span className="text-[var(--text-secondary)]">{member.role}</span>
+                  <span className="font-medium text-[var(--text-primary)]">
+                    {member.name}
+                  </span>
+                  <span className="text-[var(--text-secondary)]">
+                    {member.email}
+                  </span>
+                  <span className="text-[var(--text-secondary)]">
+                    {member.role}
+                  </span>
                   <form action={toggleTeamMemberStatusAction}>
                     <input type="hidden" name="id" value={member.id} />
                     <input
@@ -310,7 +341,10 @@ export default async function SettingsPage({ searchParams }) {
             title="Notifications"
             description="Control operational and security notification channels."
           />
-          <form id="settings-notifications-form" action={saveNotificationSettingsAction}>
+          <form
+            id="settings-notifications-form"
+            action={saveNotificationSettingsAction}
+          >
             <Card className="space-y-4 p-6">
               {[
                 {
@@ -338,7 +372,9 @@ export default async function SettingsPage({ searchParams }) {
                   key={item.key}
                   className="flex items-center justify-between rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3"
                 >
-                  <span className="text-[14px] text-[var(--text-primary)]">{item.label}</span>
+                  <span className="text-[14px] text-[var(--text-primary)]">
+                    {item.label}
+                  </span>
                   <span className="relative inline-flex items-center">
                     <input
                       type="checkbox"
@@ -366,7 +402,9 @@ export default async function SettingsPage({ searchParams }) {
           <form id="settings-advanced-form" action={saveAdvancedSettingsAction}>
             <Card className="space-y-4 p-6">
               <label className="flex items-center justify-between rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3">
-                <span className="text-[14px] text-[var(--text-primary)]">Enable strict mode</span>
+                <span className="text-[14px] text-[var(--text-primary)]">
+                  Enable strict mode
+                </span>
                 <input
                   type="checkbox"
                   name="strictMode"

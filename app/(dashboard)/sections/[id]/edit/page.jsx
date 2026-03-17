@@ -70,7 +70,9 @@ export default async function EditSectionPage({ params }) {
                 />
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-[12px] font-medium">Short description</span>
+                <span className="text-[12px] font-medium">
+                  Short description
+                </span>
                 <input
                   name="shortDescription"
                   defaultValue={section.shortDescription ?? ""}
@@ -78,7 +80,9 @@ export default async function EditSectionPage({ params }) {
                 />
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-[12px] font-medium">Full description</span>
+                <span className="text-[12px] font-medium">
+                  Full description
+                </span>
                 <textarea
                   name="fullDescription"
                   defaultValue={section.fullDescription ?? ""}
@@ -135,11 +139,15 @@ export default async function EditSectionPage({ params }) {
             <div className="space-y-3 text-[13px] text-[var(--text-secondary)]">
               <div className="flex items-center justify-between">
                 <span>Installs</span>
-                <span className="font-mono">{section._count.installEvents}</span>
+                <span className="font-mono">
+                  {section._count.installEvents}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Bundle inclusion</span>
-                <span className="font-mono">{section._count.bundleSections}</span>
+                <span className="font-mono">
+                  {section._count.bundleSections}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Category</span>
@@ -154,7 +162,6 @@ export default async function EditSectionPage({ params }) {
           >
             Save Changes
           </button>
-
         </div>
       </form>
 
