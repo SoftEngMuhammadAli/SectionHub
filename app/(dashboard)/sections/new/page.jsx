@@ -3,10 +3,17 @@ import { Card } from "@/components/ui/card";
 import { SectionTitle } from "@/components/sectionhub/ui/section-title";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getTags } from "@/lib/sectionhub/tags/service";
-export default async function NewSectionPage() {
+export default async function NewSectionPage({ searchParams }) {
+  const params = await searchParams;
+  const error = typeof params.error === "string" ? params.error : "";
   const [categories, tags] = await Promise.all([getCategories(), getTags()]);
   return (
     <div className="space-y-6">
+      {error ? (
+        <div className="rounded-[8px] border border-[var(--danger)]/20 bg-[var(--danger-light)] px-4 py-2.5 text-[13px] text-[var(--danger)]">
+          {error}
+        </div>
+      ) : null}
       <SectionTitle
         title="Upload New Section"
         subtitle="Create a persistent section with versioning, pricing, metadata, and preview support."
@@ -20,15 +27,20 @@ export default async function NewSectionPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block space-y-2">
                 <span className="text-[12px] font-medium">Section name</span>
-                <input name="name" className="sectionhub-input" />
+                <input name="name" required className="sectionhub-input" />
               </label>
               <label className="block space-y-2">
                 <span className="text-[12px] font-medium">Slug</span>
-                <input name="slug" className="sectionhub-input font-mono" />
+                <input
+                  name="slug"
+                  className="sectionhub-input font-mono"
+                  placeholder="hero-banner-pro"
+                />
               </label>
               <label className="block space-y-2">
                 <span className="text-[12px] font-medium">Category</span>
                 <select name="categoryId" className="sectionhub-select">
+                  <option value="">Select category</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}

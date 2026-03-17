@@ -1,10 +1,65 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { LogOut } from "lucide-react";
+import { logoutAction } from "@/app/actions";
 import { Icon } from "@/components/sectionhub/ui";
 import { navGroups } from "@/lib/data/navigation/sectionhub-nav";
 import { SearchBox } from "./search-box";
+
+function UserMenu() {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    function handleDocumentClick(event) {
+      if (!wrapperRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleDocumentClick);
+    return () => document.removeEventListener("mousedown", handleDocumentClick);
+  }, []);
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <button
+        type="button"
+        className="ml-1 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--color-primary-light)] text-[11px] font-semibold text-[var(--color-primary-text-light)]"
+        onClick={() => setOpen((value) => !value)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        AR
+      </button>
+
+      {open ? (
+        <div className="absolute right-0 top-10 z-40 w-48 rounded-[10px] border border-[var(--border-default)] bg-white p-2 shadow-[var(--shadow-soft)]">
+          <div className="px-2 py-1.5">
+            <div className="text-[13px] font-medium text-[var(--text-primary)]">
+              Alex Rivera
+            </div>
+            <div className="text-[11px] text-[var(--text-secondary)]">
+              admin@sectionhub.com
+            </div>
+          </div>
+          <div className="my-1 h-px bg-[var(--border-default)]" />
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="flex w-full items-center gap-2 rounded-[8px] px-2 py-2 text-left text-[13px] text-[var(--danger)] transition-colors hover:bg-[var(--danger-light)]/60"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </button>
+          </form>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export function AppHeader({ setDrawerOpen, search, setSearch }) {
   const pathname = usePathname();
@@ -63,6 +118,7 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
                 Save Changes
               </button>
             ) : null}
+            <UserMenu />
           </div>
         </div>
       </header>
@@ -116,9 +172,7 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
           >
             <Icon name="help" className="h-[18px] w-[18px]" />
           </button>
-          <button className="ml-1 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--color-primary-light)] text-[11px] font-semibold text-[var(--color-primary-text-light)]">
-            AR
-          </button>
+          <UserMenu />
         </div>
       </div>
     </header>

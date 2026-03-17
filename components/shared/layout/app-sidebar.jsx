@@ -31,6 +31,18 @@ const settingsNav = [
   { id: "advanced", label: "Advanced", icon: SquareTerminal },
 ];
 
+function getActiveNavHref(pathname) {
+  const allItems = navGroups.flatMap((group) => group.items);
+  const matches = allItems.filter((item) => {
+    if (pathname === item.href) return true;
+    if (item.href === "/dashboard") return false;
+    return pathname.startsWith(`${item.href}/`);
+  });
+
+  if (!matches.length) return "";
+  return matches.sort((a, b) => b.href.length - a.href.length)[0].href;
+}
+
 function SettingsSidebarContent({ activeTab, setDrawerOpen }) {
   return (
     <>
@@ -107,6 +119,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
   const isSettingsPage = pathname.startsWith("/settings");
   const tabParam = String(searchParams.get("tab") || "general");
   const activeTab = SETTINGS_TABS.includes(tabParam) ? tabParam : "general";
+  const activeNavHref = getActiveNavHref(pathname);
 
   if (isSettingsPage) {
     return (
@@ -167,10 +180,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
             </div>
             <div className="space-y-1">
               {group.items.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  (item.href !== "/dashboard" &&
-                    pathname.startsWith(item.href));
+                const active = item.href === activeNavHref;
                 return (
                   <Link
                     key={item.href}

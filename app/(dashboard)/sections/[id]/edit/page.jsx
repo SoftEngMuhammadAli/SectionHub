@@ -4,8 +4,11 @@ import { Card, SectionTitle } from "@/components/sectionhub/ui";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getSectionFormData } from "@/lib/sectionhub/sections/service";
 
-export default async function EditSectionPage({ params }) {
+export default async function EditSectionPage({ params, searchParams }) {
   const { id } = await params;
+  const pageParams = await searchParams;
+  const error = typeof pageParams.error === "string" ? pageParams.error : "";
+  const saved = pageParams.saved === "1";
   const [section, categories] = await Promise.all([
     getSectionFormData(id),
     getCategories(),
@@ -17,6 +20,16 @@ export default async function EditSectionPage({ params }) {
 
   return (
     <div className="space-y-6">
+      {saved ? (
+        <div className="rounded-[8px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[13px] text-[var(--success)]">
+          Section updated.
+        </div>
+      ) : null}
+      {error ? (
+        <div className="rounded-[8px] border border-[var(--danger)]/20 bg-[var(--danger-light)] px-4 py-2.5 text-[13px] text-[var(--danger)]">
+          {error}
+        </div>
+      ) : null}
       <SectionTitle
         title={`Edit Section - ${section.name}`}
         subtitle={`Current status: ${section.status}`}

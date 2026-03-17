@@ -55,6 +55,15 @@ function sanitizeFileName(name) {
     .slice(0, 60);
 }
 
+function toSlug(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 async function persistSiteLogo(file) {
   if (!file || typeof file === "string" || file.size <= 0) {
     return "";
@@ -434,69 +443,101 @@ export async function saveSectionAction(formData) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "") || undefined;
+  const name = String(formData.get("name") || "").trim();
+  const slugInput = String(formData.get("slug") || "").trim();
+  const slug = toSlug(slugInput || name);
+
+  if (!name) {
+    const target = id ? `/sections/${id}/edit` : "/sections/new";
+    redirect(`${target}?error=${encodeURIComponent("Section name is required.")}`);
+  }
+  if (!slug) {
+    const target = id ? `/sections/${id}/edit` : "/sections/new";
+    redirect(`${target}?error=${encodeURIComponent("Slug is required.")}`);
+  }
+
   const tagIds = String(formData.get("tagIds") || "")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
   const previewUrl = String(formData.get("previewUrl") || "").trim();
-  const section = await createOrUpdateSection({
-    id,
-    name: String(formData.get("name") || ""),
-    slug: String(formData.get("slug") || ""),
-    shortDescription: String(formData.get("shortDescription") || ""),
-    fullDescription: String(formData.get("fullDescription") || ""),
-    categoryId: String(formData.get("categoryId") || "") || null,
-    subcategory: String(formData.get("subcategory") || ""),
-    status: String(formData.get("status") || "DRAFT"),
-    visibility: String(formData.get("visibility") || "INTERNAL"),
-    featured: asBool(formData.get("featured")),
-    pricingType: String(formData.get("pricingType") || "PAID"),
-    priceCents: Math.round(Number(formData.get("price") || 0) * 100),
-    compareAtPriceCents:
-      Math.round(Number(formData.get("compareAtPrice") || 0) * 100) || null,
-    accessType: String(formData.get("accessType") || "SINGLE"),
-    licenseType: String(formData.get("licenseType") || "SINGLE_STORE"),
-    authorId: String(user._id),
-    version: String(formData.get("version") || "v1.0.0"),
-    changelog: String(formData.get("changelog") || ""),
-    metaTitle: String(formData.get("metaTitle") || ""),
-    metaDescription: String(formData.get("metaDescription") || ""),
-    internalKeywords: String(formData.get("internalKeywords") || ""),
-    marketplaceSubtitle: String(formData.get("marketplaceSubtitle") || ""),
-    calloutBadgeText: String(formData.get("calloutBadgeText") || ""),
-    installationSteps: String(formData.get("installationSteps") || ""),
-    usageNotes: String(formData.get("usageNotes") || ""),
-    merchantInstructions: String(formData.get("merchantInstructions") || ""),
-    supportNotes: String(formData.get("supportNotes") || ""),
-    compatibilityTheme: String(formData.get("compatibilityTheme") || ""),
-    os20Compatible: asBool(formData.get("os20Compatible")),
-    appBlockSupport: asBool(formData.get("appBlockSupport")),
-    dependencies: String(formData.get("dependencies") || ""),
-    testedEnvironments: String(formData.get("testedEnvironments") || ""),
-    tagIds,
-    previews: previewUrl
-      ? [
-          {
-            type: "IMAGE",
-            url: previewUrl,
-            title: String(formData.get("name") || "Preview"),
-            altText: String(formData.get("name") || "Preview"),
-            isThumbnail: true,
-            sortOrder: 1,
-          },
-        ]
-      : [],
-  });
-  await createActivityLog({
-    actorId: String(user._id),
-    actorName: user.name,
-    action: id ? "updated" : "created",
-    entityType: "section",
-    entityId: String(section?._id),
-    entityLabel: section?.name ?? "Section",
-  });
-  revalidatePath("/sections");
-  redirect(`/sections/${section?._id}/edit?saved=1`);
+  try {
+    const section = await createOrUpdateSection({
+      id,
+      name,
+      slug,
+      shortDescription: String(formData.get("shortDescription") || ""),
+      fullDescription: String(formData.get("fullDescription") || ""),
+      categoryId: String(formData.get("categoryId") || "") || null,
+      subcategory: String(formData.get("subcategory") || ""),
+      status: String(formData.get("status") || "DRAFT"),
+      visibility: String(formData.get("visibility") || "INTERNAL"),
+      featured: asBool(formData.get("featured")),
+      pricingType: String(formData.get("pricingType") || "PAID"),
+      priceCents: Math.round(Number(formData.get("price") || 0) * 100),
+      compareAtPriceCents:
+        Math.round(Number(formData.get("compareAtPrice") || 0) * 100) || null,
+      accessType: String(formData.get("accessType") || "SINGLE"),
+      licenseType: String(formData.get("licenseType") || "SINGLE_STORE"),
+      authorId: String(user._id),
+      version: String(formData.get("version") || "v1.0.0"),
+      changelog: String(formData.get("changelog") || ""),
+      metaTitle: String(formData.get("metaTitle") || ""),
+      metaDescription: String(formData.get("metaDescription") || ""),
+      internalKeywords: String(formData.get("internalKeywords") || ""),
+      marketplaceSubtitle: String(formData.get("marketplaceSubtitle") || ""),
+      calloutBadgeText: String(formData.get("calloutBadgeText") || ""),
+      installationSteps: String(formData.get("installationSteps") || ""),
+      usageNotes: String(formData.get("usageNotes") || ""),
+      merchantInstructions: String(formData.get("merchantInstructions") || ""),
+      supportNotes: String(formData.get("supportNotes") || ""),
+      compatibilityTheme: String(formData.get("compatibilityTheme") || ""),
+      os20Compatible: asBool(formData.get("os20Compatible")),
+      appBlockSupport: asBool(formData.get("appBlockSupport")),
+      dependencies: String(formData.get("dependencies") || ""),
+      testedEnvironments: String(formData.get("testedEnvironments") || ""),
+      tagIds,
+      previews: previewUrl
+        ? [
+            {
+              type: "IMAGE",
+              url: previewUrl,
+              title: name || "Preview",
+              altText: name || "Preview",
+              isThumbnail: true,
+              sortOrder: 1,
+            },
+          ]
+        : [],
+    });
+
+    if (!section?._id) {
+      throw new Error("Failed to save section.");
+    }
+
+    await createActivityLog({
+      actorId: String(user._id),
+      actorName: user.name,
+      action: id ? "updated" : "created",
+      entityType: "section",
+      entityId: String(section._id),
+      entityLabel: section.name ?? "Section",
+    });
+
+    revalidatePath("/sections");
+    revalidatePath("/sections/new");
+    revalidatePath(`/sections/${section._id}/edit`);
+
+    if (id) {
+      redirect(`/sections/${section._id}/edit?saved=1`);
+    }
+    redirect("/sections?created=1");
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to save section.";
+    const target = id ? `/sections/${id}/edit` : "/sections/new";
+    redirect(`${target}?error=${encodeURIComponent(message)}`);
+  }
 }
 
 export async function deleteSectionAction(formData) {
