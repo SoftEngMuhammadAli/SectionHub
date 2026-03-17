@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   Bell,
   KeyRound,
@@ -10,19 +10,28 @@ import {
   SquareTerminal,
   UsersRound,
 } from "lucide-react";
+import { logoutAction } from "@/app/actions";
 import { navGroups } from "@/lib/data/navigation/sectionhub-nav";
 import { Badge, Icon } from "@/components/sectionhub/ui";
 import { cn } from "@/components/sectionhub/ui/cn";
 
-const settingsNav = [
-  { label: "General", icon: Settings, active: true },
-  { label: "API Keys", icon: KeyRound },
-  { label: "Team", icon: UsersRound },
-  { label: "Notifications", icon: Bell },
-  { label: "Advanced", icon: SquareTerminal },
+const SETTINGS_TABS = [
+  "general",
+  "api-keys",
+  "team",
+  "notifications",
+  "advanced",
 ];
 
-function SettingsSidebarContent() {
+const settingsNav = [
+  { id: "general", label: "General", icon: Settings },
+  { id: "api-keys", label: "API Keys", icon: KeyRound },
+  { id: "team", label: "Team", icon: UsersRound },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "advanced", label: "Advanced", icon: SquareTerminal },
+];
+
+function SettingsSidebarContent({ activeTab, setDrawerOpen }) {
   return (
     <>
       <div className="flex h-[76px] items-center gap-3 border-b border-[var(--border-default)] px-6">
@@ -31,29 +40,33 @@ function SettingsSidebarContent() {
         </div>
         <div>
           <div className="text-[36px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
-            SectionHub
+            <Link href={"/"}>SectionHub</Link>
           </div>
-          <div className="text-[13px] text-[var(--text-secondary)]">System Admin</div>
+          <div className="text-[13px] text-[var(--text-secondary)]">
+            System Admin
+          </div>
         </div>
       </div>
 
       <div className="flex-1 space-y-2 px-4 py-5">
         {settingsNav.map((item) => {
           const ItemIcon = item.icon;
+          const active = activeTab === item.id;
           return (
-            <button
-              key={item.label}
-              type="button"
+            <Link
+              key={item.id}
+              href={`/settings?tab=${item.id}`}
+              onClick={() => setDrawerOpen?.(false)}
               className={cn(
                 "flex h-[44px] w-full items-center gap-3 rounded-[10px] px-3 text-left text-[16px] font-medium transition-colors",
-                item.active
+                active
                   ? "bg-[var(--color-primary-light)] text-[var(--color-primary)]"
                   : "text-[var(--text-primary)] hover:bg-[var(--surface-soft)]",
               )}
             >
               <ItemIcon className="h-4 w-4" />
               <span>{item.label}</span>
-            </button>
+            </Link>
           );
         })}
       </div>
@@ -68,15 +81,20 @@ function SettingsSidebarContent() {
               <div className="text-[16px] font-semibold text-[var(--text-primary)]">
                 Alex Rivera
               </div>
-              <div className="text-[13px] text-[var(--text-secondary)]">Admin Role</div>
+              <div className="text-[13px] text-[var(--text-secondary)]">
+                Admin Role
+              </div>
             </div>
           </div>
-          <button
-            type="button"
-            className="text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-secondary)]"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-secondary)]"
+              title="Log out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </form>
         </div>
       </div>
     </>
@@ -85,13 +103,19 @@ function SettingsSidebarContent() {
 
 export function AppSidebar({ drawerOpen, setDrawerOpen }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isSettingsPage = pathname.startsWith("/settings");
+  const tabParam = String(searchParams.get("tab") || "general");
+  const activeTab = SETTINGS_TABS.includes(tabParam) ? tabParam : "general";
 
   if (isSettingsPage) {
     return (
       <>
         <aside className="hidden w-[310px] shrink-0 flex-col border-r border-[var(--border-default)] bg-white md:flex">
-          <SettingsSidebarContent />
+          <SettingsSidebarContent
+            activeTab={activeTab}
+            setDrawerOpen={setDrawerOpen}
+          />
         </aside>
 
         {drawerOpen ? (
@@ -109,7 +133,10 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
             drawerOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
-          <SettingsSidebarContent />
+          <SettingsSidebarContent
+            activeTab={activeTab}
+            setDrawerOpen={setDrawerOpen}
+          />
         </aside>
       </>
     );

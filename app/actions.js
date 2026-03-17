@@ -6,7 +6,7 @@ import { createActivityLog } from "@/lib/sectionhub/activity/service";
 import { upsertBundle } from "@/lib/sectionhub/bundles/service";
 import { upsertCategory } from "@/lib/sectionhub/categories/service";
 import { createOrUpdateSection, publishSection, } from "@/lib/sectionhub/sections/service";
-import { createApiCredential, regenerateApiCredentialSecret, runDatabaseMaintenance, updateSettings, } from "@/lib/sectionhub/settings/service";
+import { createApiCredential, createTeamMember, regenerateApiCredentialSecret, runDatabaseMaintenance, toggleTeamMemberStatus, updateAdvancedSettings, updateNotificationSettings, updateSettings, } from "@/lib/sectionhub/settings/service";
 import { upsertTag } from "@/lib/sectionhub/tags/service";
 function asBool(value) {
     return value === "on" || value === "true";
@@ -150,24 +150,125 @@ export async function saveSettingsAction(formData) {
         entityLabel: "System Settings",
     });
     revalidatePath("/settings");
-    redirect("/settings?saved=1");
+    redirect("/settings?tab=general&saved=1");
+}
+export async function saveNotificationSettingsAction(formData) {
+    const user = await getCurrentUser();
+    if (!user)
+        redirect("/login");
+    await updateNotificationSettings({
+        emailCritical: asBool(formData.get("emailCritical")),
+        emailDigest: asBool(formData.get("emailDigest")),
+        slackEnabled: asBool(formData.get("slackEnabled")),
+        productAlerts: asBool(formData.get("productAlerts")),
+        updatedById: String(user._id),
+    });
+    await createActivityLog({
+        actorId: String(user._id),
+        actorName: user.name,
+        action: "updated",
+        entityType: "setting",
+        entityId: "notifications",
+        entityLabel: "Notification Settings",
+    });
+    revalidatePath("/settings");
+    redirect("/settings?tab=notifications&saved=1");
+}
+export async function saveAdvancedSettingsAction(formData) {
+    const user = await getCurrentUser();
+    if (!user)
+        redirect("/login");
+    await updateAdvancedSettings({
+        strictMode: asBool(formData.get("strictMode")),
+        allowPublicApiDocs: asBool(formData.get("allowPublicApiDocs")),
+        auditRetentionDays: Number(formData.get("auditRetentionDays") || 90),
+        updatedById: String(user._id),
+    });
+    await createActivityLog({
+        actorId: String(user._id),
+        actorName: user.name,
+        action: "updated",
+        entityType: "setting",
+        entityId: "advanced",
+        entityLabel: "Advanced Settings",
+    });
+    revalidatePath("/settings");
+    redirect("/settings?tab=advanced&saved=1");
+}
+export async function addTeamMemberAction(formData) {
+    const user = await getCurrentUser();
+    if (!user)
+        redirect("/login");
+    try {
+        const member = await createTeamMember({
+            name: String(formData.get("name") || ""),
+            email: String(formData.get("email") || ""),
+            role: String(formData.get("role") || "EDITOR"),
+        });
+        await createActivityLog({
+            actorId: String(user._id),
+            actorName: user.name,
+            action: "invited",
+            entityType: "team_member",
+            entityId: String(member.id),
+            entityLabel: member.email,
+            metadata: { role: member.role },
+        });
+        revalidatePath("/settings");
+        redirect(`/settings?tab=team&memberAdded=1&memberEmail=${encodeURIComponent(member.email)}`);
+    }
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to add team member.";
+        redirect(`/settings?tab=team&error=${encodeURIComponent(message)}`);
+    }
+}
+export async function toggleTeamMemberStatusAction(formData) {
+    const user = await getCurrentUser();
+    if (!user)
+        redirect("/login");
+    try {
+        const member = await toggleTeamMemberStatus({
+            id: String(formData.get("id") || ""),
+            isActive: asBool(formData.get("isActive")),
+        });
+        await createActivityLog({
+            actorId: String(user._id),
+            actorName: user.name,
+            action: member.isActive ? "activated" : "deactivated",
+            entityType: "team_member",
+            entityId: member.id,
+            entityLabel: member.email,
+        });
+        revalidatePath("/settings");
+        redirect("/settings?tab=team&memberUpdated=1");
+    }
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to update member.";
+        redirect(`/settings?tab=team&error=${encodeURIComponent(message)}`);
+    }
 }
 export async function createApiCredentialAction() {
     const user = await getCurrentUser();
     if (!user)
         redirect("/login");
-    const credential = await createApiCredential({ updatedById: String(user._id) });
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "created",
-        entityType: "api_credential",
-        entityId: String(credential?.id ?? "api-key"),
-        entityLabel: "API Credential",
-        metadata: { clientId: credential?.clientId ?? "" },
-    });
-    revalidatePath("/settings");
-    redirect("/settings?keyCreated=1");
+    try {
+        const credential = await createApiCredential({ updatedById: String(user._id) });
+        await createActivityLog({
+            actorId: String(user._id),
+            actorName: user.name,
+            action: "created",
+            entityType: "api_credential",
+            entityId: String(credential?.id ?? "api-key"),
+            entityLabel: "API Credential",
+            metadata: { clientId: credential?.clientId ?? "" },
+        });
+        revalidatePath("/settings");
+        redirect("/settings?tab=api-keys&keyCreated=1");
+    }
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to create API key.";
+        redirect(`/settings?tab=api-keys&error=${encodeURIComponent(message)}`);
+    }
 }
 export async function regenerateApiCredentialAction(formData) {
     const user = await getCurrentUser();
@@ -176,18 +277,24 @@ export async function regenerateApiCredentialAction(formData) {
     const id = String(formData.get("id") || "");
     if (!id)
         redirect("/settings");
-    const credential = await regenerateApiCredentialSecret(id);
-    await createActivityLog({
-        actorId: String(user._id),
-        actorName: user.name,
-        action: "regenerated",
-        entityType: "api_credential",
-        entityId: id,
-        entityLabel: "API Credential",
-        metadata: { clientId: credential.clientId },
-    });
-    revalidatePath("/settings");
-    redirect("/settings?keyRotated=1");
+    try {
+        const credential = await regenerateApiCredentialSecret(id);
+        await createActivityLog({
+            actorId: String(user._id),
+            actorName: user.name,
+            action: "regenerated",
+            entityType: "api_credential",
+            entityId: id,
+            entityLabel: "API Credential",
+            metadata: { clientId: credential.clientId },
+        });
+        revalidatePath("/settings");
+        redirect("/settings?tab=api-keys&keyRotated=1");
+    }
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to rotate API key.";
+        redirect(`/settings?tab=api-keys&error=${encodeURIComponent(message)}`);
+    }
 }
 export async function runDatabaseMaintenanceAction() {
     const user = await getCurrentUser();
@@ -204,7 +311,7 @@ export async function runDatabaseMaintenanceAction() {
         metadata: result,
     });
     revalidatePath("/settings");
-    redirect("/settings?maintenanceRun=1");
+    redirect("/settings?tab=advanced&maintenanceRun=1");
 }
 export async function saveSectionAction(formData) {
     const user = await getCurrentUser();

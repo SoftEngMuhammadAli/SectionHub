@@ -1,14 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Icon } from "@/components/sectionhub/ui";
 import { navGroups } from "@/lib/data/navigation/sectionhub-nav";
+import { SearchBox } from "./search-box";
 
 export function AppHeader({ setDrawerOpen, search, setSearch }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isSettingsPage = pathname.startsWith("/settings");
+  const activeSettingsTab = String(searchParams.get("tab") || "general");
+  const saveButtonFormId =
+    activeSettingsTab === "notifications"
+      ? "settings-notifications-form"
+      : activeSettingsTab === "advanced"
+        ? "settings-advanced-form"
+        : "settings-general-form";
+  const canSubmitFromHeader = ["general", "notifications", "advanced"].includes(
+    activeSettingsTab,
+  );
 
   const pageTitle = useMemo(() => {
     const match = navGroups
@@ -21,10 +32,6 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
     return match?.label ?? "SectionHub";
   }, [pathname]);
 
-  const searchHref = search?.trim()
-    ? `/sections?search=${encodeURIComponent(search.trim())}`
-    : "/sections";
-
   if (isSettingsPage) {
     return (
       <header className="sticky top-0 z-20 flex h-[68px] flex-col justify-center border-b border-[var(--border-default)] bg-white">
@@ -34,26 +41,28 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden h-[40px] min-w-[280px] items-center gap-2 rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-3 md:flex">
-              <Icon name="search" className="h-4 w-4 text-[var(--text-tertiary)]" />
-              <input
-                className="h-full w-full bg-transparent text-[14px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
-                placeholder="Search settings..."
-              />
-            </div>
+            <SearchBox
+              mode="settings"
+              value={search}
+              onChange={setSearch}
+              placeholder="Search settings..."
+              className="hidden min-w-[300px] md:block"
+            />
             <button
               type="button"
               className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-button)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-soft)]"
             >
               <Icon name="help" className="h-[18px] w-[18px]" />
             </button>
-            <button
-              type="submit"
-              form="settings-general-form"
-              className="inline-flex min-h-10 items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
-            >
-              Save Changes
-            </button>
+            {canSubmitFromHeader ? (
+              <button
+                type="submit"
+                form={saveButtonFormId}
+                className="inline-flex min-h-10 items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+              >
+                Save Changes
+              </button>
+            ) : null}
           </div>
         </div>
       </header>
@@ -87,21 +96,13 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
-          <div className="hidden h-[36px] min-w-[280px] items-center gap-2 rounded-[var(--radius-input)] border border-[var(--border-default)] bg-[var(--background-page)] px-3 transition-all focus-within:border-[var(--color-primary)] focus-within:ring-2 focus-within:ring-[var(--color-primary)]/20 md:flex">
-            <Icon name="search" className="h-4 w-4 text-[var(--text-tertiary)]" />
-            <input
-              value={search}
-              onChange={(event) => setSearch?.(event.target.value)}
-              className="h-full w-full bg-transparent text-[13px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
-              placeholder="Search sections, bundles, shops..."
-            />
-          </div>
-          <Link
-            href={searchHref}
-            className="hidden min-h-9 items-center justify-center rounded-[var(--radius-button)] bg-[var(--color-primary)] px-3.5 text-[12px] font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)] md:inline-flex"
-          >
-            Go
-          </Link>
+          <SearchBox
+            mode="global"
+            value={search}
+            onChange={setSearch}
+            placeholder="Search sections, bundles, shops..."
+            className="hidden min-w-[320px] md:block"
+          />
           <button
             type="button"
             className="relative flex h-9 w-9 items-center justify-center rounded-[var(--radius-button)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-soft)]"
