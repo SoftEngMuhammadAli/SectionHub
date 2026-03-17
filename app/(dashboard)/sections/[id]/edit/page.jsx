@@ -1,14 +1,172 @@
+import { notFound } from "next/navigation";
 import { publishSectionAction, saveSectionAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getSectionFormData } from "@/lib/sectionhub/sections/service";
-import { getTags } from "@/lib/sectionhub/tags/service";
-import { notFound } from "next/navigation";
+
 export default async function EditSectionPage({ params }) {
-    const { id } = await params;
-    const [section, categories, tags] = await Promise.all([getSectionFormData(id), getCategories(), getTags()]);
-    if (!section)
-        notFound();
-    return <div className="space-y-6"><SectionTitle title={`Edit Section - ${section.name}`} subtitle={`Current status: ${section.status}`}/><form action={saveSectionAction} className="grid gap-4 xl:grid-cols-[1.5fr_0.8fr]"><input type="hidden" name="id" value={section.id}/><div className="space-y-4"><Card className="p-5"><div className="grid gap-4 md:grid-cols-2"><label className="block space-y-2"><span className="text-[12px] font-medium">Section name</span><input name="name" defaultValue={section.name} className="sectionhub-input"/></label><label className="block space-y-2"><span className="text-[12px] font-medium">Slug</span><input name="slug" defaultValue={section.slug} className="sectionhub-input font-mono"/></label><label className="block space-y-2"><span className="text-[12px] font-medium">Category</span><select name="categoryId" defaultValue={section.categoryId ?? ""} className="sectionhub-select">{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label><label className="block space-y-2"><span className="text-[12px] font-medium">Version</span><input name="version" defaultValue={section.versions[0]?.version ?? 'v1.0.0'} className="sectionhub-input font-mono"/></label><label className="block space-y-2 md:col-span-2"><span className="text-[12px] font-medium">Short description</span><input name="shortDescription" defaultValue={section.shortDescription ?? ''} className="sectionhub-input"/></label><label className="block space-y-2 md:col-span-2"><span className="text-[12px] font-medium">Full description</span><textarea name="fullDescription" defaultValue={section.fullDescription ?? ''} className="sectionhub-textarea"/></label></div></Card><Card className="p-5"><div className="grid gap-4 md:grid-cols-2"><label className="block space-y-2"><span className="text-[12px] font-medium">Price</span><input name="price" type="number" step="0.01" defaultValue={section.priceCents / 100} className="sectionhub-input"/></label><label className="block space-y-2"><span className="text-[12px] font-medium">Compare At</span><input name="compareAtPrice" type="number" step="0.01" defaultValue={(section.compareAtPriceCents ?? 0) / 100} className="sectionhub-input"/></label><label className="block space-y-2"><span className="text-[12px] font-medium">Preview URL</span><input name="previewUrl" defaultValue={section.previews[0]?.url ?? ''} className="sectionhub-input"/></label><label className="block space-y-2"><span className="text-[12px] font-medium">Tag IDs</span><input name="tagIds" defaultValue={section.tags.map((tag) => tag.tagId).join(',')} className="sectionhub-input font-mono"/></label></div></Card></div><div className="space-y-4"><Card className="p-5"><div className="space-y-3 text-[13px] text-[var(--text-secondary)]"><div className="flex items-center justify-between"><span>Installs</span><span className="font-mono">{section._count.installEvents}</span></div><div className="flex items-center justify-between"><span>Bundle inclusion</span><span className="font-mono">{section._count.bundleSections}</span></div><div className="flex items-center justify-between"><span>Category</span><span>{section.category?.name ?? 'Unassigned'}</span></div></div></Card><button type="submit" className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white">Save Changes</button></></form><form action={publishSectionAction}><input type="hidden" name="id" value={section.id}/><button type="submit" className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] border border-[var(--border)] bg-white px-4 text-[13px] font-medium text-[var(--text-primary)]">Publish</button></form></div>;
-    div > ;
+  const { id } = await params;
+  const [section, categories] = await Promise.all([
+    getSectionFormData(id),
+    getCategories(),
+  ]);
+
+  if (!section) {
+    notFound();
+  }
+
+  return (
+    <div className="space-y-6">
+      <SectionTitle
+        title={`Edit Section - ${section.name}`}
+        subtitle={`Current status: ${section.status}`}
+      />
+
+      <form
+        action={saveSectionAction}
+        className="grid gap-4 xl:grid-cols-[1.5fr_0.8fr]"
+      >
+        <input type="hidden" name="id" value={section.id} />
+
+        <div className="space-y-4">
+          <Card className="p-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Section name</span>
+                <input
+                  name="name"
+                  defaultValue={section.name}
+                  className="sectionhub-input"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Slug</span>
+                <input
+                  name="slug"
+                  defaultValue={section.slug}
+                  className="sectionhub-input font-mono"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Category</span>
+                <select
+                  name="categoryId"
+                  defaultValue={section.categoryId ?? ""}
+                  className="sectionhub-select"
+                >
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Version</span>
+                <input
+                  name="version"
+                  defaultValue={section.versions[0]?.version ?? "v1.0.0"}
+                  className="sectionhub-input font-mono"
+                />
+              </label>
+              <label className="block space-y-2 md:col-span-2">
+                <span className="text-[12px] font-medium">Short description</span>
+                <input
+                  name="shortDescription"
+                  defaultValue={section.shortDescription ?? ""}
+                  className="sectionhub-input"
+                />
+              </label>
+              <label className="block space-y-2 md:col-span-2">
+                <span className="text-[12px] font-medium">Full description</span>
+                <textarea
+                  name="fullDescription"
+                  defaultValue={section.fullDescription ?? ""}
+                  className="sectionhub-textarea"
+                />
+              </label>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Price</span>
+                <input
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  defaultValue={section.priceCents / 100}
+                  className="sectionhub-input"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Compare At</span>
+                <input
+                  name="compareAtPrice"
+                  type="number"
+                  step="0.01"
+                  defaultValue={(section.compareAtPriceCents ?? 0) / 100}
+                  className="sectionhub-input"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Preview URL</span>
+                <input
+                  name="previewUrl"
+                  defaultValue={section.previews[0]?.url ?? ""}
+                  className="sectionhub-input"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[12px] font-medium">Tag IDs</span>
+                <input
+                  name="tagIds"
+                  defaultValue={section.tags.map((tag) => tag.tagId).join(",")}
+                  className="sectionhub-input font-mono"
+                />
+              </label>
+            </div>
+          </Card>
+        </div>
+
+        <div className="space-y-4">
+          <Card className="p-5">
+            <div className="space-y-3 text-[13px] text-[var(--text-secondary)]">
+              <div className="flex items-center justify-between">
+                <span>Installs</span>
+                <span className="font-mono">{section._count.installEvents}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Bundle inclusion</span>
+                <span className="font-mono">{section._count.bundleSections}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Category</span>
+                <span>{section.category?.name ?? "Unassigned"}</span>
+              </div>
+            </div>
+          </Card>
+
+          <button
+            type="submit"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[13px] font-medium text-white"
+          >
+            Save Changes
+          </button>
+
+        </div>
+      </form>
+
+      <form action={publishSectionAction}>
+        <input type="hidden" name="id" value={section.id} />
+        <button
+          type="submit"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[13px] font-medium text-[var(--text-primary)]"
+        >
+          Publish
+        </button>
+      </form>
+    </div>
+  );
 }

@@ -37,9 +37,9 @@ async function main() {
     AdminUserModel.deleteMany({}),
   ]);
   const admin = await AdminUserModel.create({
-    name: "Alex Rivera",
-    email: "admin@sectionhub.com",
-    passwordHash: await bcrypt.hash("admin12345", 10),
+    name: "Muhammad Ali",
+    email: "admin@gmail.com",
+    passwordHash: await bcrypt.hash("Pakistan123", 10),
     role: "ADMIN",
     isActive: true,
   });

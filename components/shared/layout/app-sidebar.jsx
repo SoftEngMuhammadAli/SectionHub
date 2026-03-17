@@ -25,7 +25,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
           </div>
         </div>
       </div>
-      
+
       <div className="sectionhub-scrollbar flex-1 space-y-6 overflow-y-auto px-3 py-4">
         {navGroups.map((group) => (
           <div key={group.label} className="space-y-2">
@@ -34,7 +34,10 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
             </div>
             <div className="space-y-1">
               {group.items.map((item) => {
-                const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                const active =
+                  pathname === item.href ||
+                  (item.href !== "/dashboard" &&
+                    pathname.startsWith(item.href));
                 return (
                   <Link
                     key={item.href}
@@ -70,7 +73,12 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
               admin@sectionhub.com
             </div>
           </div>
-          <Badge variant="default" className="bg-[var(--color-primary)] border-none">Admin</Badge>
+          <Badge
+            variant="default"
+            className="bg-[var(--color-primary)] border-none"
+          >
+            Admin
+          </Badge>
         </div>
       </div>
     </>
@@ -81,7 +89,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
       <aside className="hidden w-[232px] shrink-0 flex-col bg-[var(--sidebar-bg)] text-white md:flex">
         {navContent}
       </aside>
-      
+
       {/* Mobile Drawer */}
       {drawerOpen ? (
         <button

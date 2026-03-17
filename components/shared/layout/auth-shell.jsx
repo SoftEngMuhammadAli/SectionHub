@@ -5,7 +5,7 @@ import { Icon } from "@/components/sectionhub/ui";
 export function AuthShell({ title, subtitle, children, footer }) {
   return (
     <div className="sectionhub-dot-grid flex min-h-screen items-center justify-center px-4 py-8 sm:py-10">
-      <Card className="w-full max-w-[420px] rounded-[16px] p-6 sm:p-10 border-none shadow-[0_12px_24px_rgba(0,0,0,0.06),_0_4px_8px_rgba(0,0,0,0.03)] border-[1px] border-[var(--border-default)]">
+      <Card className="w-full max-w-[420px] rounded-[16px] border-[1px] border-[var(--border-default)] p-6 shadow-[0_12px_24px_rgba(0,0,0,0.06),_0_4px_8px_rgba(0,0,0,0.03)] sm:p-10">
         <div className="mb-8 flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[var(--color-primary)] text-white">
             <Icon name="grid" className="h-5 w-5" />
@@ -15,7 +15,7 @@ export function AuthShell({ title, subtitle, children, footer }) {
               SectionHub
             </div>
             <div className="text-[12px] text-[var(--text-tertiary)]">
-              Restricted access · Admin only
+              Restricted access - Admin only
             </div>
           </div>
         </div>

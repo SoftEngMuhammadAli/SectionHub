@@ -24,12 +24,12 @@ export function DashboardShell({ children }) {
   const navContent = (
     <>
       <div className="flex h-[60px] items-center gap-3 px-5">
-        <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-[var(--primary)] text-white">
+        <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-[var(--color-primary)] text-white">
           <Icon name="grid" className="h-4 w-4" />
         </div>
         <div>
           <div className="text-[14px] font-semibold">SectionHub</div>
-          <div className="flex items-center gap-2 text-[11px] text-[var(--sidebar-inactive-text)]">
+          <div className="flex items-center gap-2 text-[11px] text-[var(--sidebar-text)]">
             <span>Admin</span>
             <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] uppercase tracking-[0.08em]">
               Internal
@@ -58,7 +58,7 @@ export function DashboardShell({ children }) {
                       "flex h-[38px] items-center gap-3 rounded-[10px] border-l-2 px-3 text-[13px] transition-colors",
                       active
                         ? "border-[var(--sidebar-active-border)] bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]"
-                        : "border-transparent text-[var(--sidebar-inactive-text)] hover:bg-[var(--sidebar-hover)] hover:text-white",
+                        : "border-transparent text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white",
                     )}
                   >
                     <Icon name={item.icon} className="h-4 w-4" />
@@ -72,14 +72,14 @@ export function DashboardShell({ children }) {
       </div>
       <div className="border-t border-white/8 p-4">
         <div className="flex items-center gap-3 rounded-[12px] bg-white/4 p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary-light)] font-semibold text-[var(--primary-light-text)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary-light)] font-semibold text-[var(--color-primary-text-light)]">
             AR
           </div>
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13px] font-medium text-white">
               Alex Rivera
             </div>
-            <div className="truncate text-[11px] text-[var(--sidebar-inactive-text)]">
+            <div className="truncate text-[11px] text-[var(--sidebar-text)]">
               admin@sectionhub.com
             </div>
           </div>
@@ -89,7 +89,7 @@ export function DashboardShell({ children }) {
     </>
   );
   return (
-    <div className="flex min-h-screen bg-[var(--app-bg)] text-[var(--text-primary)]">
+    <div className="flex min-h-screen bg-[var(--background-app)] text-[var(--text-primary)]">
       <aside className="hidden w-[232px] shrink-0 flex-col bg-[var(--sidebar-bg)] text-white md:flex">
         {navContent}
       </aside>
@@ -120,12 +120,12 @@ export function DashboardShell({ children }) {
         {navContent}
       </aside>
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-white">
+        <header className="sticky top-0 z-20 border-b border-[var(--border-default)] bg-white">
           <div className="flex min-h-14 items-center justify-between gap-3 px-4 md:px-6">
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)] md:hidden"
+                className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white text-[var(--text-secondary)] md:hidden"
                 onClick={() => setDrawerOpen(true)}
               >
                 <Icon name="menu" />
@@ -140,7 +140,7 @@ export function DashboardShell({ children }) {
               </div>
             </div>
             <div className="flex items-center gap-2 md:gap-3">
-              <div className="hidden min-w-[280px] items-center gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--page-bg)] px-3 py-2 md:flex">
+              <div className="hidden min-w-[280px] items-center gap-2 rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] px-3 py-2 md:flex">
                 <Icon
                   name="search"
                   className="h-4 w-4 text-[var(--text-tertiary)]"
@@ -154,26 +154,26 @@ export function DashboardShell({ children }) {
               </div>
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)]"
+                className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white text-[var(--text-secondary)]"
               >
                 <Icon name="bell" />
               </button>
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border)] bg-white text-[var(--text-secondary)]"
+                className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white text-[var(--text-secondary)]"
               >
                 <Icon name="help" />
               </button>
               <Link
                 href={searchHref}
-                className="hidden min-h-11 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white md:inline-flex"
+                className="hidden min-h-11 items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[13px] font-medium text-white md:inline-flex"
               >
                 Go
               </Link>
             </div>
           </div>
           <div className="px-4 pb-3 md:hidden">
-            <div className="flex items-center gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--page-bg)] px-3 py-2">
+            <div className="flex items-center gap-2 rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] px-3 py-2">
               <Icon
                 name="search"
                 className="h-4 w-4 text-[var(--text-tertiary)]"
@@ -186,7 +186,7 @@ export function DashboardShell({ children }) {
               />
               <Link
                 href={searchHref}
-                className="text-[12px] font-medium text-[var(--primary)]"
+                className="text-[12px] font-medium text-[var(--color-primary)]"
               >
                 Go
               </Link>
@@ -203,7 +203,7 @@ export function AuthShell({ title, subtitle, children, footer }) {
     <div className="sectionhub-dot-grid flex min-h-screen items-center justify-center px-4 py-8 sm:py-10">
       <Card className="w-full max-w-[420px] rounded-[16px] p-6 sm:p-10">
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[var(--primary)] text-white">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[var(--color-primary)] text-white">
             <Icon name="grid" className="h-5 w-5" />
           </div>
           <div>

@@ -65,6 +65,25 @@
 
   /* Shadow */
   --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.04);
+
+  /* Legacy aliases for existing SectionHub screens */
+  --app-bg: var(--background-app);
+  --page-bg: var(--background-page);
+  --primary: var(--color-primary);
+  --primary-hover: var(--color-primary-hover);
+  --primary-pressed: var(--color-primary-pressed);
+  --primary-light: var(--color-primary-light);
+  --primary-light-text: var(--color-primary-text-light);
+  --border: var(--border-default);
+  --success: var(--color-success);
+  --success-light: var(--color-success-light);
+  --warning: var(--color-warning);
+  --warning-light: var(--color-warning-light);
+  --danger: var(--color-danger);
+  --danger-light: var(--color-danger-light);
+  --info: var(--color-info);
+  --info-light: var(--color-info-light);
+  --sidebar-inactive-text: var(--sidebar-text);
 }
 
 * {
@@ -117,6 +136,13 @@ textarea::placeholder {
   box-shadow: var(--shadow-soft);
 }
 
+.sectionhub-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+}
+
 .sh-input {
   background: var(--surface-card);
   border: 1px solid var(--border-default);
@@ -131,6 +157,76 @@ textarea::placeholder {
 .sh-input:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(109, 76, 255, 0.12);
+}
+
+.sectionhub-input {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  width: 100%;
+  padding: 10px 14px;
+  outline: none;
+  min-height: 44px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sectionhub-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(109, 76, 255, 0.12);
+}
+
+.sh-select,
+.sectionhub-select {
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-input);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  padding: 10px 38px 10px 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-tertiary) 50%),
+    linear-gradient(135deg, var(--text-tertiary) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 13px) calc(50% - 3px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.sh-select:focus,
+.sectionhub-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(109, 76, 255, 0.12);
+}
+
+.sh-textarea,
+.sectionhub-textarea {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  width: 100%;
+  padding: 10px 14px;
+  outline: none;
+  min-height: 110px;
+  resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sh-textarea:focus,
+.sectionhub-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(109, 76, 255, 0.12);
+}
+
+.sectionhub-mobile-list {
+  display: grid;
+  gap: 12px;
 }
 
 .sh-muted-surface {
