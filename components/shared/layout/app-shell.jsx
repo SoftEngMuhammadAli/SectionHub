@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { AppSidebar } from "./app-sidebar";
 import { AppHeader } from "./app-header";
 import { Icon } from "@/components/sectionhub/ui";
@@ -8,6 +9,8 @@ import { Icon } from "@/components/sectionhub/ui";
 export function AppShell({ children }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const pathname = usePathname();
+  const isSettingsPage = pathname.startsWith("/settings");
 
   return (
     <div className="flex min-h-screen bg-[var(--background-app)] text-[var(--text-primary)] font-sans">
@@ -24,7 +27,11 @@ export function AppShell({ children }) {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 className="w-full bg-transparent text-[13px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
-                placeholder="Search sections, bundles, shops..."
+                placeholder={
+                  isSettingsPage
+                    ? "Search settings..."
+                    : "Search sections, bundles, shops..."
+                }
               />
             </div>
         </div>

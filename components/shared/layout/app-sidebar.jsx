@@ -2,12 +2,118 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  Bell,
+  KeyRound,
+  LogOut,
+  Settings,
+  SquareTerminal,
+  UsersRound,
+} from "lucide-react";
 import { navGroups } from "@/lib/data/navigation/sectionhub-nav";
 import { Badge, Icon } from "@/components/sectionhub/ui";
 import { cn } from "@/components/sectionhub/ui/cn";
 
+const settingsNav = [
+  { label: "General", icon: Settings, active: true },
+  { label: "API Keys", icon: KeyRound },
+  { label: "Team", icon: UsersRound },
+  { label: "Notifications", icon: Bell },
+  { label: "Advanced", icon: SquareTerminal },
+];
+
+function SettingsSidebarContent() {
+  return (
+    <>
+      <div className="flex h-[76px] items-center gap-3 border-b border-[var(--border-default)] px-6">
+        <div className="flex h-[42px] w-[42px] items-center justify-center rounded-[14px] bg-[var(--color-primary)] text-white">
+          <Icon name="grid" className="h-5 w-5" />
+        </div>
+        <div>
+          <div className="text-[36px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
+            SectionHub
+          </div>
+          <div className="text-[13px] text-[var(--text-secondary)]">System Admin</div>
+        </div>
+      </div>
+
+      <div className="flex-1 space-y-2 px-4 py-5">
+        {settingsNav.map((item) => {
+          const ItemIcon = item.icon;
+          return (
+            <button
+              key={item.label}
+              type="button"
+              className={cn(
+                "flex h-[44px] w-full items-center gap-3 rounded-[10px] px-3 text-left text-[16px] font-medium transition-colors",
+                item.active
+                  ? "bg-[var(--color-primary-light)] text-[var(--color-primary)]"
+                  : "text-[var(--text-primary)] hover:bg-[var(--surface-soft)]",
+              )}
+            >
+              <ItemIcon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="border-t border-[var(--border-default)] p-4">
+        <div className="flex items-center justify-between gap-3 rounded-[12px] p-2">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[12px] font-semibold text-[var(--color-primary)]">
+              AR
+            </div>
+            <div>
+              <div className="text-[16px] font-semibold text-[var(--text-primary)]">
+                Alex Rivera
+              </div>
+              <div className="text-[13px] text-[var(--text-secondary)]">Admin Role</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-secondary)]"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function AppSidebar({ drawerOpen, setDrawerOpen }) {
   const pathname = usePathname();
+  const isSettingsPage = pathname.startsWith("/settings");
+
+  if (isSettingsPage) {
+    return (
+      <>
+        <aside className="hidden w-[310px] shrink-0 flex-col border-r border-[var(--border-default)] bg-white md:flex">
+          <SettingsSidebarContent />
+        </aside>
+
+        {drawerOpen ? (
+          <button
+            type="button"
+            aria-label="Close navigation"
+            className="fixed inset-0 z-30 bg-black/20 md:hidden"
+            onClick={() => setDrawerOpen(false)}
+          />
+        ) : null}
+
+        <aside
+          className={cn(
+            "fixed inset-y-0 left-0 z-40 flex w-[300px] max-w-[86vw] flex-col border-r border-[var(--border-default)] bg-white shadow-xl transition-transform md:hidden",
+            drawerOpen ? "translate-x-0" : "-translate-x-full",
+          )}
+        >
+          <SettingsSidebarContent />
+        </aside>
+      </>
+    );
+  }
 
   const navContent = (
     <>
@@ -61,24 +167,26 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
       </div>
 
       <div className="border-t border-white/8 p-4">
-        <div className="flex items-center gap-3 rounded-[12px] bg-white/4 p-3 hover:bg-[var(--sidebar-hover)] cursor-pointer transition-colors">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-light)] font-semibold text-[var(--color-primary-text-light)]">
-            AR
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[13px] font-medium text-white">
-              Alex Rivera
+        <div className="cursor-pointer rounded-[12px] bg-white/4 p-3 transition-colors hover:bg-[var(--sidebar-hover)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-light)] font-semibold text-[var(--color-primary-text-light)]">
+              AR
             </div>
-            <div className="truncate text-[11px] text-[var(--sidebar-text)]">
-              admin@sectionhub.com
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[13px] font-medium text-white">
+                Alex Rivera
+              </div>
+              <div className="truncate text-[11px] text-[var(--sidebar-text)]">
+                admin@sectionhub.com
+              </div>
             </div>
+            <Badge
+              variant="default"
+              className="border-none bg-[var(--color-primary)]"
+            >
+              Admin
+            </Badge>
           </div>
-          <Badge
-            variant="default"
-            className="bg-[var(--color-primary)] border-none"
-          >
-            Admin
-          </Badge>
         </div>
       </div>
     </>
@@ -90,7 +198,6 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
         {navContent}
       </aside>
 
-      {/* Mobile Drawer */}
       {drawerOpen ? (
         <button
           type="button"
@@ -99,6 +206,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
           onClick={() => setDrawerOpen(false)}
         />
       ) : null}
+
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-40 flex w-[280px] max-w-[85vw] flex-col bg-[var(--sidebar-bg)] text-white shadow-xl transition-transform md:hidden",

@@ -6,7 +6,7 @@ import { createActivityLog } from "@/lib/sectionhub/activity/service";
 import { upsertBundle } from "@/lib/sectionhub/bundles/service";
 import { upsertCategory } from "@/lib/sectionhub/categories/service";
 import { createOrUpdateSection, publishSection, } from "@/lib/sectionhub/sections/service";
-import { updateSettings } from "@/lib/sectionhub/settings/service";
+import { createApiCredential, regenerateApiCredentialSecret, runDatabaseMaintenance, updateSettings, } from "@/lib/sectionhub/settings/service";
 import { upsertTag } from "@/lib/sectionhub/tags/service";
 function asBool(value) {
     return value === "on" || value === "true";
@@ -138,6 +138,7 @@ export async function saveSettingsAction(formData) {
         siteName: String(formData.get("siteName") || "SectionHub Enterprise"),
         defaultCurrency: String(formData.get("defaultCurrency") || "USD"),
         maintenanceMode: asBool(formData.get("maintenanceMode")),
+        siteLogo: String(formData.get("siteLogo") || ""),
         updatedById: String(user._id),
     });
     await createActivityLog({
@@ -150,6 +151,60 @@ export async function saveSettingsAction(formData) {
     });
     revalidatePath("/settings");
     redirect("/settings?saved=1");
+}
+export async function createApiCredentialAction() {
+    const user = await getCurrentUser();
+    if (!user)
+        redirect("/login");
+    const credential = await createApiCredential({ updatedById: String(user._id) });
+    await createActivityLog({
+        actorId: String(user._id),
+        actorName: user.name,
+        action: "created",
+        entityType: "api_credential",
+        entityId: String(credential?.id ?? "api-key"),
+        entityLabel: "API Credential",
+        metadata: { clientId: credential?.clientId ?? "" },
+    });
+    revalidatePath("/settings");
+    redirect("/settings?keyCreated=1");
+}
+export async function regenerateApiCredentialAction(formData) {
+    const user = await getCurrentUser();
+    if (!user)
+        redirect("/login");
+    const id = String(formData.get("id") || "");
+    if (!id)
+        redirect("/settings");
+    const credential = await regenerateApiCredentialSecret(id);
+    await createActivityLog({
+        actorId: String(user._id),
+        actorName: user.name,
+        action: "regenerated",
+        entityType: "api_credential",
+        entityId: id,
+        entityLabel: "API Credential",
+        metadata: { clientId: credential.clientId },
+    });
+    revalidatePath("/settings");
+    redirect("/settings?keyRotated=1");
+}
+export async function runDatabaseMaintenanceAction() {
+    const user = await getCurrentUser();
+    if (!user)
+        redirect("/login");
+    const result = await runDatabaseMaintenance();
+    await createActivityLog({
+        actorId: String(user._id),
+        actorName: user.name,
+        action: "optimized",
+        entityType: "database",
+        entityId: "maintenance",
+        entityLabel: "Database Maintenance",
+        metadata: result,
+    });
+    revalidatePath("/settings");
+    redirect("/settings?maintenanceRun=1");
 }
 export async function saveSectionAction(formData) {
     const user = await getCurrentUser();

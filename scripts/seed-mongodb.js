@@ -38,8 +38,8 @@ async function main() {
   ]);
   const admin = await AdminUserModel.create({
     name: "Muhammad Ali",
-    email: "admin@gmail.com",
-    passwordHash: await bcrypt.hash("Pakistan123", 10),
+    email: "admin@sectionhub.com",
+    passwordHash: await bcrypt.hash("admin12345", 10),
     role: "ADMIN",
     isActive: true,
   });

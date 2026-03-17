@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Icon } from "@/components/sectionhub/ui";
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { Icon } from "@/components/sectionhub/ui";
 import { navGroups } from "@/lib/data/navigation/sectionhub-nav";
 
 export function AppHeader({ setDrawerOpen, search, setSearch }) {
   const pathname = usePathname();
+  const isSettingsPage = pathname.startsWith("/settings");
 
   const pageTitle = useMemo(() => {
     const match = navGroups
@@ -24,6 +25,41 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
     ? `/sections?search=${encodeURIComponent(search.trim())}`
     : "/sections";
 
+  if (isSettingsPage) {
+    return (
+      <header className="sticky top-0 z-20 flex h-[68px] flex-col justify-center border-b border-[var(--border-default)] bg-white">
+        <div className="flex min-h-14 items-center justify-between gap-3 px-4 md:px-6">
+          <div className="text-[40px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
+            System Settings
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden h-[40px] min-w-[280px] items-center gap-2 rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-3 md:flex">
+              <Icon name="search" className="h-4 w-4 text-[var(--text-tertiary)]" />
+              <input
+                className="h-full w-full bg-transparent text-[14px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
+                placeholder="Search settings..."
+              />
+            </div>
+            <button
+              type="button"
+              className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-button)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-soft)]"
+            >
+              <Icon name="help" className="h-[18px] w-[18px]" />
+            </button>
+            <button
+              type="submit"
+              form="settings-general-form"
+              className="inline-flex min-h-10 items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-20 flex h-[56px] flex-col justify-center border-b border-[var(--border-default)] bg-white">
       <div className="flex min-h-14 items-center justify-between gap-3 px-4 md:px-6">
@@ -36,18 +72,17 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
             <Icon name="menu" />
           </button>
           <div className="hidden flex-col md:flex">
-             <div className="flex items-center text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)] gap-2">
-                <span>SectionHub</span>
-                <span>/</span>
-                <span>Admin</span>
-             </div>
-             <div className="text-[17px] mt-[2px] font-semibold text-[var(--text-primary)] tracking-tight">
-               {pageTitle}
-             </div>
+            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+              <span>SectionHub</span>
+              <span>/</span>
+              <span>Admin</span>
+            </div>
+            <div className="mt-[2px] text-[17px] font-semibold tracking-tight text-[var(--text-primary)]">
+              {pageTitle}
+            </div>
           </div>
-          {/* Mobile title */}
-          <div className="md:hidden text-[15px] font-semibold text-[var(--text-primary)]">
-             {pageTitle}
+          <div className="text-[15px] font-semibold text-[var(--text-primary)] md:hidden">
+            {pageTitle}
           </div>
         </div>
 
@@ -57,7 +92,7 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
             <input
               value={search}
               onChange={(event) => setSearch?.(event.target.value)}
-              className="w-full bg-transparent text-[13px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)] h-full"
+              className="h-full w-full bg-transparent text-[13px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
               placeholder="Search sections, bundles, shops..."
             />
           </div>
@@ -69,25 +104,22 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
           </Link>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-button)] text-[var(--text-secondary)] hover:bg-[var(--surface-soft)] transition-colors relative"
+            className="relative flex h-9 w-9 items-center justify-center rounded-[var(--radius-button)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-soft)]"
           >
             <Icon name="bell" className="h-[18px] w-[18px]" />
-            <span className="absolute top-[8px] right-[8px] h-2 w-2 rounded-full bg-[var(--color-primary)] border-2 border-white"></span>
+            <span className="absolute right-[8px] top-[8px] h-2 w-2 rounded-full border-2 border-white bg-[var(--color-primary)]" />
           </button>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-button)] text-[var(--text-secondary)] hover:bg-[var(--surface-soft)] transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-button)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-soft)]"
           >
             <Icon name="help" className="h-[18px] w-[18px]" />
           </button>
-          {/* Avatar button */}
-          <button className="h-8 w-8 rounded-full bg-[var(--color-primary-light)] text-[var(--color-primary-text-light)] font-semibold text-[11px] flex items-center justify-center ml-1 border border-[var(--border-default)]">
+          <button className="ml-1 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--color-primary-light)] text-[11px] font-semibold text-[var(--color-primary-text-light)]">
             AR
           </button>
         </div>
       </div>
-      
-      {/* Mobile search is shown outside header layout in the parent wrapper or hidden based on state, keeping it thin here */}
     </header>
   );
 }

@@ -11,16 +11,21 @@ async function seed() {
   await db.collection("users").deleteMany({});
   const hashedPassword = await bcrypt.hash("password123", 10);
 
+  const name = "Muhammad Ali";
+  const email = "admin@gmail.com";
+
   await db.collection("users").insertOne({
-    name: "Muhammad Ali",
-    email: "admin@gmail.com",
-    passwordHash: await bcrypt.hash("Pakistan123", 10),
+    name: name,
+    email: email,
+    passwordHash: hashedPassword,
     role: "ADMIN",
     createdAt: new Date(),
     updatedAt: new Date(),
   });
 
-  console.log("Admin user created (admin@sectionhub.com / password123)");
+  console.log(
+    `Admin Created with Name: ${name} & Email: ${email} & Password: ${passwordHash}`,
+  );
   process.exit();
 }
 
