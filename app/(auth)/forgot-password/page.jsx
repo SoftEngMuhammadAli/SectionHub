@@ -51,9 +51,11 @@ export default async function ForgotPasswordPage({ searchParams }) {
             href="/login"
             className="inline-flex items-center gap-2 text-[14px] font-medium text-[var(--primary)]"
           >
-            <ArrowLeft className="h-4 w-4" /> Back to Login
+            <ArrowLeft className="h-4 w-4" />
+            Back to Login
           </Link>
         </div>
+
         {sent ? (
           <div className="rounded-[8px] bg-[var(--primary-light)] p-3 text-[13px] text-[var(--primary-light-text)]">
             Reset token generated locally:{" "}

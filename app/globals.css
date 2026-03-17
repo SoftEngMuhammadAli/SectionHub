@@ -36,6 +36,11 @@
   --sidebar-active-text: #ffffff;
   --sidebar-text: #8e95b5;
   --sidebar-section-label: #66708f;
+  --sidebar-light-bg: #ffffff;
+  --sidebar-light-hover: #f3f2ff;
+  --sidebar-light-active-bg: #eee9ff;
+  --sidebar-light-active-text: #4b32c3;
+  --sidebar-light-text: #344562;
 
   /* Borders */
   --border-default: #e6e8f2;
@@ -151,7 +156,7 @@ textarea::placeholder {
   width: 100%;
   padding: 10px 14px;
   outline: none;
-  min-height: 44px;
+  min-height: 40px;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -169,7 +174,7 @@ textarea::placeholder {
   width: 100%;
   padding: 10px 14px;
   outline: none;
-  min-height: 44px;
+  min-height: 40px;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -184,7 +189,7 @@ textarea::placeholder {
 .sectionhub-select {
   appearance: none;
   width: 100%;
-  min-height: 44px;
+  min-height: 40px;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-input);
   background: var(--surface-card);
@@ -293,10 +298,10 @@ textarea::placeholder {
 .sectionhub-dot-grid {
   background-color: var(--background-app);
   background-image: radial-gradient(
-    rgba(109, 76, 255, 0.11) 0.8px,
+    rgba(139, 145, 168, 0.28) 0.8px,
     transparent 0.8px
   );
-  background-size: 18px 18px;
+  background-size: 22px 22px;
 }
 
 .sectionhub-scrollbar::-webkit-scrollbar {

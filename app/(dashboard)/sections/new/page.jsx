@@ -175,7 +175,7 @@ export default async function NewSectionPage({ searchParams }) {
             type="submit"
             className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
           >
-            Save Draft
+            Save
           </button>
         </div>
       </form>

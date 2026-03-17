@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   Bell,
@@ -12,7 +14,7 @@ import {
 } from "lucide-react";
 import { logoutAction } from "@/app/actions";
 import { navGroups } from "@/lib/data/navigation/sectionhub-nav";
-import { Badge, Icon } from "@/components/sectionhub/ui";
+import { Icon } from "@/components/sectionhub/ui";
 import { cn } from "@/components/sectionhub/ui/cn";
 
 const SETTINGS_TABS = [
@@ -43,24 +45,42 @@ function getActiveNavHref(pathname) {
   return matches.sort((a, b) => b.href.length - a.href.length)[0].href;
 }
 
-function SettingsSidebarContent({ activeTab, setDrawerOpen }) {
+function BrandMark({ siteLogo }) {
+  if (siteLogo) {
+    return (
+      <Image
+        src={siteLogo}
+        alt="Site logo"
+        width={30}
+        height={30}
+        className="h-[30px] w-[30px] rounded-[8px] border border-[var(--border-default)] object-cover"
+      />
+    );
+  }
+
+  return (
+    <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[8px] bg-[var(--color-primary)] text-white">
+      <Icon name="grid" className="h-4 w-4" />
+    </div>
+  );
+}
+
+function SettingsSidebarContent({ activeTab, setDrawerOpen, siteLogo }) {
   return (
     <>
-      <div className="flex h-[76px] items-center gap-3 border-b border-[var(--border-default)] px-6">
-        <div className="flex h-[42px] w-[42px] items-center justify-center rounded-[14px] bg-[var(--color-primary)] text-white">
-          <Icon name="grid" className="h-5 w-5" />
-        </div>
+      <div className="flex h-[60px] items-center gap-3 border-b border-[var(--border-default)] px-4">
+        <BrandMark siteLogo={siteLogo} />
         <div>
-          <div className="text-[36px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
-            <Link href={"/"}>SectionHub</Link>
+          <div className="text-[18px] font-semibold text-[var(--text-primary)]">
+            <Link href="/">SectionHub</Link>
           </div>
-          <div className="text-[13px] text-[var(--text-secondary)]">
+          <div className="text-[11px] text-[var(--text-secondary)]">
             System Admin
           </div>
         </div>
       </div>
 
-      <div className="flex-1 space-y-2 px-4 py-5">
+      <div className="flex-1 space-y-1.5 px-3 py-4">
         {settingsNav.map((item) => {
           const ItemIcon = item.icon;
           const active = activeTab === item.id;
@@ -70,10 +90,10 @@ function SettingsSidebarContent({ activeTab, setDrawerOpen }) {
               href={`/settings?tab=${item.id}`}
               onClick={() => setDrawerOpen?.(false)}
               className={cn(
-                "flex h-[44px] w-full items-center gap-3 rounded-[10px] px-3 text-left text-[16px] font-medium transition-colors",
+                "flex h-[38px] items-center gap-3 rounded-[8px] px-3 text-[14px] font-medium transition-colors",
                 active
-                  ? "bg-[var(--color-primary-light)] text-[var(--color-primary)]"
-                  : "text-[var(--text-primary)] hover:bg-[var(--surface-soft)]",
+                  ? "bg-[var(--sidebar-light-active-bg)] text-[var(--sidebar-light-active-text)]"
+                  : "text-[var(--sidebar-light-text)] hover:bg-[var(--sidebar-light-hover)]",
               )}
             >
               <ItemIcon className="h-4 w-4" />
@@ -84,16 +104,16 @@ function SettingsSidebarContent({ activeTab, setDrawerOpen }) {
       </div>
 
       <div className="border-t border-[var(--border-default)] p-4">
-        <div className="flex items-center justify-between gap-3 rounded-[12px] p-2">
+        <div className="flex items-center justify-between gap-3 rounded-[10px] bg-[var(--surface-soft)] p-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[12px] font-semibold text-[var(--color-primary)]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[12px] font-medium text-[var(--color-primary)]">
               AR
             </div>
             <div>
-              <div className="text-[16px] font-semibold text-[var(--text-primary)]">
+              <div className="text-[14px] font-medium text-[var(--text-primary)]">
                 Alex Rivera
               </div>
-              <div className="text-[13px] text-[var(--text-secondary)]">
+              <div className="text-[12px] text-[var(--text-secondary)]">
                 Admin Role
               </div>
             </div>
@@ -113,71 +133,36 @@ function SettingsSidebarContent({ activeTab, setDrawerOpen }) {
   );
 }
 
-export function AppSidebar({ drawerOpen, setDrawerOpen }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const isSettingsPage = pathname.startsWith("/settings");
-  const tabParam = String(searchParams.get("tab") || "general");
-  const activeTab = SETTINGS_TABS.includes(tabParam) ? tabParam : "general";
-  const activeNavHref = getActiveNavHref(pathname);
-
-  if (isSettingsPage) {
-    return (
-      <>
-        <aside className="hidden w-[310px] shrink-0 flex-col border-r border-[var(--border-default)] bg-white md:flex">
-          <SettingsSidebarContent
-            activeTab={activeTab}
-            setDrawerOpen={setDrawerOpen}
-          />
-        </aside>
-
-        {drawerOpen ? (
-          <button
-            type="button"
-            aria-label="Close navigation"
-            className="fixed inset-0 z-30 bg-black/20 md:hidden"
-            onClick={() => setDrawerOpen(false)}
-          />
-        ) : null}
-
-        <aside
-          className={cn(
-            "fixed inset-y-0 left-0 z-40 flex w-[300px] max-w-[86vw] flex-col border-r border-[var(--border-default)] bg-white shadow-xl transition-transform md:hidden",
-            drawerOpen ? "translate-x-0" : "-translate-x-full",
-          )}
-        >
-          <SettingsSidebarContent
-            activeTab={activeTab}
-            setDrawerOpen={setDrawerOpen}
-          />
-        </aside>
-      </>
-    );
-  }
-
-  const navContent = (
+function GeneralSidebarContent({
+  activeNavHref,
+  setDrawerOpen,
+  siteLogo,
+}) {
+  return (
     <>
-      <div className="flex h-[60px] items-center gap-3 px-5">
-        <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-[var(--color-primary)] text-white">
-          <Icon name="grid" className="h-4 w-4" />
-        </div>
+      <div className="flex h-[60px] items-center gap-3 px-4">
+        <BrandMark siteLogo={siteLogo} />
         <div>
-          <div className="text-[14px] font-semibold text-white">SectionHub</div>
-          <div className="flex items-center gap-2 text-[11px] text-[var(--sidebar-text)]">
-            <span>Admin</span>
-            <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] uppercase tracking-[0.08em]">
-              Internal
-            </span>
+          <div
+            className="text-[18px] font-semibold text-white"
+          >
+            SectionHub
+          </div>
+          <div className="text-[11px] text-[var(--sidebar-text)]">
+            Admin Console
           </div>
         </div>
       </div>
 
-      <div className="sectionhub-scrollbar flex-1 space-y-6 overflow-y-auto px-3 py-4">
+      <div className="sectionhub-scrollbar flex-1 space-y-5 overflow-y-auto px-3 py-4">
         {navGroups.map((group) => (
           <div key={group.label} className="space-y-2">
-            <div className="px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--sidebar-section-label)]">
+            <div
+              className="px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--sidebar-section-label)]"
+            >
               {group.label}
             </div>
+
             <div className="space-y-1">
               {group.items.map((item) => {
                 const active = item.href === activeNavHref;
@@ -187,7 +172,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
                     href={item.href}
                     onClick={() => setDrawerOpen?.(false)}
                     className={cn(
-                      "flex h-[38px] items-center gap-3 rounded-[10px] border-l-2 px-3 text-[13px] transition-colors",
+                      "flex h-[38px] items-center gap-3 rounded-[8px] border-l-2 px-3 text-[13px] font-medium transition-colors",
                       active
                         ? "border-[var(--sidebar-active-border)] bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]"
                         : "border-transparent text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white",
@@ -203,10 +188,12 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
         ))}
       </div>
 
-      <div className="border-t border-white/8 p-4">
-        <div className="cursor-pointer rounded-[12px] bg-white/4 p-3 transition-colors hover:bg-[var(--sidebar-hover)]">
+      <div
+        className="border-t border-white/8 p-4"
+      >
+        <div className="rounded-[10px] bg-white/4 p-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-light)] font-semibold text-[var(--color-primary-text-light)]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[12px] font-medium text-[var(--color-primary-text-light)]">
               AR
             </div>
             <div className="min-w-0 flex-1">
@@ -217,22 +204,88 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
                 admin@sectionhub.com
               </div>
             </div>
-            <Badge
-              variant="default"
-              className="border-none bg-[var(--color-primary)]"
-            >
-              Admin
-            </Badge>
           </div>
         </div>
       </div>
     </>
   );
+}
+
+export function AppSidebar({ drawerOpen, setDrawerOpen }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [siteLogo, setSiteLogo] = useState("");
+  const isSettingsPage = pathname.startsWith("/settings");
+  const tabParam = String(searchParams.get("tab") || "general");
+  const activeTab = SETTINGS_TABS.includes(tabParam) ? tabParam : "general";
+  const activeNavHref = getActiveNavHref(pathname);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadSettings() {
+      try {
+        const response = await fetch("/api/settings", { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!ignore) {
+          setSiteLogo(String(data.siteLogo ?? ""));
+        }
+      } catch {}
+    }
+
+    void loadSettings();
+    return () => {
+      ignore = true;
+    };
+  }, [pathname, tabParam]);
+
+  if (isSettingsPage) {
+    return (
+      <>
+        <aside className="hidden w-[232px] shrink-0 flex-col border-r border-[var(--border-default)] bg-white md:flex">
+          <SettingsSidebarContent
+            activeTab={activeTab}
+            setDrawerOpen={setDrawerOpen}
+            siteLogo={siteLogo}
+          />
+        </aside>
+
+        {drawerOpen ? (
+          <button
+            type="button"
+            aria-label="Close navigation"
+            className="fixed inset-0 z-30 bg-black/20 md:hidden"
+            onClick={() => setDrawerOpen(false)}
+          />
+        ) : null}
+
+        <aside
+          className={cn(
+            "fixed inset-y-0 left-0 z-40 flex w-[260px] max-w-[86vw] flex-col border-r border-[var(--border-default)] bg-white shadow-xl transition-transform md:hidden",
+            drawerOpen ? "translate-x-0" : "-translate-x-full",
+          )}
+        >
+          <SettingsSidebarContent
+            activeTab={activeTab}
+            setDrawerOpen={setDrawerOpen}
+            siteLogo={siteLogo}
+          />
+        </aside>
+      </>
+    );
+  }
 
   return (
     <>
-      <aside className="hidden w-[232px] shrink-0 flex-col bg-[var(--sidebar-bg)] text-white md:flex">
-        {navContent}
+      <aside
+        className="hidden w-[232px] shrink-0 flex-col bg-[var(--sidebar-bg)] text-white md:flex"
+      >
+        <GeneralSidebarContent
+          activeNavHref={activeNavHref}
+          setDrawerOpen={setDrawerOpen}
+          siteLogo={siteLogo}
+        />
       </aside>
 
       {drawerOpen ? (
@@ -246,21 +299,30 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-[280px] max-w-[85vw] flex-col bg-[var(--sidebar-bg)] text-white shadow-xl transition-transform md:hidden",
+          "fixed inset-y-0 left-0 z-40 flex w-[260px] max-w-[85vw] flex-col shadow-xl transition-transform md:hidden",
+          "bg-[var(--sidebar-bg)] text-white",
           drawerOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
-          <div className="text-[14px] font-semibold text-white">Navigation</div>
+        <div
+          className="flex items-center justify-between border-b border-white/8 px-4 py-3"
+        >
+          <div className="text-[14px] font-medium text-white">
+            Navigation
+          </div>
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-white/10 text-white hover:bg-white/10"
+            className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/10 text-white"
             onClick={() => setDrawerOpen(false)}
           >
             <Icon name="close" />
           </button>
         </div>
-        {navContent}
+        <GeneralSidebarContent
+          activeNavHref={activeNavHref}
+          setDrawerOpen={setDrawerOpen}
+          siteLogo={siteLogo}
+        />
       </aside>
     </>
   );

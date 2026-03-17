@@ -38,10 +38,10 @@ function Notice({ tone = "success", children }) {
 function SectionTitle({ title, description }) {
   return (
     <div>
-      <h2 className="text-[40px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
+      <h2 className="text-[24px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
         {title}
       </h2>
-      <p className="mt-1 text-[15px] text-[var(--text-secondary)]">
+      <p className="mt-1 text-[14px] text-[var(--text-secondary)]">
         {description}
       </p>
     </div>
@@ -98,7 +98,11 @@ export default async function SettingsPage({ searchParams }) {
             description="Manage your core instance configuration and branding."
           />
 
-          <form id="settings-general-form" action={saveSettingsAction}>
+          <form
+            id="settings-general-form"
+            action={saveSettingsAction}
+            encType="multipart/form-data"
+          >
             <Card className="space-y-6 p-6">
               <div className="grid gap-5 lg:grid-cols-2">
                 <label className="block space-y-2">
@@ -138,9 +142,9 @@ export default async function SettingsPage({ searchParams }) {
                   <span className="text-[12px] font-semibold text-[var(--text-primary)]">
                     Maintenance Mode
                   </span>
-                  <label className="flex min-h-[120px] items-start justify-between gap-4 rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] p-5">
+                  <label className="flex min-h-[104px] items-start justify-between gap-4 rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] p-4">
                     <div>
-                      <div className="text-[28px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+                      <div className="text-[18px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                         Maintenance Mode
                       </div>
                       <p className="mt-1 text-[14px] leading-6 text-[var(--text-secondary)]">
@@ -190,7 +194,7 @@ export default async function SettingsPage({ searchParams }) {
           <Card className="overflow-hidden p-0">
             <div className="space-y-0">
               <div className="grid gap-4 border-b border-[var(--border-default)] px-6 py-6 md:grid-cols-[220px_1fr_auto] md:items-center">
-                <div className="text-[30px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+                <div className="text-[18px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                   Client ID
                 </div>
                 <div className="overflow-x-auto rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3 font-mono-ui text-[13px] text-[var(--text-primary)]">
@@ -202,7 +206,7 @@ export default async function SettingsPage({ searchParams }) {
               </div>
 
               <div className="grid gap-4 border-b border-[var(--border-default)] px-6 py-6 md:grid-cols-[220px_1fr_auto] md:items-center">
-                <div className="text-[30px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+                <div className="text-[18px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                   Client Secret
                 </div>
                 <CredentialSecretValue
@@ -443,7 +447,7 @@ export default async function SettingsPage({ searchParams }) {
             className="flex scroll-mt-24 flex-col items-start justify-between gap-4 border-[var(--danger)]/20 bg-[var(--danger-light)]/35 p-6 md:flex-row md:items-center"
           >
             <div>
-              <h3 className="text-[30px] font-semibold tracking-[-0.02em] text-[var(--danger)]">
+              <h3 className="text-[24px] font-semibold tracking-[-0.01em] text-[var(--danger)]">
                 Database Maintenance
               </h3>
               <p className="mt-1 text-[15px] text-[var(--danger)]/90">
