@@ -33,6 +33,22 @@ const settingsNav = [
   { id: "advanced", label: "Advanced", icon: SquareTerminal },
 ];
 
+const DARK_SIDEBAR_ROUTE_PATTERNS = ["/dashboard", "/bundles"];
+
+function matchesRoutePattern(pathname, pattern) {
+  if (pathname === pattern) return true;
+  if (pattern === "/dashboard") return false;
+  return pathname.startsWith(`${pattern}/`);
+}
+
+function resolveSidebarTheme(pathname) {
+  return DARK_SIDEBAR_ROUTE_PATTERNS.some((pattern) =>
+    matchesRoutePattern(pathname, pattern),
+  )
+    ? "dark"
+    : "light";
+}
+
 function getActiveNavHref(pathname) {
   const allItems = navGroups.flatMap((group) => group.items);
   const matches = allItems.filter((item) => {
@@ -137,18 +153,31 @@ function GeneralSidebarContent({
   activeNavHref,
   setDrawerOpen,
   siteLogo,
+  theme = "dark",
 }) {
+  const isDark = theme === "dark";
+
   return (
     <>
       <div className="flex h-[60px] items-center gap-3 px-4">
         <BrandMark siteLogo={siteLogo} />
         <div>
           <div
-            className="text-[18px] font-semibold text-white"
+            className={cn(
+              "text-[18px] font-semibold",
+              isDark ? "text-white" : "text-[var(--text-primary)]",
+            )}
           >
             SectionHub
           </div>
-          <div className="text-[11px] text-[var(--sidebar-text)]">
+          <div
+            className={cn(
+              "text-[11px]",
+              isDark
+                ? "text-[var(--sidebar-text)]"
+                : "text-[var(--text-secondary)]",
+            )}
+          >
             Admin Console
           </div>
         </div>
@@ -158,7 +187,12 @@ function GeneralSidebarContent({
         {navGroups.map((group) => (
           <div key={group.label} className="space-y-2">
             <div
-              className="px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--sidebar-section-label)]"
+              className={cn(
+                "px-3 text-[11px] font-medium uppercase tracking-[0.08em]",
+                isDark
+                  ? "text-[var(--sidebar-section-label)]"
+                  : "text-[var(--text-tertiary)]",
+              )}
             >
               {group.label}
             </div>
@@ -173,9 +207,13 @@ function GeneralSidebarContent({
                     onClick={() => setDrawerOpen?.(false)}
                     className={cn(
                       "flex h-[38px] items-center gap-3 rounded-[8px] border-l-2 px-3 text-[13px] font-medium transition-colors",
-                      active
-                        ? "border-[var(--sidebar-active-border)] bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]"
-                        : "border-transparent text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white",
+                      isDark
+                        ? active
+                          ? "border-[var(--sidebar-active-border)] bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] shadow-[0_4px_14px_rgba(109,76,255,0.24)]"
+                          : "border-transparent text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white"
+                        : active
+                          ? "border-[var(--sidebar-active-border)] bg-[var(--sidebar-light-active-bg)] text-[var(--sidebar-light-active-text)] shadow-[0_3px_10px_rgba(109,76,255,0.16)]"
+                          : "border-transparent text-[var(--sidebar-light-text)] hover:bg-[var(--sidebar-light-hover)] hover:text-[var(--text-primary)]",
                     )}
                   >
                     <Icon name={item.icon} className="h-4 w-4" />
@@ -189,18 +227,38 @@ function GeneralSidebarContent({
       </div>
 
       <div
-        className="border-t border-white/8 p-4"
+        className={cn(
+          "border-t p-4",
+          isDark ? "border-white/8" : "border-[var(--border-default)]",
+        )}
       >
-        <div className="rounded-[10px] bg-white/4 p-3">
+        <div
+          className={cn(
+            "rounded-[10px] p-3",
+            isDark ? "bg-white/4" : "bg-[var(--surface-soft)]",
+          )}
+        >
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[12px] font-medium text-[var(--color-primary-text-light)]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[12px] font-medium text-[var(--color-primary)]">
               AR
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[13px] font-medium text-white">
+              <div
+                className={cn(
+                  "truncate text-[13px] font-medium",
+                  isDark ? "text-white" : "text-[var(--text-primary)]",
+                )}
+              >
                 Alex Rivera
               </div>
-              <div className="truncate text-[11px] text-[var(--sidebar-text)]">
+              <div
+                className={cn(
+                  "truncate text-[11px]",
+                  isDark
+                    ? "text-[var(--sidebar-text)]"
+                    : "text-[var(--text-secondary)]",
+                )}
+              >
                 admin@sectionhub.com
               </div>
             </div>
@@ -216,6 +274,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
   const searchParams = useSearchParams();
   const [siteLogo, setSiteLogo] = useState("");
   const isSettingsPage = pathname.startsWith("/settings");
+  const sidebarTheme = resolveSidebarTheme(pathname);
   const tabParam = String(searchParams.get("tab") || "general");
   const activeTab = SETTINGS_TABS.includes(tabParam) ? tabParam : "general";
   const activeNavHref = getActiveNavHref(pathname);
@@ -279,12 +338,18 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
   return (
     <>
       <aside
-        className="hidden w-[232px] shrink-0 flex-col bg-[var(--sidebar-bg)] text-white md:flex"
+        className={cn(
+          "hidden w-[232px] shrink-0 flex-col md:flex",
+          sidebarTheme === "dark"
+            ? "bg-[var(--sidebar-bg)] text-white"
+            : "border-r border-[var(--border-default)] bg-[var(--sidebar-light-bg)] text-[var(--text-primary)]",
+        )}
       >
         <GeneralSidebarContent
           activeNavHref={activeNavHref}
           setDrawerOpen={setDrawerOpen}
           siteLogo={siteLogo}
+          theme={sidebarTheme}
         />
       </aside>
 
@@ -292,7 +357,10 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
         <button
           type="button"
           aria-label="Close navigation"
-          className="fixed inset-0 z-30 bg-[#0b1020]/50 md:hidden"
+          className={cn(
+            "fixed inset-0 z-30 md:hidden",
+            sidebarTheme === "dark" ? "bg-[#0b1020]/50" : "bg-black/20",
+          )}
           onClick={() => setDrawerOpen(false)}
         />
       ) : null}
@@ -300,19 +368,36 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-40 flex w-[260px] max-w-[85vw] flex-col shadow-xl transition-transform md:hidden",
-          "bg-[var(--sidebar-bg)] text-white",
+          sidebarTheme === "dark"
+            ? "bg-[var(--sidebar-bg)] text-white"
+            : "border-r border-[var(--border-default)] bg-[var(--sidebar-light-bg)] text-[var(--text-primary)]",
           drawerOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div
-          className="flex items-center justify-between border-b border-white/8 px-4 py-3"
+          className={cn(
+            "flex items-center justify-between border-b px-4 py-3",
+            sidebarTheme === "dark"
+              ? "border-white/8"
+              : "border-[var(--border-default)]",
+          )}
         >
-          <div className="text-[14px] font-medium text-white">
+          <div
+            className={cn(
+              "text-[14px] font-medium",
+              sidebarTheme === "dark" ? "text-white" : "text-[var(--text-primary)]",
+            )}
+          >
             Navigation
           </div>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/10 text-white"
+            className={cn(
+              "flex h-9 w-9 items-center justify-center rounded-[8px] border",
+              sidebarTheme === "dark"
+                ? "border-white/10 text-white"
+                : "border-[var(--border-default)] text-[var(--text-secondary)]",
+            )}
             onClick={() => setDrawerOpen(false)}
           >
             <Icon name="close" />
@@ -322,6 +407,7 @@ export function AppSidebar({ drawerOpen, setDrawerOpen }) {
           activeNavHref={activeNavHref}
           setDrawerOpen={setDrawerOpen}
           siteLogo={siteLogo}
+          theme={sidebarTheme}
         />
       </aside>
     </>

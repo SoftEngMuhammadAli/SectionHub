@@ -1,44 +1,85 @@
 import { saveSectionAction } from "@/app/actions";
 import { Card } from "@/components/ui/card";
-import { SectionTitle } from "@/components/sectionhub/ui/section-title";
+import { MultiSelectChips } from "@/components/sectionhub/forms/multi-select-chips";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getTags } from "@/lib/sectionhub/tags/service";
+
 export default async function NewSectionPage({ searchParams }) {
   const params = await searchParams;
   const error = typeof params.error === "string" ? params.error : "";
   const [categories, tags] = await Promise.all([getCategories(), getTags()]);
+  const tagOptions = tags.map((tag) => ({
+    id: tag.id,
+    name: tag.name,
+    meta: tag.slug,
+  }));
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {error ? (
         <div className="rounded-[8px] border border-[var(--danger)]/20 bg-[var(--danger-light)] px-4 py-2.5 text-[13px] text-[var(--danger)]">
           {error}
         </div>
       ) : null}
-      <SectionTitle
-        title="Upload New Section"
-        subtitle="Create a persistent section with versioning, pricing, metadata, and preview support."
-      />
-      <form
-        action={saveSectionAction}
-        className="grid gap-4 xl:grid-cols-[1.5fr_0.8fr]"
-      >
+
+      <div className="space-y-1">
+        <h1 className="text-[24px] font-semibold text-[var(--text-primary)]">
+          Upload New Section
+        </h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Add pricing, metadata, compatibility and publishing information.
+        </p>
+      </div>
+
+      <form action={saveSectionAction} className="grid gap-4 xl:grid-cols-[1.75fr_0.9fr]">
         <div className="space-y-4">
           <Card className="p-5">
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Section name</span>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+                Basic Information
+              </h2>
+              <span className="font-mono text-[11px] text-[var(--text-tertiary)]">
+                v1.0.0
+              </span>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Section Name
+                </span>
                 <input name="name" required className="sectionhub-input" />
               </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Slug</span>
-                <input
-                  name="slug"
-                  className="sectionhub-input font-mono"
-                  placeholder="hero-banner-pro"
-                />
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Slug
+                </span>
+                <div className="flex">
+                  <span className="inline-flex items-center rounded-l-[8px] border border-r-0 border-[var(--border-default)] bg-[var(--background-page)] px-3 font-mono text-[13px] text-[var(--text-tertiary)]">
+                    /s/
+                  </span>
+                  <input
+                    name="slug"
+                    className="sectionhub-input rounded-l-none font-mono"
+                    placeholder="hero-banner-pro"
+                  />
+                </div>
               </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Category</span>
+              <label className="space-y-1.5 md:col-span-2">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Short Description
+                </span>
+                <input name="shortDescription" className="sectionhub-input" />
+              </label>
+              <label className="space-y-1.5 md:col-span-2">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Full Description
+                </span>
+                <textarea name="fullDescription" className="sectionhub-textarea" />
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Category
+                </span>
                 <select name="categoryId" className="sectionhub-select">
                   <option value="">Select category</option>
                   {categories.map((category) => (
@@ -48,101 +89,154 @@ export default async function NewSectionPage({ searchParams }) {
                   ))}
                 </select>
               </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Version</span>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Subcategory
+                </span>
+                <input name="subcategory" className="sectionhub-input" />
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Version
+                </span>
                 <input
                   name="version"
                   defaultValue="v1.0.0"
                   className="sectionhub-input font-mono"
                 />
               </label>
-              <label className="block space-y-2 md:col-span-2">
-                <span className="text-[12px] font-medium">
-                  Short description
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Author
                 </span>
-                <input name="shortDescription" className="sectionhub-input" />
-              </label>
-              <label className="block space-y-2 md:col-span-2">
-                <span className="text-[12px] font-medium">
-                  Full description
-                </span>
-                <textarea
-                  name="fullDescription"
-                  className="sectionhub-textarea"
-                />
+                <input defaultValue="Admin" disabled className="sectionhub-input" />
               </label>
             </div>
           </Card>
+
           <Card className="p-5">
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Pricing Type</span>
-                <select name="pricingType" className="sectionhub-select">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+                Pricing & Access
+              </h2>
+              <div className="flex items-center gap-2 text-[13px]">
+                <span className="text-[var(--text-secondary)]">Free</span>
+                <select name="pricingType" className="sectionhub-select min-w-[110px]">
                   <option value="PAID">Paid</option>
                   <option value="FREE">Free</option>
                 </select>
-              </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Price</span>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Price ($)
+                </span>
                 <input
                   name="price"
                   type="number"
                   step="0.01"
-                  defaultValue="39"
+                  defaultValue="29"
                   className="sectionhub-input"
                 />
               </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Compare At</span>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Compare at ($)
+                </span>
                 <input
                   name="compareAtPrice"
                   type="number"
                   step="0.01"
-                  defaultValue="59"
+                  defaultValue="49"
                   className="sectionhub-input"
                 />
               </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Visibility</span>
-                <select name="visibility" className="sectionhub-select">
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Access Type
+                </span>
+                <select name="accessType" className="sectionhub-select">
+                  <option value="SINGLE">Single Purchase</option>
+                  <option value="BUNDLE">Bundle</option>
+                  <option value="SUBSCRIPTION">Subscription</option>
                   <option value="INTERNAL">Internal</option>
-                  <option value="MARKETPLACE">Marketplace</option>
+                </select>
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  License Type
+                </span>
+                <select name="licenseType" className="sectionhub-select">
+                  <option value="SINGLE_STORE">Single Store</option>
+                  <option value="MULTI_STORE">Multi Store</option>
+                  <option value="UNLIMITED">Unlimited</option>
                 </select>
               </label>
             </div>
           </Card>
+
           <Card className="p-5">
-            <div className="grid gap-4">
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Preview URL</span>
+            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">Liquid File</h2>
+            <div className="mt-4 rounded-[8px] border border-dashed border-[var(--border-strong)] bg-[var(--background-page)] p-8 text-center">
+              <div className="text-[14px] font-medium text-[var(--text-primary)]">
+                Click to upload or drag and drop
+              </div>
+              <div className="mt-1 text-[12px] text-[var(--text-tertiary)]">
+                .liquid files only, max 2MB
+              </div>
+            </div>
+            <div className="mt-3 rounded-[8px] bg-[#0d1735] px-3 py-2 font-mono text-[12px] text-white">
+              SHA-256: 8f3a...e9b2
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+              Media Preview
+            </h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <label className="space-y-1.5 md:col-span-2">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Preview URL
+                </span>
                 <input
                   name="previewUrl"
                   className="sectionhub-input"
-                  placeholder="/previews/new-section.png"
+                  placeholder="/previews/hero-banner-pro.png"
                 />
               </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">Tag IDs</span>
-                <input
+              <div className="md:col-span-2">
+                <MultiSelectChips
                   name="tagIds"
-                  defaultValue={tags
-                    .slice(0, 3)
-                    .map((tag) => tag.id)
-                    .join(",")}
-                  className="sectionhub-input font-mono"
+                  label="Tags"
+                  placeholder="Search tags by name..."
+                  options={tagOptions}
+                  emptyText="No tags found."
                 />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+              Documentation & Compatibility
+            </h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <label className="space-y-1.5 md:col-span-2">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Installation Steps
                 </span>
-                <textarea
-                  name="installationSteps"
-                  className="sectionhub-textarea"
-                />
+                <textarea name="installationSteps" className="sectionhub-textarea" />
               </label>
-              <label className="block space-y-2">
-                <span className="text-[12px] font-medium">
+              <label className="space-y-1.5 md:col-span-2">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Usage Notes
+                </span>
+                <textarea name="usageNotes" className="sectionhub-textarea" />
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Compatibility Theme
                 </span>
                 <input
@@ -151,32 +245,162 @@ export default async function NewSectionPage({ searchParams }) {
                   className="sectionhub-input"
                 />
               </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Tested Environments
+                </span>
+                <input
+                  name="testedEnvironments"
+                  defaultValue="Desktop Chrome, Safari, Mobile iOS"
+                  className="sectionhub-input"
+                />
+              </label>
+              <label className="space-y-1.5 md:col-span-2">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Dependencies
+                </span>
+                <input
+                  name="dependencies"
+                  placeholder="theme.css, app.js"
+                  className="sectionhub-input"
+                />
+              </label>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">SEO Metadata</h2>
+            <div className="mt-4 grid gap-3">
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Meta Title
+                </span>
+                <input name="metaTitle" className="sectionhub-input" />
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Meta Description
+                </span>
+                <textarea name="metaDescription" className="sectionhub-textarea" />
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Internal Keywords
+                </span>
+                <input
+                  name="internalKeywords"
+                  placeholder="hero, conversion, cta"
+                  className="sectionhub-input"
+                />
+              </label>
+              <div className="grid gap-3 md:grid-cols-2">
+                <label className="space-y-1.5">
+                  <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                    Marketplace Subtitle
+                  </span>
+                  <input name="marketplaceSubtitle" className="sectionhub-input" />
+                </label>
+                <label className="space-y-1.5">
+                  <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                    Callout Badge
+                  </span>
+                  <input name="calloutBadgeText" className="sectionhub-input" />
+                </label>
+              </div>
             </div>
           </Card>
         </div>
+
         <div className="space-y-4">
           <Card className="p-5">
-            <div className="space-y-3 text-[13px] text-[var(--text-secondary)]">
+            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">Publishing</h2>
+            <div className="mt-4 space-y-3 text-[14px] text-[var(--text-secondary)]">
               <label className="flex items-center justify-between">
-                <span>Featured</span>
-                <input type="checkbox" name="featured" />
+                <span>Featured Section</span>
+                <input type="checkbox" name="featured" className="h-4 w-4" />
               </label>
               <label className="flex items-center justify-between">
-                <span>OS 2.0 compatible</span>
-                <input type="checkbox" name="os20Compatible" defaultChecked />
+                <span>OS 2.0 Compatible</span>
+                <input
+                  type="checkbox"
+                  name="os20Compatible"
+                  defaultChecked
+                  className="h-4 w-4"
+                />
               </label>
               <label className="flex items-center justify-between">
-                <span>App block support</span>
-                <input type="checkbox" name="appBlockSupport" defaultChecked />
+                <span>App Block Support</span>
+                <input
+                  type="checkbox"
+                  name="appBlockSupport"
+                  defaultChecked
+                  className="h-4 w-4"
+                />
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Status
+                </span>
+                <select name="status" defaultValue="DRAFT" className="sectionhub-select">
+                  <option value="DRAFT">Draft</option>
+                  <option value="PUBLISHED">Published</option>
+                  <option value="ARCHIVED">Archived</option>
+                </select>
+              </label>
+              <label className="space-y-1.5">
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  Visibility
+                </span>
+                <select name="visibility" defaultValue="MARKETPLACE" className="sectionhub-select">
+                  <option value="MARKETPLACE">Public</option>
+                  <option value="INTERNAL">Internal</option>
+                  <option value="HIDDEN">Hidden</option>
+                  <option value="PRIVATE">Private</option>
+                </select>
               </label>
             </div>
+            <div className="mt-4 space-y-2">
+              <button
+                type="submit"
+                className="inline-flex h-10 w-full items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[14px] font-medium text-white"
+              >
+                Save Changes
+              </button>
+              <button
+                type="submit"
+                name="status"
+                value="DRAFT"
+                className="inline-flex h-10 w-full items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[14px] font-medium text-[var(--text-primary)]"
+              >
+                Save as Draft
+              </button>
+            </div>
           </Card>
-          <button
-            type="submit"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
-          >
-            Save
-          </button>
+
+          <Card className="p-5">
+            <h3 className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+              Requirements Checklist
+            </h3>
+            <div className="mt-3 space-y-2 text-[13px] text-[var(--text-secondary)]">
+              <div>• Basic information completed</div>
+              <div>• Liquid file uploaded and verified</div>
+              <div>• Primary preview image added</div>
+              <div>• Pricing and access rules defined</div>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h3 className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+              Version State
+            </h3>
+            <div className="mt-3 text-[13px] text-[var(--text-secondary)]">
+              Pending upload...
+            </div>
+          </Card>
+
+          <input type="hidden" name="merchantInstructions" value="" />
+          <input type="hidden" name="supportNotes" value="" />
+          <input type="hidden" name="changelog" value="Initial release." />
         </div>
       </form>
     </div>

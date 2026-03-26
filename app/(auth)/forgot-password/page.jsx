@@ -29,15 +29,17 @@ export default async function ForgotPasswordPage({ searchParams }) {
             Email address
           </span>
           <div className="relative">
+            <span className="pointer-events-none absolute left-4 top-1/2 z-[1] -translate-y-1/2 text-[var(--text-tertiary)]">
+              <Mail className="h-4 w-4" />
+            </span>
             <input
               name="email"
               type="email"
               autoComplete="email"
               placeholder="name@company.com"
               required
-              className="sectionhub-input pl-10"
+              className="sectionhub-input h-[52px] pl-12 pr-4 text-[15px]"
             />
-            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
           </div>
         </label>
         <button

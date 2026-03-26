@@ -9,20 +9,28 @@ function asValue(value) {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 }
 
+function parsePrice(value) {
+  return Number(String(value).replace(/[^0-9.]/g, "")) || 0;
+}
+
 function StatusBadge({ status }) {
   const tones = {
     PUBLISHED: "bg-[var(--success-light)] text-[var(--success)]",
     ARCHIVED: "bg-[var(--surface-soft)] text-[var(--text-secondary)]",
-    DRAFT: "bg-[var(--color-info-light)] text-[var(--color-info)]",
+    DRAFT: "bg-[var(--warning-light)] text-[var(--warning)]",
   };
 
   return (
     <span
-      className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ${
+      className={`inline-flex rounded-full px-2.5 py-1 text-[12px] font-medium ${
         tones[status] ?? tones.DRAFT
       }`}
     >
-      {status}
+      {status === "PUBLISHED"
+        ? "Active"
+        : status === "DRAFT"
+          ? "Draft"
+          : "Archived"}
     </span>
   );
 }
@@ -33,6 +41,8 @@ export default async function SectionsPage({ searchParams }) {
   const category = asValue(params.category).trim();
   const tag = asValue(params.tag).trim();
   const status = asValue(params.status).trim();
+  const pricing = asValue(params.pricing).trim();
+  const sort = asValue(params.sort || "updated").trim();
 
   const [sections, categories, tags] = await Promise.all([
     getSections({
@@ -44,6 +54,18 @@ export default async function SectionsPage({ searchParams }) {
     getCategories(),
     getTags(),
   ]);
+
+  const filteredSections = sections
+    .filter((section) => {
+      const priceValue = parsePrice(section.price);
+      if (pricing === "free") return priceValue === 0;
+      if (pricing === "paid") return priceValue > 0;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sort === "name") return a.name.localeCompare(b.name);
+      return b.updatedAt.localeCompare(a.updatedAt);
+    });
 
   const created = params.created === "1";
   const deleted = params.deleted === "1";
@@ -76,7 +98,7 @@ export default async function SectionsPage({ searchParams }) {
       <div className="flex items-start justify-between gap-3">
         <SectionTitle
           title="Sections List"
-          subtitle="Search, filter, and manage your section catalog."
+          subtitle="Search sections by name, slug, category and publishing status."
         />
         <Link
           href="/sections/new"
@@ -87,7 +109,7 @@ export default async function SectionsPage({ searchParams }) {
       </div>
 
       <Card className="p-4">
-        <form className="grid gap-3 md:grid-cols-[1.6fr_1fr_1fr_1fr_auto_auto]">
+        <form className="grid gap-3 lg:grid-cols-[1.6fr_0.9fr_0.8fr_0.7fr_0.8fr_0.8fr_auto]">
           <input
             name="search"
             defaultValue={query}
@@ -124,18 +146,25 @@ export default async function SectionsPage({ searchParams }) {
             <option value="DRAFT">Draft</option>
             <option value="ARCHIVED">Archived</option>
           </select>
+          <select
+            name="pricing"
+            defaultValue={pricing}
+            className="sectionhub-select"
+          >
+            <option value="">Pricing: All</option>
+            <option value="paid">Paid</option>
+            <option value="free">Free</option>
+          </select>
+          <select name="sort" defaultValue={sort} className="sectionhub-select">
+            <option value="updated">Sort: Recently Updated</option>
+            <option value="name">Sort: Name</option>
+          </select>
           <button
             type="submit"
             className="inline-flex min-h-9 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[14px] font-medium text-white"
           >
-            Apply
+            Filter
           </button>
-          <Link
-            href="/sections"
-            className="inline-flex min-h-9 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[14px] font-medium text-[var(--text-primary)]"
-          >
-            Reset
-          </Link>
         </form>
       </Card>
 
@@ -143,22 +172,51 @@ export default async function SectionsPage({ searchParams }) {
         <table className="min-w-full text-left">
           <thead className="border-b border-[var(--border-default)] bg-[var(--background-page)] text-[12px] font-medium uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
             <tr>
+              <th className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-[var(--border-default)]"
+                />
+              </th>
+              <th className="px-5 py-3">Thumbnail</th>
               <th className="px-5 py-3">Section</th>
               <th className="px-5 py-3">Category</th>
               <th className="px-5 py-3">Tags</th>
               <th className="px-5 py-3">Price</th>
               <th className="px-5 py-3">Version</th>
               <th className="px-5 py-3">Installs</th>
+              <th className="px-5 py-3">Updated</th>
               <th className="px-5 py-3">Status</th>
               <th className="px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {sections.map((section) => (
+            {filteredSections.map((section, index) => (
               <tr
                 key={section.id}
                 className="border-b border-[var(--border-default)] text-[14px] last:border-b-0 hover:bg-[var(--surface-soft)]/40"
               >
+                <td className="px-4 py-4">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-[var(--border-default)]"
+                  />
+                </td>
+                <td className="px-5 py-4">
+                  <div
+                    className="h-8 w-12 rounded-[6px] border border-[var(--border-default)]"
+                    style={{
+                      background: [
+                        "linear-gradient(135deg,#c6baf8,#b9a5ff)",
+                        "linear-gradient(135deg,#c4d3f7,#aec2ff)",
+                        "linear-gradient(135deg,#bde8e0,#9ad5cb)",
+                        "linear-gradient(135deg,#d3d8df,#b7bec7)",
+                        "linear-gradient(135deg,#f2c7de,#e7afcc)",
+                        "linear-gradient(135deg,#b8d8f2,#9ec8eb)",
+                      ][index % 6],
+                    }}
+                  />
+                </td>
                 <td className="px-5 py-4">
                   <div className="font-medium text-[var(--text-primary)]">
                     {section.name}
@@ -196,6 +254,9 @@ export default async function SectionsPage({ searchParams }) {
                 <td className="px-5 py-4 font-mono-ui text-[13px] text-[var(--text-secondary)]">
                   {section.installs}
                 </td>
+                <td className="px-5 py-4 text-[13px] text-[var(--text-secondary)]">
+                  {section.updatedAt}
+                </td>
                 <td className="px-5 py-4">
                   <StatusBadge status={section.status} />
                 </td>
@@ -220,10 +281,10 @@ export default async function SectionsPage({ searchParams }) {
                 </td>
               </tr>
             ))}
-            {!sections.length ? (
+            {!filteredSections.length ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={11}
                   className="px-5 py-12 text-center text-[14px] text-[var(--text-secondary)]"
                 >
                   No sections found for the current filters.
@@ -233,6 +294,34 @@ export default async function SectionsPage({ searchParams }) {
           </tbody>
         </table>
       </Card>
+
+      <div className="flex items-center justify-between text-[14px] text-[var(--text-secondary)]">
+        <div>
+          Showing 1-{Math.min(filteredSections.length, 10)} of{" "}
+          {filteredSections.length}
+        </div>
+        <div className="flex items-center gap-1">
+          <button className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-secondary)]">
+            &lt;
+          </button>
+          <button className="h-8 w-8 rounded-[8px] bg-[var(--color-primary)] text-white">
+            1
+          </button>
+          <button className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-primary)]">
+            2
+          </button>
+          <button className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-primary)]">
+            3
+          </button>
+          <span className="px-1 text-[var(--text-tertiary)]">...</span>
+          <button className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-primary)]">
+            13
+          </button>
+          <button className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-secondary)]">
+            &gt;
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
