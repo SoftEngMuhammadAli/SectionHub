@@ -1,4 +1,4 @@
-import { saveTagAction } from "@/app/actions";
+﻿import { saveTagAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
 import { getTags } from "@/lib/sectionhub/tags/service";
 export default async function TagsPage() {
@@ -49,7 +49,7 @@ export default async function TagsPage() {
               </label>
               <button
                 type="submit"
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
+                className="inline-flex min-h-10 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
               >
                 Save Tag
               </button>
@@ -60,3 +60,4 @@ export default async function TagsPage() {
     </div>
   );
 }
+

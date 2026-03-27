@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { deleteSectionAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
 import { getCategories } from "@/lib/sectionhub/categories/service";
@@ -13,24 +13,46 @@ function parsePrice(value) {
   return Number(String(value).replace(/[^0-9.]/g, "")) || 0;
 }
 
-function StatusBadge({ status }) {
-  const tones = {
-    PUBLISHED: "bg-[var(--success-light)] text-[var(--success)]",
-    ARCHIVED: "bg-[var(--surface-soft)] text-[var(--text-secondary)]",
-    DRAFT: "bg-[var(--warning-light)] text-[var(--warning)]",
+function statusMeta(status) {
+  if (status === "PUBLISHED") {
+    return {
+      label: "Active",
+      className: "bg-[var(--success-light)] text-[var(--success)]",
+    };
+  }
+
+  if (status === "ARCHIVED") {
+    return {
+      label: "Archived",
+      className: "bg-[var(--surface-soft)] text-[var(--text-secondary)]",
+    };
+  }
+
+  return {
+    label: "Draft",
+    className: "bg-[var(--warning-light)] text-[var(--warning)]",
   };
+}
+
+function gradientForIndex(index) {
+  return [
+    "linear-gradient(135deg,#c6baf8,#b9a5ff)",
+    "linear-gradient(135deg,#c4d3f7,#aec2ff)",
+    "linear-gradient(135deg,#bde8e0,#9ad5cb)",
+    "linear-gradient(135deg,#d3d8df,#b7bec7)",
+    "linear-gradient(135deg,#f2c7de,#e7afcc)",
+    "linear-gradient(135deg,#b8d8f2,#9ec8eb)",
+  ][index % 6];
+}
+
+function StatusBadge({ status }) {
+  const meta = statusMeta(status);
 
   return (
     <span
-      className={`inline-flex rounded-full px-2.5 py-1 text-[12px] font-medium ${
-        tones[status] ?? tones.DRAFT
-      }`}
+      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${meta.className}`}
     >
-      {status === "PUBLISHED"
-        ? "Active"
-        : status === "DRAFT"
-          ? "Draft"
-          : "Archived"}
+      {meta.label}
     </span>
   );
 }
@@ -73,43 +95,43 @@ export default async function SectionsPage({ searchParams }) {
   const error = asValue(params.error);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {created ? (
-        <div className="rounded-[8px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[13px] text-[var(--success)]">
+        <div className="rounded-[10px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[12px] font-medium text-[var(--success)]">
           Section created successfully.
         </div>
       ) : null}
       {deleted ? (
-        <div className="rounded-[8px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[13px] text-[var(--success)]">
+        <div className="rounded-[10px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[12px] font-medium text-[var(--success)]">
           Section deleted successfully.
         </div>
       ) : null}
       {published ? (
-        <div className="rounded-[8px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[13px] text-[var(--success)]">
+        <div className="rounded-[10px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[12px] font-medium text-[var(--success)]">
           Section published successfully.
         </div>
       ) : null}
       {error ? (
-        <div className="rounded-[8px] border border-[var(--danger)]/20 bg-[var(--danger-light)] px-4 py-2.5 text-[13px] text-[var(--danger)]">
+        <div className="rounded-[10px] border border-[var(--danger)]/20 bg-[var(--danger-light)] px-4 py-2.5 text-[12px] font-medium text-[var(--danger)]">
           {error}
         </div>
       ) : null}
 
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <SectionTitle
-          title="Sections List"
+          title="Sections"
           subtitle="Search sections by name, slug, category and publishing status."
         />
         <Link
           href="/sections/new"
-          className="inline-flex min-h-9 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[14px] font-medium text-white"
+          className="inline-flex min-h-9 items-center justify-center rounded-[10px] bg-[var(--primary)] px-3.5 text-[12px] font-semibold text-white"
         >
           + Upload Section
         </Link>
       </div>
 
       <Card className="p-4">
-        <form className="grid gap-3 lg:grid-cols-[1.6fr_0.9fr_0.8fr_0.7fr_0.8fr_0.8fr_auto]">
+        <form className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1.6fr)_repeat(5,minmax(0,0.82fr))_auto_auto]">
           <input
             name="search"
             defaultValue={query}
@@ -156,149 +178,236 @@ export default async function SectionsPage({ searchParams }) {
             <option value="free">Free</option>
           </select>
           <select name="sort" defaultValue={sort} className="sectionhub-select">
-            <option value="updated">Sort: Recently Updated</option>
-            <option value="name">Sort: Name</option>
+            <option value="updated">Recently Updated</option>
+            <option value="name">Sort by Name</option>
           </select>
           <button
             type="submit"
-            className="inline-flex min-h-9 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[14px] font-medium text-white"
+            className="inline-flex min-h-9 items-center justify-center rounded-[10px] bg-[var(--primary)] px-4 text-[12px] font-semibold text-white"
           >
             Filter
           </button>
+          <Link
+            href="/sections"
+            className="inline-flex min-h-9 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
+          >
+            Reset
+          </Link>
         </form>
       </Card>
 
-      <Card className="overflow-x-auto p-0">
-        <table className="min-w-full text-left">
-          <thead className="border-b border-[var(--border-default)] bg-[var(--background-page)] text-[12px] font-medium uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
-            <tr>
-              <th className="px-4 py-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-[var(--border-default)]"
+      <div className="sectionhub-mobile-list xl:hidden">
+        {filteredSections.map((section, index) => (
+          <Card key={section.id} className="p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-start gap-3">
+                <div
+                  className="mt-0.5 h-10 w-14 shrink-0 rounded-[10px] border border-[var(--border-default)]"
+                  style={{ background: gradientForIndex(index) }}
                 />
-              </th>
-              <th className="px-5 py-3">Thumbnail</th>
-              <th className="px-5 py-3">Section</th>
-              <th className="px-5 py-3">Category</th>
-              <th className="px-5 py-3">Tags</th>
-              <th className="px-5 py-3">Price</th>
-              <th className="px-5 py-3">Version</th>
-              <th className="px-5 py-3">Installs</th>
-              <th className="px-5 py-3">Updated</th>
-              <th className="px-5 py-3">Status</th>
-              <th className="px-5 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSections.map((section, index) => (
-              <tr
-                key={section.id}
-                className="border-b border-[var(--border-default)] text-[14px] last:border-b-0 hover:bg-[var(--surface-soft)]/40"
-              >
-                <td className="px-4 py-4">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-[var(--border-default)]"
-                  />
-                </td>
-                <td className="px-5 py-4">
-                  <div
-                    className="h-8 w-12 rounded-[6px] border border-[var(--border-default)]"
-                    style={{
-                      background: [
-                        "linear-gradient(135deg,#c6baf8,#b9a5ff)",
-                        "linear-gradient(135deg,#c4d3f7,#aec2ff)",
-                        "linear-gradient(135deg,#bde8e0,#9ad5cb)",
-                        "linear-gradient(135deg,#d3d8df,#b7bec7)",
-                        "linear-gradient(135deg,#f2c7de,#e7afcc)",
-                        "linear-gradient(135deg,#b8d8f2,#9ec8eb)",
-                      ][index % 6],
-                    }}
-                  />
-                </td>
-                <td className="px-5 py-4">
-                  <div className="font-medium text-[var(--text-primary)]">
+                <div className="min-w-0">
+                  <div className="truncate text-[15px] font-semibold text-[var(--text-primary)]">
                     {section.name}
                   </div>
-                  <div className="font-mono-ui text-[12px] text-[var(--text-tertiary)]">
+                  <div className="truncate font-mono-ui text-[11px] text-[var(--text-tertiary)]">
                     {section.slug}
                   </div>
-                </td>
-                <td className="px-5 py-4 text-[var(--text-secondary)]">
-                  {section.category}
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex flex-wrap gap-1.5">
-                    {(section.tags ?? []).slice(0, 2).map((item) => (
-                      <span
-                        key={`${section.id}-${item}`}
-                        className="rounded-full bg-[var(--surface-soft)] px-2 py-1 text-[11px] text-[var(--text-secondary)]"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                    {(section.tags ?? []).length > 2 ? (
-                      <span className="rounded-full bg-[var(--surface-soft)] px-2 py-1 text-[11px] text-[var(--text-secondary)]">
-                        +{section.tags.length - 2}
-                      </span>
-                    ) : null}
-                  </div>
-                </td>
-                <td className="px-5 py-4 font-mono-ui text-[13px]">
-                  {section.price}
-                </td>
-                <td className="px-5 py-4 font-mono-ui text-[13px] text-[var(--text-secondary)]">
-                  {section.version}
-                </td>
-                <td className="px-5 py-4 font-mono-ui text-[13px] text-[var(--text-secondary)]">
-                  {section.installs}
-                </td>
-                <td className="px-5 py-4 text-[13px] text-[var(--text-secondary)]">
-                  {section.updatedAt}
-                </td>
-                <td className="px-5 py-4">
-                  <StatusBadge status={section.status} />
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link
-                      href={`/sections/${section.id}/edit`}
-                      className="inline-flex min-h-8 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-3 text-[12px] font-medium text-[var(--text-primary)]"
-                    >
-                      Edit
-                    </Link>
-                    <form action={deleteSectionAction}>
-                      <input type="hidden" name="id" value={section.id} />
-                      <button
-                        type="submit"
-                        className="inline-flex min-h-8 items-center justify-center rounded-[8px] border border-[var(--danger)]/25 bg-white px-3 text-[12px] font-medium text-[var(--danger)]"
-                      >
-                        Delete
-                      </button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!filteredSections.length ? (
-              <tr>
-                <td
-                  colSpan={11}
-                  className="px-5 py-12 text-center text-[14px] text-[var(--text-secondary)]"
+                </div>
+              </div>
+              <StatusBadge status={section.status} />
+            </div>
+
+            <div className="sectionhub-data-card mt-4">
+              <div className="sectionhub-data-card-row">
+                <span>Category</span>
+                <strong className="text-right">{section.category}</strong>
+              </div>
+              <div className="sectionhub-data-card-row">
+                <span>Price</span>
+                <strong>{section.price}</strong>
+              </div>
+              <div className="sectionhub-data-card-row">
+                <span>Version</span>
+                <strong className="font-mono-ui">{section.version}</strong>
+              </div>
+              <div className="sectionhub-data-card-row">
+                <span>Installs</span>
+                <strong className="font-mono-ui">{section.installs}</strong>
+              </div>
+              <div className="sectionhub-data-card-row">
+                <span>Updated</span>
+                <strong className="text-right">{section.updatedAt}</strong>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {(section.tags ?? []).slice(0, 3).map((item) => (
+                <span
+                  key={`${section.id}-${item}`}
+                  className="rounded-full bg-[var(--surface-soft)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]"
                 >
-                  No sections found for the current filters.
-                </td>
+                  {item}
+                </span>
+              ))}
+              {(section.tags ?? []).length > 3 ? (
+                <span className="rounded-full bg-[var(--surface-soft)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">
+                  +{section.tags.length - 3}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="mt-4 flex items-center gap-2">
+              <Link
+                href={`/sections/${section.id}/edit`}
+                className="inline-flex min-h-8 flex-1 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-3 text-[12px] font-semibold text-[var(--text-primary)]"
+              >
+                Edit
+              </Link>
+              <form action={deleteSectionAction} className="flex-1">
+                <input type="hidden" name="id" value={section.id} />
+                <button
+                  type="submit"
+                  className="inline-flex min-h-8 w-full items-center justify-center rounded-[10px] border border-[var(--danger)]/25 bg-white px-3 text-[12px] font-semibold text-[var(--danger)]"
+                >
+                  Delete
+                </button>
+              </form>
+            </div>
+          </Card>
+        ))}
+
+        {!filteredSections.length ? (
+          <Card className="p-6 text-[13px] text-[var(--text-secondary)]">
+            No sections found for the current filters.
+          </Card>
+        ) : null}
+      </div>
+
+      <Card className="hidden overflow-hidden p-0 xl:block">
+        <div className="sectionhub-table-scroll">
+          <table className="min-w-full table-fixed text-left">
+            <thead className="border-b border-[var(--border-default)] bg-[var(--background-page)] text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+              <tr>
+                <th className="w-[44px] px-3 py-3">
+                  <input
+                    type="checkbox"
+                    className="sectionhub-checkbox"
+                    aria-label="Select all sections"
+                  />
+                </th>
+                <th className="w-[92px] px-3 py-3">Thumb</th>
+                <th className="w-[200px] px-3 py-3">Section</th>
+                <th className="w-[160px] px-3 py-3">Category</th>
+                <th className="w-[190px] px-3 py-3">Tags</th>
+                <th className="w-[92px] px-3 py-3">Price</th>
+                <th className="w-[96px] px-3 py-3 2xl:table-cell hidden">Version</th>
+                <th className="w-[84px] px-3 py-3">Installs</th>
+                <th className="w-[110px] px-3 py-3">Updated</th>
+                <th className="w-[92px] px-3 py-3">Status</th>
+                <th className="w-[132px] px-3 py-3 text-right">Actions</th>
               </tr>
-            ) : null}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredSections.map((section, index) => (
+                <tr
+                  key={section.id}
+                  className="border-b border-[var(--border-default)] text-[12px] last:border-b-0 hover:bg-[var(--surface-soft)]/40"
+                >
+                  <td className="px-3 py-3.5 align-top">
+                    <input
+                      type="checkbox"
+                      className="sectionhub-checkbox"
+                      aria-label={`Select ${section.name}`}
+                    />
+                  </td>
+                  <td className="px-3 py-3.5 align-top">
+                    <div
+                      className="h-8 w-12 rounded-[8px] border border-[var(--border-default)]"
+                      style={{ background: gradientForIndex(index) }}
+                    />
+                  </td>
+                  <td className="px-3 py-3.5 align-top">
+                    <div className="truncate font-semibold text-[13px] text-[var(--text-primary)]">
+                      {section.name}
+                    </div>
+                    <div className="truncate font-mono-ui text-[11px] text-[var(--text-tertiary)]">
+                      {section.slug}
+                    </div>
+                  </td>
+                  <td className="px-3 py-3.5 align-top text-[var(--text-secondary)]">
+                    <div className="line-clamp-2">{section.category}</div>
+                  </td>
+                  <td className="px-3 py-3.5 align-top">
+                    <div className="flex flex-wrap gap-1.5">
+                      {(section.tags ?? []).slice(0, 2).map((item) => (
+                        <span
+                          key={`${section.id}-${item}`}
+                          className="rounded-full bg-[var(--surface-soft)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                      {(section.tags ?? []).length > 2 ? (
+                        <span className="rounded-full bg-[var(--surface-soft)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">
+                          +{section.tags.length - 2}
+                        </span>
+                      ) : null}
+                    </div>
+                  </td>
+                  <td className="px-3 py-3.5 align-top font-mono-ui text-[12px] text-[var(--text-primary)]">
+                    {section.price}
+                  </td>
+                  <td className="hidden px-3 py-3.5 align-top font-mono-ui text-[12px] text-[var(--text-secondary)] 2xl:table-cell">
+                    {section.version}
+                  </td>
+                  <td className="px-3 py-3.5 align-top font-mono-ui text-[12px] text-[var(--text-secondary)]">
+                    {section.installs}
+                  </td>
+                  <td className="px-3 py-3.5 align-top text-[12px] text-[var(--text-secondary)]">
+                    {section.updatedAt}
+                  </td>
+                  <td className="px-3 py-3.5 align-top">
+                    <StatusBadge status={section.status} />
+                  </td>
+                  <td className="px-3 py-3.5 align-top">
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/sections/${section.id}/edit`}
+                        className="inline-flex min-h-8 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-2.5 text-[11px] font-semibold text-[var(--text-primary)]"
+                      >
+                        Edit
+                      </Link>
+                      <form action={deleteSectionAction}>
+                        <input type="hidden" name="id" value={section.id} />
+                        <button
+                          type="submit"
+                          className="inline-flex min-h-8 items-center justify-center rounded-[10px] border border-[var(--danger)]/25 bg-white px-2.5 text-[11px] font-semibold text-[var(--danger)]"
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {!filteredSections.length ? (
+                <tr>
+                  <td
+                    colSpan={11}
+                    className="px-5 py-12 text-center text-[13px] text-[var(--text-secondary)]"
+                  >
+                    No sections found for the current filters.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
-      <div className="flex items-center justify-between text-[14px] text-[var(--text-secondary)]">
+      <div className="flex flex-col gap-3 text-[12px] text-[var(--text-secondary)] sm:flex-row sm:items-center sm:justify-between">
         <div>
-          Showing 1-{Math.min(filteredSections.length, 10)} of{" "}
-          {filteredSections.length}
+          Showing 1-{Math.min(filteredSections.length, 10)} of {filteredSections.length}
         </div>
         <div className="flex items-center gap-1">
           <button className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-secondary)]">

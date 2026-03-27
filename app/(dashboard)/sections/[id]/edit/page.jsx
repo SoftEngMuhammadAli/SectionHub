@@ -7,6 +7,22 @@ import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getSectionFormData } from "@/lib/sectionhub/sections/service";
 import { getTags } from "@/lib/sectionhub/tags/service";
 
+function ToggleRow({ name, label, defaultChecked = false }) {
+  return (
+    <label className="flex items-center justify-between gap-4 rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3">
+      <span className="text-[13px] font-medium text-[var(--text-primary)]">
+        {label}
+      </span>
+      <span className="sectionhub-switch">
+        <input type="checkbox" name={name} defaultChecked={defaultChecked} />
+        <span className="sectionhub-switch-track">
+          <span className="sectionhub-switch-thumb" />
+        </span>
+      </span>
+    </label>
+  );
+}
+
 export default async function EditSectionPage({ params, searchParams }) {
   const { id } = await params;
   const pageParams = await searchParams;
@@ -48,24 +64,24 @@ export default async function EditSectionPage({ params, searchParams }) {
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-[24px] font-semibold text-[var(--text-primary)]">
+            <h1 className="text-[22px] font-semibold text-[var(--text-primary)]">
               {section.name}
             </h1>
             <div className="mt-1 text-[14px] text-[var(--text-secondary)]">
-              Created by Admin • Last edited today •{" "}
-              <span className="text-[var(--color-primary)]">View in Marketplace ↗</span>
+              Created by Admin - Last edited today -{" "}
+              <span className="text-[var(--color-primary)]">View in Marketplace</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/sections/new"
-              className="inline-flex h-10 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[14px] font-medium text-[var(--text-primary)]"
+              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
             >
               Duplicate
             </Link>
             <button
               type="button"
-              className="inline-flex h-10 items-center justify-center rounded-[8px] border border-[var(--danger)]/40 bg-white px-4 text-[14px] font-medium text-[var(--danger)]"
+              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-[var(--danger)]/40 bg-white px-4 text-[12px] font-semibold text-[var(--danger)]"
             >
               Unpublish
             </button>
@@ -78,7 +94,7 @@ export default async function EditSectionPage({ params, searchParams }) {
 
         <div className="space-y-4">
           <Card className="p-5">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
               Section Configuration
             </h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -153,7 +169,7 @@ export default async function EditSectionPage({ params, searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
               Pricing, Visibility & Metadata
             </h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -291,26 +307,21 @@ export default async function EditSectionPage({ params, searchParams }) {
                   {section.status}
                 </span>
               </div>
-              <label className="flex items-center justify-between">
-                <span>Featured</span>
-                <input type="checkbox" name="featured" defaultChecked={section.featured} />
-              </label>
-              <label className="flex items-center justify-between">
-                <span>OS 2.0 Compatible</span>
-                <input
-                  type="checkbox"
-                  name="os20Compatible"
-                  defaultChecked={section.compatibility?.os20Compatible}
-                />
-              </label>
-              <label className="flex items-center justify-between">
-                <span>App Block Support</span>
-                <input
-                  type="checkbox"
-                  name="appBlockSupport"
-                  defaultChecked={section.compatibility?.appBlockSupport}
-                />
-              </label>
+              <ToggleRow
+                name="featured"
+                label="Featured"
+                defaultChecked={section.featured}
+              />
+              <ToggleRow
+                name="os20Compatible"
+                label="OS 2.0 Compatible"
+                defaultChecked={section.compatibility?.os20Compatible}
+              />
+              <ToggleRow
+                name="appBlockSupport"
+                label="App Block Support"
+                defaultChecked={section.compatibility?.appBlockSupport}
+              />
               <label className="space-y-1.5">
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Status
@@ -325,7 +336,7 @@ export default async function EditSectionPage({ params, searchParams }) {
             <div className="mt-4 space-y-2">
               <button
                 type="submit"
-                className="inline-flex h-10 w-full items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[14px] font-medium text-white"
+                className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-4 text-[12px] font-semibold text-white"
               >
                 Save Changes
               </button>
@@ -333,7 +344,7 @@ export default async function EditSectionPage({ params, searchParams }) {
                 type="submit"
                 name="status"
                 value="DRAFT"
-                className="inline-flex h-10 w-full items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[14px] font-medium text-[var(--text-primary)]"
+                className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
               >
                 Save as Draft
               </button>
@@ -372,7 +383,7 @@ export default async function EditSectionPage({ params, searchParams }) {
                 <div className="text-[11px] uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
                   Installs
                 </div>
-                <div className="mt-1 font-mono text-[24px] font-semibold text-[var(--text-primary)]">
+                <div className="mt-1 font-mono text-[22px] font-semibold text-[var(--text-primary)]">
                   {section._count.installEvents}
                 </div>
               </div>
@@ -380,7 +391,7 @@ export default async function EditSectionPage({ params, searchParams }) {
                 <div className="text-[11px] uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
                   Bundles
                 </div>
-                <div className="mt-1 font-mono text-[24px] font-semibold text-[var(--text-primary)]">
+                <div className="mt-1 font-mono text-[22px] font-semibold text-[var(--text-primary)]">
                   {section._count.bundleSections}
                 </div>
               </div>
@@ -454,7 +465,7 @@ export default async function EditSectionPage({ params, searchParams }) {
         <input type="hidden" name="id" value={section.id} />
         <button
           type="submit"
-          className="inline-flex h-10 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[14px] font-medium text-[var(--text-primary)]"
+          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
         >
           Publish to Marketplace
         </button>

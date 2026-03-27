@@ -166,7 +166,7 @@ export function DashboardShell({ children }) {
               </button>
               <Link
                 href={searchHref}
-                className="hidden min-h-11 items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[13px] font-medium text-white md:inline-flex"
+                className="hidden min-h-10 items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[13px] font-medium text-white md:inline-flex"
               >
                 Go
               </Link>
@@ -207,16 +207,16 @@ export function AuthShell({ title, subtitle, children, footer }) {
             <Icon name="grid" className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[18px] font-semibold tracking-[-0.02em]">
+            <div className="text-[16px] font-semibold tracking-[-0.02em]">
               SectionHub
             </div>
             <div className="text-[12px] text-[var(--text-tertiary)]">
-              Restricted access · Admin only
+              Restricted access Â· Admin only
             </div>
           </div>
         </div>
         <div className="mb-6 space-y-1">
-          <h1 className="text-[22px] font-semibold tracking-[-0.03em] sm:text-[24px]">
+          <h1 className="text-[18px] font-semibold tracking-[-0.03em] sm:text-[20px]">
             {title}
           </h1>
           <p className="text-[14px] text-[var(--text-secondary)]">{subtitle}</p>
@@ -229,3 +229,4 @@ export function AuthShell({ title, subtitle, children, footer }) {
     </div>
   );
 }
+

@@ -10,8 +10,10 @@ const Switch = React.forwardRef(
         aria-checked={checked}
         onClick={() => onCheckedChange?.(!checked)}
         className={cn(
-          "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 tracking-normal",
-          checked ? "bg-[var(--color-primary)]" : "bg-[var(--border-strong)]",
+          "peer inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full border border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/30 disabled:cursor-not-allowed disabled:opacity-50 tracking-normal",
+          checked
+            ? "bg-[linear-gradient(135deg,var(--color-primary)_0%,#8572ff_100%)]"
+            : "bg-[var(--border-strong)]",
           className,
         )}
         ref={ref}
@@ -19,8 +21,8 @@ const Switch = React.forwardRef(
       >
         <span
           className={cn(
-            "pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform",
-            checked ? "translate-x-4" : "translate-x-0",
+            "pointer-events-none block h-[18px] w-[18px] rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.14)] ring-0 transition-transform",
+            checked ? "translate-x-[18px]" : "translate-x-[3px]",
           )}
         />
       </button>

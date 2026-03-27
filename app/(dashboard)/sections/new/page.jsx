@@ -4,6 +4,22 @@ import { MultiSelectChips } from "@/components/sectionhub/forms/multi-select-chi
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getTags } from "@/lib/sectionhub/tags/service";
 
+function ToggleRow({ name, label, defaultChecked = false }) {
+  return (
+    <label className="flex items-center justify-between gap-4 rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3">
+      <span className="text-[13px] font-medium text-[var(--text-primary)]">
+        {label}
+      </span>
+      <span className="sectionhub-switch">
+        <input type="checkbox" name={name} defaultChecked={defaultChecked} />
+        <span className="sectionhub-switch-track">
+          <span className="sectionhub-switch-thumb" />
+        </span>
+      </span>
+    </label>
+  );
+}
+
 export default async function NewSectionPage({ searchParams }) {
   const params = await searchParams;
   const error = typeof params.error === "string" ? params.error : "";
@@ -23,7 +39,7 @@ export default async function NewSectionPage({ searchParams }) {
       ) : null}
 
       <div className="space-y-1">
-        <h1 className="text-[24px] font-semibold text-[var(--text-primary)]">
+        <h1 className="text-[20px] font-semibold text-[var(--text-primary)]">
           Upload New Section
         </h1>
         <p className="text-[14px] text-[var(--text-secondary)]">
@@ -35,7 +51,7 @@ export default async function NewSectionPage({ searchParams }) {
         <div className="space-y-4">
           <Card className="p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+              <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
                 Basic Information
               </h2>
               <span className="font-mono text-[11px] text-[var(--text-tertiary)]">
@@ -49,17 +65,17 @@ export default async function NewSectionPage({ searchParams }) {
                 </span>
                 <input name="name" required className="sectionhub-input" />
               </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+              <label className="sectionhub-field">
+                <span className="sectionhub-field-label">
                   Slug
                 </span>
-                <div className="flex">
-                  <span className="inline-flex items-center rounded-l-[8px] border border-r-0 border-[var(--border-default)] bg-[var(--background-page)] px-3 font-mono text-[13px] text-[var(--text-tertiary)]">
+                <div className="sectionhub-input-group">
+                  <span className="sectionhub-input-addon sectionhub-input-addon--left font-mono-ui">
                     /s/
                   </span>
                   <input
                     name="slug"
-                    className="sectionhub-input rounded-l-none font-mono"
+                    className="sectionhub-input rounded-l-none font-mono-ui"
                     placeholder="hero-banner-pro"
                   />
                 </div>
@@ -115,12 +131,12 @@ export default async function NewSectionPage({ searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
                 Pricing & Access
               </h2>
-              <div className="flex items-center gap-2 text-[13px]">
-                <span className="text-[var(--text-secondary)]">Free</span>
+              <div className="flex items-center gap-2 text-[12px]">
+                <span className="text-[var(--text-secondary)]">Pricing Type</span>
                 <select name="pricingType" className="sectionhub-select min-w-[110px]">
                   <option value="PAID">Paid</option>
                   <option value="FREE">Free</option>
@@ -177,7 +193,7 @@ export default async function NewSectionPage({ searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">Liquid File</h2>
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">Liquid File</h2>
             <div className="mt-4 rounded-[8px] border border-dashed border-[var(--border-strong)] bg-[var(--background-page)] p-8 text-center">
               <div className="text-[14px] font-medium text-[var(--text-primary)]">
                 Click to upload or drag and drop
@@ -192,7 +208,7 @@ export default async function NewSectionPage({ searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
               Media Preview
             </h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -219,7 +235,7 @@ export default async function NewSectionPage({ searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
               Documentation & Compatibility
             </h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -269,7 +285,7 @@ export default async function NewSectionPage({ searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">SEO Metadata</h2>
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">SEO Metadata</h2>
             <div className="mt-4 grid gap-3">
               <label className="space-y-1.5">
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
@@ -313,30 +329,19 @@ export default async function NewSectionPage({ searchParams }) {
 
         <div className="space-y-4">
           <Card className="p-5">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">Publishing</h2>
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">Publishing</h2>
             <div className="mt-4 space-y-3 text-[14px] text-[var(--text-secondary)]">
-              <label className="flex items-center justify-between">
-                <span>Featured Section</span>
-                <input type="checkbox" name="featured" className="h-4 w-4" />
-              </label>
-              <label className="flex items-center justify-between">
-                <span>OS 2.0 Compatible</span>
-                <input
-                  type="checkbox"
-                  name="os20Compatible"
-                  defaultChecked
-                  className="h-4 w-4"
-                />
-              </label>
-              <label className="flex items-center justify-between">
-                <span>App Block Support</span>
-                <input
-                  type="checkbox"
-                  name="appBlockSupport"
-                  defaultChecked
-                  className="h-4 w-4"
-                />
-              </label>
+              <ToggleRow name="featured" label="Featured Section" />
+              <ToggleRow
+                name="os20Compatible"
+                label="OS 2.0 Compatible"
+                defaultChecked
+              />
+              <ToggleRow
+                name="appBlockSupport"
+                label="App Block Support"
+                defaultChecked
+              />
               <label className="space-y-1.5">
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Status
@@ -362,7 +367,7 @@ export default async function NewSectionPage({ searchParams }) {
             <div className="mt-4 space-y-2">
               <button
                 type="submit"
-                className="inline-flex h-10 w-full items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[14px] font-medium text-white"
+                className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-4 text-[12px] font-semibold text-white"
               >
                 Save Changes
               </button>
@@ -370,7 +375,7 @@ export default async function NewSectionPage({ searchParams }) {
                 type="submit"
                 name="status"
                 value="DRAFT"
-                className="inline-flex h-10 w-full items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[14px] font-medium text-[var(--text-primary)]"
+                className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
               >
                 Save as Draft
               </button>
@@ -382,10 +387,10 @@ export default async function NewSectionPage({ searchParams }) {
               Requirements Checklist
             </h3>
             <div className="mt-3 space-y-2 text-[13px] text-[var(--text-secondary)]">
-              <div>• Basic information completed</div>
-              <div>• Liquid file uploaded and verified</div>
-              <div>• Primary preview image added</div>
-              <div>• Pricing and access rules defined</div>
+              <div>- Basic information completed</div>
+              <div>- Liquid file uploaded and verified</div>
+              <div>- Primary preview image added</div>
+              <div>- Pricing and access rules defined</div>
             </div>
           </Card>
 
@@ -406,3 +411,4 @@ export default async function NewSectionPage({ searchParams }) {
     </div>
   );
 }
+

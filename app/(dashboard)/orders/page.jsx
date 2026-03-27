@@ -1,4 +1,4 @@
-import { Card, SectionTitle } from "@/components/sectionhub/ui";
+﻿import { Card, SectionTitle } from "@/components/sectionhub/ui";
 import { getOrders } from "@/lib/sectionhub/orders/service";
 function asValue(value) {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
@@ -64,13 +64,13 @@ export default async function OrdersPage({ searchParams }) {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="inline-flex min-h-11 flex-1 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
+              className="inline-flex min-h-10 flex-1 items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
             >
               Apply
             </button>
             <a
               href="/orders"
-              className="inline-flex min-h-11 flex-1 items-center justify-center rounded-[8px] border border-[var(--border)] bg-white px-4 text-[13px] font-medium text-[var(--text-primary)]"
+              className="inline-flex min-h-10 flex-1 items-center justify-center rounded-[8px] border border-[var(--border)] bg-white px-4 text-[13px] font-medium text-[var(--text-primary)]"
             >
               Reset
             </a>
@@ -178,3 +178,4 @@ export default async function OrdersPage({ searchParams }) {
     </div>
   );
 }
+

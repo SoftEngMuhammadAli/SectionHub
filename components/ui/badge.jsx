@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { cn } from "@/components/sectionhub/ui/cn";
 
 const Badge = React.forwardRef(
@@ -8,7 +8,7 @@ const Badge = React.forwardRef(
   ) => {
     const toneClass = {
       default:
-        "border border-[var(--border-default)] bg-[var(--surface-soft)] text-[var(--text-secondary)]",
+        "border border-[var(--border-default)] bg-white/78 text-[var(--text-secondary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]",
       success:
         "border border-transparent bg-[var(--color-success-light)] text-[var(--color-success)]",
       warning:
@@ -21,9 +21,10 @@ const Badge = React.forwardRef(
     };
 
     const variantClass = {
-      default: "border border-transparent bg-[var(--color-primary)] text-white",
+      default:
+        "border border-transparent bg-[linear-gradient(135deg,var(--color-primary)_0%,#8572ff_100%)] text-white shadow-[0_10px_24px_rgba(109,76,255,0.18)]",
       outline:
-        "border border-[var(--border-strong)] text-[var(--text-primary)]",
+        "border border-[var(--border-strong)] bg-white/78 text-[var(--text-primary)]",
       success: toneClass.success,
       warning: toneClass.warning,
       danger: toneClass.danger,
@@ -36,7 +37,7 @@ const Badge = React.forwardRef(
       <span
         ref={ref}
         className={cn(
-          "inline-flex items-center rounded-[var(--radius-pill)] px-2.5 py-0.5 text-[11px] font-semibold transition-colors",
+          "inline-flex items-center rounded-[var(--radius-pill)] px-2 py-0.5 text-[10px] font-semibold tracking-[0.02em] transition-colors",
           tone ? toneClass[tone] : variantClass[variant],
           className,
         )}

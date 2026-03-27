@@ -46,16 +46,19 @@ export function LoginForm() {
         </div>
       </label>
 
-      <div className="flex items-center justify-between text-[14px] text-[var(--text-secondary)]">
-        <label className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-[13px] text-[var(--text-secondary)]">
+        <label className="flex items-center gap-2.5">
           <input
             type="checkbox"
             name="rememberMe"
-            className="h-4 w-4 rounded border-[var(--border-default)]"
+            className="sectionhub-checkbox"
           />
           Remember me
         </label>
-        <Link href="/forgot-password" className="font-medium text-[var(--primary)]">
+        <Link
+          href="/forgot-password"
+          className="font-medium text-[var(--primary)]"
+        >
           Forgot password?
         </Link>
       </div>

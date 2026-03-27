@@ -65,25 +65,23 @@ export function MultiSelectChips({
   }
 
   return (
-    <div className="space-y-2">
-      <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-        {label}
-      </span>
+    <div className="sectionhub-field">
+      <span className="sectionhub-field-label">{label}</span>
 
       <input type="hidden" name={name} value={selectedIds.join(",")} />
 
-      <div className="rounded-[8px] border border-[var(--border-default)] bg-white p-2.5">
+      <div className="rounded-[12px] border border-[var(--border-default)] bg-white/82 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
         <div className="flex flex-wrap gap-2">
           {selectedOptions.map((option) => (
             <span
               key={option.id}
-              className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-soft)] px-2.5 py-1 text-[12px] text-[var(--text-primary)]"
+              className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-primary)]"
             >
               {option.name}
               <button
                 type="button"
                 onClick={() => removeSelection(option.id)}
-                className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--text-tertiary)] hover:bg-[var(--border-default)]"
+                className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--text-tertiary)] hover:bg-[var(--border-default)]/70"
                 aria-label={`Remove ${option.name}`}
               >
                 <X className="h-3 w-3" />
@@ -99,12 +97,12 @@ export function MultiSelectChips({
               }
             }}
             placeholder={placeholder}
-            className="min-w-[180px] flex-1 bg-transparent py-1 text-[14px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
+            className="min-w-[150px] flex-1 bg-transparent py-1 text-[13px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
           />
         </div>
       </div>
 
-      <div className="max-h-[170px] overflow-y-auto rounded-[8px] border border-[var(--border-default)] bg-[var(--background-page)]">
+      <div className="sectionhub-scrollbar max-h-[180px] overflow-y-auto rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)]">
         {filteredOptions.length ? (
           filteredOptions.map((option) => {
             const active = selectedSet.has(String(option.id));
@@ -113,7 +111,7 @@ export function MultiSelectChips({
                 key={option.id}
                 type="button"
                 onClick={() => toggleSelection(option.id)}
-                className={`flex w-full items-center justify-between gap-3 border-b border-[var(--border-default)] px-3 py-2 text-left last:border-b-0 ${
+                className={`flex w-full items-center justify-between gap-3 border-b border-[var(--border-default)] px-3 py-2.5 text-left last:border-b-0 ${
                   active ? "bg-[var(--primary-light)]" : "hover:bg-white"
                 }`}
               >
@@ -128,7 +126,7 @@ export function MultiSelectChips({
                   ) : null}
                 </div>
                 <span
-                  className={`inline-flex h-4 w-4 rounded-[4px] border ${
+                  className={`inline-flex h-4 w-4 rounded-[5px] border ${
                     active
                       ? "border-[var(--color-primary)] bg-[var(--color-primary)]"
                       : "border-[var(--border-strong)] bg-white"
@@ -138,7 +136,7 @@ export function MultiSelectChips({
             );
           })
         ) : (
-          <div className="px-3 py-3 text-[13px] text-[var(--text-secondary)]">
+          <div className="px-3 py-3 text-[12px] text-[var(--text-secondary)]">
             {emptyText}
           </div>
         )}

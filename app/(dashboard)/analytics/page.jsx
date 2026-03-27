@@ -28,7 +28,7 @@ function Metric({ label, value, delta, tone = "success" }) {
           {delta}
         </span>
       </div>
-      <div className="mt-3 font-mono text-[20px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
+      <div className="mt-3 font-mono text-[16px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
         {value}
       </div>
     </Card>
@@ -74,7 +74,7 @@ export default async function AnalyticsPage() {
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-[24px] font-semibold text-[var(--text-primary)]">
+        <h1 className="text-[20px] font-semibold text-[var(--text-primary)]">
           Analytics Dashboard
         </h1>
         <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export default async function AnalyticsPage() {
       <div className="grid gap-4 xl:grid-cols-[1.75fr_0.85fr]">
         <Card className="p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
               Revenue Over Time
             </h2>
             <div className="flex gap-1">
@@ -144,7 +144,7 @@ export default async function AnalyticsPage() {
         </Card>
 
         <Card className="p-5">
-          <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+          <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
             Recent Installs
           </h2>
           <div className="mt-4 space-y-3">
@@ -169,7 +169,7 @@ export default async function AnalyticsPage() {
 
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.2fr]">
         <Card className="p-5">
-          <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+          <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
             Installs per Section
           </h2>
           <div className="mt-5 space-y-4">
@@ -199,7 +199,7 @@ export default async function AnalyticsPage() {
         </Card>
 
         <Card className="p-5">
-          <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">
+          <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
             Top Performing Categories
           </h2>
           <div className="mt-5 grid gap-4 md:grid-cols-[1fr_180px] md:items-center">
@@ -238,7 +238,7 @@ export default async function AnalyticsPage() {
                   <div className="text-[12px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
                     Total
                   </div>
-                  <div className="font-mono text-[32px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
+                  <div className="font-mono text-[20px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
                     100%
                   </div>
                 </div>
@@ -250,3 +250,4 @@ export default async function AnalyticsPage() {
     </div>
   );
 }
+

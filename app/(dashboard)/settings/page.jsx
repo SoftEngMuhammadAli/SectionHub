@@ -38,13 +38,36 @@ function Notice({ tone = "success", children }) {
 function SectionTitle({ title, description }) {
   return (
     <div>
-      <h2 className="text-[24px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+      <h2 className="text-[20px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
         {title}
       </h2>
       <p className="mt-1 text-[14px] text-[var(--text-secondary)]">
         {description}
       </p>
     </div>
+  );
+}
+
+function ToggleControl({ name, defaultChecked, label, description }) {
+  return (
+    <label className="flex items-start justify-between gap-4 rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3.5">
+      <div>
+        <div className="text-[13px] font-semibold text-[var(--text-primary)]">
+          {label}
+        </div>
+        {description ? (
+          <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
+            {description}
+          </p>
+        ) : null}
+      </div>
+      <span className="sectionhub-switch">
+        <input type="checkbox" name={name} defaultChecked={defaultChecked} />
+        <span className="sectionhub-switch-track">
+          <span className="sectionhub-switch-thumb" />
+        </span>
+      </span>
+    </label>
   );
 }
 
@@ -142,27 +165,12 @@ export default async function SettingsPage({ searchParams }) {
                   <span className="text-[12px] font-semibold text-[var(--text-primary)]">
                     Maintenance Mode
                   </span>
-                  <label className="flex min-h-[104px] items-start justify-between gap-4 rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] p-4">
-                    <div>
-                      <div className="text-[18px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
-                        Maintenance Mode
-                      </div>
-                      <p className="mt-1 text-[14px] leading-6 text-[var(--text-secondary)]">
-                        Prevent non-admin users from accessing the platform
-                        while updating.
-                      </p>
-                    </div>
-                    <span className="relative mt-1 inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        name="maintenanceMode"
-                        defaultChecked={settings.maintenanceMode}
-                        className="peer sr-only"
-                      />
-                      <span className="h-7 w-12 rounded-full bg-[var(--border-default)] transition peer-checked:bg-[var(--color-primary)]" />
-                      <span className="absolute left-1 h-5 w-5 rounded-full bg-white transition-transform peer-checked:translate-x-5" />
-                    </span>
-                  </label>
+                  <ToggleControl
+                    name="maintenanceMode"
+                    defaultChecked={settings.maintenanceMode}
+                    label="Maintenance Mode"
+                    description="Prevent non-admin users from accessing the platform while updating."
+                  />
                 </div>
               </div>
             </Card>
@@ -194,7 +202,7 @@ export default async function SettingsPage({ searchParams }) {
           <Card className="overflow-hidden p-0">
             <div className="space-y-0">
               <div className="grid gap-4 border-b border-[var(--border-default)] px-6 py-6 md:grid-cols-[220px_1fr_auto] md:items-center">
-                <div className="text-[18px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+                <div className="text-[16px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                   Client ID
                 </div>
                 <div className="overflow-x-auto rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3 font-mono-ui text-[13px] text-[var(--text-primary)]">
@@ -206,7 +214,7 @@ export default async function SettingsPage({ searchParams }) {
               </div>
 
               <div className="grid gap-4 border-b border-[var(--border-default)] px-6 py-6 md:grid-cols-[220px_1fr_auto] md:items-center">
-                <div className="text-[18px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+                <div className="text-[16px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                   Client Secret
                 </div>
                 <CredentialSecretValue
@@ -285,7 +293,7 @@ export default async function SettingsPage({ searchParams }) {
               </label>
               <button
                 type="submit"
-                className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[13px] font-medium text-white"
+                className="inline-flex min-h-10 items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[13px] font-medium text-white"
               >
                 Add Member
               </button>
@@ -293,17 +301,53 @@ export default async function SettingsPage({ searchParams }) {
           </form>
 
           <Card className="overflow-hidden p-0">
-            <div className="grid grid-cols-[1.2fr_1.4fr_140px_140px] border-b border-[var(--border-default)] bg-[var(--background-page)] px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
+            <div className="hidden grid-cols-[1.2fr_1.4fr_140px_140px] border-b border-[var(--border-default)] bg-[var(--background-page)] px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.06em] text-[var(--text-tertiary)] md:grid">
               <span>Name</span>
               <span>Email</span>
               <span>Role</span>
               <span>Action</span>
             </div>
             <div className="divide-y divide-[var(--border-default)]">
+              <div className="space-y-3 p-4 md:hidden">
+                {settings.teamMembers.map((member) => (
+                  <div
+                    key={`${member.id}-mobile`}
+                    className="rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] p-4"
+                  >
+                    <div className="text-[14px] font-semibold text-[var(--text-primary)]">
+                      {member.name}
+                    </div>
+                    <div className="mt-1 text-[12px] text-[var(--text-secondary)]">
+                      {member.email}
+                    </div>
+                    <div className="mt-3 flex items-center justify-between text-[12px] text-[var(--text-secondary)]">
+                      <span>{member.role}</span>
+                      <form action={toggleTeamMemberStatusAction}>
+                        <input type="hidden" name="id" value={member.id} />
+                        <input
+                          type="hidden"
+                          name="isActive"
+                          value={member.isActive ? "false" : "true"}
+                        />
+                        <button
+                          type="submit"
+                          className={`inline-flex min-h-8 items-center justify-center rounded-[10px] px-3 text-[11px] font-semibold ${
+                            member.isActive
+                              ? "bg-[var(--danger-light)] text-[var(--danger)]"
+                              : "bg-[var(--success-light)] text-[var(--success)]"
+                          }`}
+                        >
+                          {member.isActive ? "Deactivate" : "Activate"}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                ))}
+              </div>
               {settings.teamMembers.map((member) => (
                 <div
                   key={member.id}
-                  className="grid grid-cols-[1.2fr_1.4fr_140px_140px] items-center gap-2 px-6 py-4 text-[14px]"
+                  className="hidden grid-cols-[1.2fr_1.4fr_140px_140px] items-center gap-2 px-6 py-4 text-[14px] md:grid"
                 >
                   <span className="font-medium text-[var(--text-primary)]">
                     {member.name}
@@ -372,24 +416,12 @@ export default async function SettingsPage({ searchParams }) {
                   value: settings.notifications.productAlerts,
                 },
               ].map((item) => (
-                <label
+                <ToggleControl
                   key={item.key}
-                  className="flex items-center justify-between rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3"
-                >
-                  <span className="text-[14px] text-[var(--text-primary)]">
-                    {item.label}
-                  </span>
-                  <span className="relative inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      name={item.key}
-                      defaultChecked={item.value}
-                      className="peer sr-only"
-                    />
-                    <span className="h-6 w-11 rounded-full bg-[var(--border-default)] transition peer-checked:bg-[var(--color-primary)]" />
-                    <span className="absolute left-1 h-4.5 w-4.5 rounded-full bg-white transition-transform peer-checked:translate-x-5" />
-                  </span>
-                </label>
+                  name={item.key}
+                  defaultChecked={item.value}
+                  label={item.label}
+                />
               ))}
             </Card>
           </form>
@@ -405,28 +437,16 @@ export default async function SettingsPage({ searchParams }) {
 
           <form id="settings-advanced-form" action={saveAdvancedSettingsAction}>
             <Card className="space-y-4 p-6">
-              <label className="flex items-center justify-between rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3">
-                <span className="text-[14px] text-[var(--text-primary)]">
-                  Enable strict mode
-                </span>
-                <input
-                  type="checkbox"
-                  name="strictMode"
-                  defaultChecked={settings.advanced.strictMode}
-                  className="h-4 w-4"
-                />
-              </label>
-              <label className="flex items-center justify-between rounded-[10px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3">
-                <span className="text-[14px] text-[var(--text-primary)]">
-                  Allow public API docs
-                </span>
-                <input
-                  type="checkbox"
-                  name="allowPublicApiDocs"
-                  defaultChecked={settings.advanced.allowPublicApiDocs}
-                  className="h-4 w-4"
-                />
-              </label>
+              <ToggleControl
+                name="strictMode"
+                defaultChecked={settings.advanced.strictMode}
+                label="Enable strict mode"
+              />
+              <ToggleControl
+                name="allowPublicApiDocs"
+                defaultChecked={settings.advanced.allowPublicApiDocs}
+                label="Allow public API docs"
+              />
               <label className="block space-y-2">
                 <span className="text-[12px] font-semibold text-[var(--text-primary)]">
                   Audit retention days
@@ -447,7 +467,7 @@ export default async function SettingsPage({ searchParams }) {
             className="flex scroll-mt-24 flex-col items-start justify-between gap-4 border-[var(--danger)]/20 bg-[var(--danger-light)]/35 p-6 md:flex-row md:items-center"
           >
             <div>
-              <h3 className="text-[24px] font-semibold tracking-[-0.01em] text-[var(--danger)]">
+              <h3 className="text-[20px] font-semibold tracking-[-0.01em] text-[var(--danger)]">
                 Database Maintenance
               </h3>
               <p className="mt-1 text-[15px] text-[var(--danger)]/90">
@@ -457,7 +477,7 @@ export default async function SettingsPage({ searchParams }) {
             <form action={runDatabaseMaintenanceAction}>
               <button
                 type="submit"
-                className="inline-flex min-h-11 items-center justify-center rounded-[10px] border border-[var(--danger)]/35 bg-white px-6 text-[16px] font-semibold text-[var(--danger)]"
+                className="inline-flex min-h-10 items-center justify-center rounded-[10px] border border-[var(--danger)]/35 bg-white px-6 text-[16px] font-semibold text-[var(--danger)]"
               >
                 Run Optimizer
               </button>
@@ -468,3 +488,4 @@ export default async function SettingsPage({ searchParams }) {
     </div>
   );
 }
+

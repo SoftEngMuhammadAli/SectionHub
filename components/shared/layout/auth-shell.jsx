@@ -34,7 +34,7 @@ export function AuthShell({
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[var(--color-primary)]">
                   <Icon name="help" className="h-7 w-7" />
                 </div>
-                <h1 className="text-[24px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+                <h1 className="text-[20px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                   {title}
                 </h1>
                 <p className="mt-2 text-[14px] leading-6 text-[var(--text-secondary)]">
@@ -47,7 +47,7 @@ export function AuthShell({
         </main>
 
         <footer className="border-t border-[var(--border-default)] bg-white px-4 py-6 text-center text-[14px] text-[var(--text-secondary)]">
-          {footer ?? "© 2024 SectionHub Inc. All rights reserved."}
+          {footer ?? "Â© 2024 SectionHub Inc. All rights reserved."}
         </footer>
       </div>
     );
@@ -65,13 +65,13 @@ export function AuthShell({
               SectionHub
             </div>
             <div className="mt-1 text-[14px] text-[var(--text-secondary)]">
-              Restricted access · Admin only
+              Restricted access Â· Admin only
             </div>
           </div>
 
           {title ? (
             <div className="mb-5">
-              <h1 className="text-[24px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+              <h1 className="text-[20px] font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
                 {title}
               </h1>
               <p className="mt-1 text-[14px] text-[var(--text-secondary)]">
@@ -83,9 +83,10 @@ export function AuthShell({
           {children}
         </Card>
         <div className="mt-8 text-center font-mono-ui text-[11px] text-[var(--text-tertiary)]">
-          {footer ?? "SECTIONHUB V1.0 | INTERNAL USE ONLY | © 2026"}
+          {footer ?? "SECTIONHUB V1.0 | INTERNAL USE ONLY | Â© 2026"}
         </div>
       </div>
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import { saveCategoryAction } from "@/app/actions";
+﻿import { saveCategoryAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 export default async function CategoriesPage() {
@@ -73,7 +73,7 @@ export default async function CategoriesPage() {
               </label>
               <button
                 type="submit"
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
+                className="inline-flex min-h-10 w-full items-center justify-center rounded-[8px] bg-[var(--primary)] px-4 text-[13px] font-medium text-white"
               >
                 Save Category
               </button>
@@ -84,3 +84,4 @@ export default async function CategoriesPage() {
     </div>
   );
 }
+
