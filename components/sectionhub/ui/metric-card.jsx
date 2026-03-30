@@ -5,10 +5,10 @@ export function MetricCard({ label, value, hint }) {
       <div className="text-[12px] font-medium text-[var(--text-secondary)]">
         {label}
       </div>
-      <div className="mt-3 text-[22px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
+      <div className="mt-3 text-[20px] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
         {value}
       </div>
-      <div className="mt-2 text-[12px] text-[var(--text-tertiary)]">{hint}</div>
+      <div className="mt-2 text-[11px] text-[var(--text-tertiary)]">{hint}</div>
     </Card>
   );
 }

@@ -119,7 +119,7 @@ export default async function SectionsPage({ searchParams }) {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <SectionTitle
-          title="Sections"
+          title="Sections List"
           subtitle="Search sections by name, slug, category and publishing status."
         />
         <Link
@@ -135,7 +135,7 @@ export default async function SectionsPage({ searchParams }) {
           <input
             name="search"
             defaultValue={query}
-            placeholder="Search by section name or slug..."
+            placeholder="Search sections by name, slug or category..."
             className="sectionhub-input"
           />
           <select

@@ -2,14 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { publishSectionAction, saveSectionAction } from "@/app/actions";
 import { Card } from "@/components/ui/card";
-import { MultiSelectChips } from "@/components/sectionhub/forms/multi-select-chips";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getSectionFormData } from "@/lib/sectionhub/sections/service";
-import { getTags } from "@/lib/sectionhub/tags/service";
 
 function ToggleRow({ name, label, defaultChecked = false }) {
   return (
-    <label className="flex items-center justify-between gap-4 rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)] px-4 py-3">
+    <label className="flex items-center justify-between gap-4">
       <span className="text-[13px] font-medium text-[var(--text-primary)]">
         {label}
       </span>
@@ -23,15 +21,26 @@ function ToggleRow({ name, label, defaultChecked = false }) {
   );
 }
 
+function formatStatus(status) {
+  if (status === "PUBLISHED") {
+    return "bg-[var(--success-light)] text-[var(--success)]";
+  }
+
+  if (status === "DRAFT") {
+    return "bg-[var(--warning-light)] text-[var(--warning)]";
+  }
+
+  return "bg-[var(--surface-soft)] text-[var(--text-secondary)]";
+}
+
 export default async function EditSectionPage({ params, searchParams }) {
   const { id } = await params;
   const pageParams = await searchParams;
   const error = typeof pageParams.error === "string" ? pageParams.error : "";
   const saved = pageParams.saved === "1";
-  const [section, categories, tags] = await Promise.all([
+  const [section, categories] = await Promise.all([
     getSectionFormData(id),
     getCategories(),
-    getTags(),
   ]);
 
   if (!section) {
@@ -39,11 +48,6 @@ export default async function EditSectionPage({ params, searchParams }) {
   }
 
   const tagIds = section.tags.map((tag) => tag.tagId).join(",");
-  const tagOptions = tags.map((tag) => ({
-    id: tag.id,
-    name: tag.name,
-    meta: tag.slug,
-  }));
 
   return (
     <div className="space-y-5">
@@ -59,59 +63,89 @@ export default async function EditSectionPage({ params, searchParams }) {
       ) : null}
 
       <div className="space-y-2">
-        <div className="text-[14px] text-[var(--text-secondary)]">
+        <div className="text-[12px] text-[var(--text-secondary)]">
           Sections / {section.name} / Edit
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <h1 className="text-[22px] font-semibold text-[var(--text-primary)]">
-              {section.name}
-            </h1>
-            <div className="mt-1 text-[14px] text-[var(--text-secondary)]">
-              Created by Admin - Last edited today -{" "}
-              <span className="text-[var(--color-primary)]">View in Marketplace</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-[18px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
+                {section.name}
+              </h1>
+              <span
+                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${formatStatus(section.status)}`}
+              >
+                {section.status === "PUBLISHED" ? "Published" : section.status}
+              </span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-3 text-[12px] text-[var(--text-secondary)]">
+              <span>Created by Admin</span>
+              <span>2 days ago</span>
+              <span>Last edited 1 hour ago</span>
+              <span className="font-medium text-[var(--color-primary)]">
+                View in Marketplace
+              </span>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="inline-flex h-10 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
+            >
+              Preview
+            </button>
             <Link
               href="/sections/new"
-              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
+              className="inline-flex h-10 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
             >
               Duplicate
             </Link>
             <button
               type="button"
-              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-[var(--danger)]/40 bg-white px-4 text-[12px] font-semibold text-[var(--danger)]"
+              className="inline-flex h-10 items-center justify-center rounded-[8px] border border-[var(--danger)]/30 bg-white px-4 text-[12px] font-semibold text-[var(--danger)]"
             >
               Unpublish
+            </button>
+            <button
+              type="submit"
+              form="edit-section-form"
+              className="inline-flex h-10 items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[12px] font-semibold text-white"
+            >
+              Save Changes
             </button>
           </div>
         </div>
       </div>
 
-      <form action={saveSectionAction} className="grid gap-4 xl:grid-cols-[1.75fr_0.9fr]">
+      <form
+        id="edit-section-form"
+        action={saveSectionAction}
+        className="grid gap-4 xl:grid-cols-[1.7fr_0.86fr]"
+      >
         <input type="hidden" name="id" value={section.id} />
 
         <div className="space-y-4">
           <Card className="p-5">
-            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
-              Section Configuration
-            </h2>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Section Name
-                </span>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-[var(--color-primary)]">✦</span>
+              <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
+                Section Configuration
+              </h2>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="sectionhub-field">
+                <span className="sectionhub-field-label">Section Name</span>
                 <input
                   name="name"
                   defaultValue={section.name}
                   className="sectionhub-input"
                 />
               </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Category
-                </span>
+
+              <label className="sectionhub-field">
+                <span className="sectionhub-field-label">Category</span>
                 <select
                   name="categoryId"
                   defaultValue={section.categoryId ?? ""}
@@ -125,249 +159,86 @@ export default async function EditSectionPage({ params, searchParams }) {
                   ))}
                 </select>
               </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Slug
-                </span>
-                <input
-                  name="slug"
-                  defaultValue={section.slug}
-                  className="sectionhub-input font-mono"
-                />
-              </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Version
-                </span>
-                <input
-                  name="version"
-                  defaultValue={section.versions[0]?.version ?? "v1.0.0"}
-                  className="sectionhub-input font-mono"
-                />
-              </label>
-              <label className="space-y-1.5 md:col-span-2">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Short Description
-                </span>
-                <textarea
-                  name="shortDescription"
-                  defaultValue={section.shortDescription ?? ""}
-                  className="sectionhub-textarea"
-                />
-              </label>
-              <label className="space-y-1.5 md:col-span-2">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Full Description
-                </span>
-                <textarea
-                  name="fullDescription"
-                  defaultValue={section.fullDescription ?? ""}
-                  className="sectionhub-textarea"
-                />
-              </label>
+
+              <div className="md:col-span-2">
+                <label className="sectionhub-field">
+                  <span className="sectionhub-field-label">Short Description</span>
+                  <textarea
+                    name="shortDescription"
+                    defaultValue={section.shortDescription ?? ""}
+                    className="sectionhub-textarea"
+                  />
+                </label>
+              </div>
             </div>
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
-              Pricing, Visibility & Metadata
-            </h2>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Pricing Type
-                </span>
-                <select
-                  name="pricingType"
-                  defaultValue={section.pricingType}
-                  className="sectionhub-select"
-                >
-                  <option value="PAID">Paid</option>
-                  <option value="FREE">Free</option>
-                </select>
-              </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Visibility
-                </span>
-                <select
-                  name="visibility"
-                  defaultValue={section.visibility}
-                  className="sectionhub-select"
-                >
-                  <option value="MARKETPLACE">Public</option>
-                  <option value="INTERNAL">Internal</option>
-                  <option value="HIDDEN">Hidden</option>
-                  <option value="PRIVATE">Private</option>
-                </select>
-              </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Price ($)
-                </span>
-                <input
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  defaultValue={section.priceCents / 100}
-                  className="sectionhub-input"
-                />
-              </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Compare at ($)
-                </span>
-                <input
-                  name="compareAtPrice"
-                  type="number"
-                  step="0.01"
-                  defaultValue={(section.compareAtPriceCents ?? 0) / 100}
-                  className="sectionhub-input"
-                />
-              </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Access Type
-                </span>
-                <select
-                  name="accessType"
-                  defaultValue={section.accessType}
-                  className="sectionhub-select"
-                >
-                  <option value="SINGLE">Single Purchase</option>
-                  <option value="BUNDLE">Bundle</option>
-                  <option value="SUBSCRIPTION">Subscription</option>
-                  <option value="INTERNAL">Internal</option>
-                </select>
-              </label>
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  License Type
-                </span>
-                <select
-                  name="licenseType"
-                  defaultValue={section.licenseType}
-                  className="sectionhub-select"
-                >
-                  <option value="SINGLE_STORE">Single Store</option>
-                  <option value="MULTI_STORE">Multi Store</option>
-                  <option value="UNLIMITED">Unlimited</option>
-                </select>
-              </label>
-              <label className="space-y-1.5 md:col-span-2">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Preview URL
-                </span>
-                <input
-                  name="previewUrl"
-                  defaultValue={section.previews?.[0]?.url ?? ""}
-                  className="sectionhub-input"
-                />
-              </label>
-              <div className="md:col-span-2">
-                <MultiSelectChips
-                  name="tagIds"
-                  label="Tags"
-                  placeholder="Search tags by name..."
-                  options={tagOptions}
-                  initialSelectedIds={tagIds}
-                  emptyText="No tags found."
-                />
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
+                Component Assets
+              </h2>
+              <button
+                type="button"
+                className="text-[12px] font-semibold text-[var(--color-primary)]"
+              >
+                Update All
+              </button>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-[10px] border border-[var(--border-default)] p-3">
+                <div className="h-[120px] rounded-[8px] bg-[linear-gradient(180deg,#dbe8ef_0%,#8fc0ff_100%)]" />
+                <div className="mt-3 text-center text-[12px] font-medium text-[var(--text-primary)]">
+                  Thumbnail.png
+                </div>
               </div>
-              <label className="space-y-1.5 md:col-span-2">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Meta Title
-                </span>
-                <input
-                  name="metaTitle"
-                  defaultValue={section.metaTitle ?? ""}
-                  className="sectionhub-input"
-                />
-              </label>
-              <label className="space-y-1.5 md:col-span-2">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Meta Description
-                </span>
-                <textarea
-                  name="metaDescription"
-                  defaultValue={section.metaDescription ?? ""}
-                  className="sectionhub-textarea"
-                />
-              </label>
+
+              <div className="rounded-[10px] border border-[var(--border-default)] p-3">
+                <div className="flex h-[120px] items-center justify-center rounded-[8px] bg-[var(--color-primary-light)] text-[12px] font-semibold text-[var(--color-primary)]">
+                  JS
+                </div>
+                <div className="mt-3 text-center text-[12px] font-medium text-[var(--text-primary)]">
+                  index.js
+                </div>
+              </div>
+
+              <div className="rounded-[10px] border border-[var(--border-default)] p-3">
+                <div className="flex h-[120px] items-center justify-center rounded-[8px] bg-[#d8e8ff] text-[12px] font-semibold text-[#4d6fd8]">
+                  CSS
+                </div>
+                <div className="mt-3 text-center text-[12px] font-medium text-[var(--text-primary)]">
+                  styles.css
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-[10px] border border-dashed border-[var(--border-strong)] bg-[var(--background-page)] px-4 py-5 text-center text-[12px] text-[var(--text-secondary)]">
+              Drop files to add or replace
             </div>
           </Card>
         </div>
 
         <div className="space-y-4">
-          <Card className="p-5">
-            <div className="space-y-3 text-[14px] text-[var(--text-secondary)]">
-              <div className="flex items-center justify-between">
-                <span>Status</span>
-                <span className="rounded-full bg-[var(--success-light)] px-2 py-0.5 text-[12px] font-medium text-[var(--success)]">
-                  {section.status}
-                </span>
-              </div>
-              <ToggleRow
-                name="featured"
-                label="Featured"
-                defaultChecked={section.featured}
-              />
-              <ToggleRow
-                name="os20Compatible"
-                label="OS 2.0 Compatible"
-                defaultChecked={section.compatibility?.os20Compatible}
-              />
-              <ToggleRow
-                name="appBlockSupport"
-                label="App Block Support"
-                defaultChecked={section.compatibility?.appBlockSupport}
-              />
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  Status
-                </span>
-                <select name="status" defaultValue={section.status} className="sectionhub-select">
-                  <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED">Published</option>
-                  <option value="ARCHIVED">Archived</option>
-                </select>
-              </label>
-            </div>
-            <div className="mt-4 space-y-2">
-              <button
-                type="submit"
-                className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-4 text-[12px] font-semibold text-white"
-              >
-                Save Changes
-              </button>
-              <button
-                type="submit"
-                name="status"
-                value="DRAFT"
-                className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
-              >
-                Save as Draft
-              </button>
-            </div>
-          </Card>
-
           <Card className="overflow-hidden p-0">
             <div className="border-b border-[var(--border-default)] px-4 py-3">
-              <h3 className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+              <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
                 Version History
               </h3>
             </div>
-            <div className="max-h-[260px] space-y-0 overflow-y-auto">
-              {section.versions.slice(0, 6).map((version, index) => (
-                <div
-                  key={`${version.version}-${index}`}
-                  className="border-t border-[var(--border-default)] px-4 py-3 first:border-t-0"
-                >
-                  <div className="font-mono text-[14px] font-medium text-[var(--text-primary)]">
-                    {version.version}
+            <div className="divide-y divide-[var(--border-default)]">
+              {section.versions.slice(0, 3).map((version, index) => (
+                <div key={`${version.version}-${index}`} className="px-4 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[16px] font-semibold text-[var(--text-primary)]">
+                      {version.version}
+                    </div>
+                    <span className="text-[11px] text-[var(--text-tertiary)]">
+                      {index === 0 ? "1h ago" : index === 1 ? "Yesterday" : "2 days ago"}
+                    </span>
                   </div>
-                  <div className="mt-1 text-[13px] text-[var(--text-secondary)]">
-                    {version.changelog || "Version update."}
+                  <div className="mt-2 text-[12px] text-[var(--text-secondary)]">
+                    {version.changelog || "Updated spacing and responsive behavior."}
                   </div>
                 </div>
               ))}
@@ -375,29 +246,116 @@ export default async function EditSectionPage({ params, searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h3 className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
               Marketplace Stats
             </h3>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <div className="rounded-[8px] bg-[var(--background-page)] p-3">
-                <div className="text-[11px] uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-[8px] bg-[var(--background-page)] p-4">
+                <div className="text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
                   Installs
                 </div>
-                <div className="mt-1 font-mono text-[22px] font-semibold text-[var(--text-primary)]">
+                <div className="mt-1 text-[24px] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
                   {section._count.installEvents}
                 </div>
               </div>
-              <div className="rounded-[8px] bg-[var(--background-page)] p-3">
-                <div className="text-[11px] uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
-                  Bundles
+              <div className="rounded-[8px] bg-[var(--background-page)] p-4">
+                <div className="text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+                  Rating
                 </div>
-                <div className="mt-1 font-mono text-[22px] font-semibold text-[var(--text-primary)]">
-                  {section._count.bundleSections}
+                <div className="mt-1 text-[24px] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+                  4.8
                 </div>
               </div>
             </div>
           </Card>
 
+          <Card className="p-5">
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+              Permissions
+            </h3>
+            <div className="mt-4 space-y-4">
+              <ToggleRow
+                name="visibilityMarketplace"
+                label="Public Access"
+                defaultChecked={section.visibility === "MARKETPLACE"}
+              />
+              <ToggleRow name="allowForks" label="Allow Forks" />
+            </div>
+          </Card>
+
+          <input type="hidden" name="slug" defaultValue={section.slug} />
+          <input
+            type="hidden"
+            name="version"
+            defaultValue={section.versions[0]?.version ?? "v1.0.0"}
+          />
+          <input
+            type="hidden"
+            name="fullDescription"
+            defaultValue={section.fullDescription ?? ""}
+          />
+          <input
+            type="hidden"
+            name="pricingType"
+            defaultValue={section.pricingType}
+          />
+          <input
+            type="hidden"
+            name="visibility"
+            defaultValue={section.visibility}
+          />
+          <input
+            type="hidden"
+            name="price"
+            defaultValue={section.priceCents / 100}
+          />
+          <input
+            type="hidden"
+            name="compareAtPrice"
+            defaultValue={(section.compareAtPriceCents ?? 0) / 100}
+          />
+          <input
+            type="hidden"
+            name="accessType"
+            defaultValue={section.accessType}
+          />
+          <input
+            type="hidden"
+            name="licenseType"
+            defaultValue={section.licenseType}
+          />
+          <input
+            type="hidden"
+            name="previewUrl"
+            defaultValue={section.previews?.[0]?.url ?? ""}
+          />
+          <input type="hidden" name="tagIds" defaultValue={tagIds} />
+          <input
+            type="hidden"
+            name="metaTitle"
+            defaultValue={section.metaTitle ?? ""}
+          />
+          <input
+            type="hidden"
+            name="metaDescription"
+            defaultValue={section.metaDescription ?? ""}
+          />
+          <input
+            type="hidden"
+            name="featured"
+            defaultValue={String(section.featured)}
+          />
+          <input
+            type="hidden"
+            name="os20Compatible"
+            defaultValue={String(section.compatibility?.os20Compatible ?? false)}
+          />
+          <input
+            type="hidden"
+            name="appBlockSupport"
+            defaultValue={String(section.compatibility?.appBlockSupport ?? false)}
+          />
+          <input type="hidden" name="status" defaultValue={section.status} />
           <input
             type="hidden"
             name="subcategory"
@@ -465,7 +423,7 @@ export default async function EditSectionPage({ params, searchParams }) {
         <input type="hidden" name="id" value={section.id} />
         <button
           type="submit"
-          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
+          className="inline-flex h-10 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
         >
           Publish to Marketplace
         </button>

@@ -70,7 +70,7 @@ export function MultiSelectChips({
 
       <input type="hidden" name={name} value={selectedIds.join(",")} />
 
-      <div className="rounded-[12px] border border-[var(--border-default)] bg-white/82 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+      <div className="rounded-[8px] border border-[var(--border-default)] bg-white p-2.5">
         <div className="flex flex-wrap gap-2">
           {selectedOptions.map((option) => (
             <span
@@ -102,7 +102,7 @@ export function MultiSelectChips({
         </div>
       </div>
 
-      <div className="sectionhub-scrollbar max-h-[180px] overflow-y-auto rounded-[12px] border border-[var(--border-default)] bg-[var(--background-page)]">
+      <div className="sectionhub-scrollbar max-h-[180px] overflow-y-auto rounded-[8px] border border-[var(--border-default)] bg-[var(--background-page)]">
         {filteredOptions.length ? (
           filteredOptions.map((option) => {
             const active = selectedSet.has(String(option.id));

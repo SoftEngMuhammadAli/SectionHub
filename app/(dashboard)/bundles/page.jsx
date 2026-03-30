@@ -12,7 +12,7 @@ function asValue(value) {
 function getBundleStatusMeta(status) {
   if (status === "ACTIVE") {
     return {
-      label: "Published",
+      label: "Active",
       className: "bg-[var(--primary-light)] text-[var(--primary-light-text)]",
     };
   }
@@ -63,6 +63,9 @@ export default async function BundlesPage({ searchParams }) {
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
+          <div className="mb-2 text-[12px] text-[var(--text-secondary)]">
+            Admin / Bundles Management
+          </div>
           <h1 className="text-[20px] font-semibold text-[var(--text-primary)]">Bundles</h1>
           <p className="mt-1 text-[14px] text-[var(--text-secondary)]">
             Design, curate and manage your premium section packages.

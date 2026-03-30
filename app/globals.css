@@ -13,39 +13,39 @@
   --font-sans: "Outfit", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  --background-app: #eef2f8;
-  --background-page: #f7f8fd;
-  --surface-card: rgba(255, 255, 255, 0.88);
-  --surface-muted: #eef1fb;
-  --surface-soft: #ebeefe;
-  --surface-elevated: rgba(255, 255, 255, 0.76);
+  --background-app: #f5f6fb;
+  --background-page: #f8f9fd;
+  --surface-card: #ffffff;
+  --surface-muted: #f4f1ff;
+  --surface-soft: #f2f4fb;
+  --surface-elevated: #ffffff;
 
   --color-primary: #6d4cff;
-  --color-primary-hover: #5c3ff1;
-  --color-primary-pressed: #4b33d0;
-  --color-primary-light: #ede8ff;
-  --color-primary-text-light: #4e36c9;
+  --color-primary-hover: #5f3ff0;
+  --color-primary-pressed: #4f32d1;
+  --color-primary-light: #efeaff;
+  --color-primary-text-light: #5a42d7;
 
-  --sidebar-bg: #0d1429;
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-active-bg: rgba(109, 76, 255, 0.2);
+  --sidebar-bg: #0f1220;
+  --sidebar-hover: #171c2e;
+  --sidebar-active-bg: rgba(109, 76, 255, 0.16);
   --sidebar-active-border: #7b64ff;
   --sidebar-active-text: #ffffff;
-  --sidebar-text: rgba(228, 234, 255, 0.74);
-  --sidebar-section-label: rgba(161, 173, 211, 0.52);
-  --sidebar-light-bg: rgba(255, 255, 255, 0.72);
-  --sidebar-light-hover: #f2f4ff;
-  --sidebar-light-active-bg: #ece8ff;
-  --sidebar-light-active-text: #4e36c9;
-  --sidebar-light-text: #35435f;
+  --sidebar-text: rgba(231, 235, 255, 0.76);
+  --sidebar-section-label: rgba(150, 160, 195, 0.58);
+  --sidebar-light-bg: #ffffff;
+  --sidebar-light-hover: #f4f1ff;
+  --sidebar-light-active-bg: #efeaff;
+  --sidebar-light-active-text: #674cf6;
+  --sidebar-light-text: #46506d;
 
-  --border-default: rgba(95, 106, 143, 0.16);
-  --border-strong: rgba(95, 106, 143, 0.24);
+  --border-default: #e6e9f2;
+  --border-strong: #d9deec;
 
-  --text-primary: #10182d;
-  --text-secondary: #5f6785;
-  --text-tertiary: #8a92af;
-  --text-faint: #b4bad0;
+  --text-primary: #1b2033;
+  --text-secondary: #6e768f;
+  --text-tertiary: #99a0b5;
+  --text-faint: #bcc1d1;
 
   --color-success: #15803d;
   --color-success-light: #dcfce7;
@@ -56,17 +56,15 @@
   --color-info: #2563eb;
   --color-info-light: #dde9ff;
 
-  --radius-card: 16px;
-  --radius-input: 12px;
-  --radius-button: 10px;
+  --radius-card: 12px;
+  --radius-input: 8px;
+  --radius-button: 8px;
   --radius-pill: 999px;
 
   --shadow-soft:
-    0 12px 28px rgba(15, 23, 42, 0.07),
-    0 2px 8px rgba(15, 23, 42, 0.04);
+    0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 24px rgba(15, 23, 42, 0.04);
   --shadow-strong:
-    0 22px 48px rgba(15, 23, 42, 0.12),
-    0 8px 22px rgba(15, 23, 42, 0.06);
+    0 18px 44px rgba(15, 23, 42, 0.1), 0 8px 18px rgba(15, 23, 42, 0.05);
 
   --app-bg: var(--background-app);
   --page-bg: var(--background-page);
@@ -93,7 +91,7 @@
 
 html {
   scroll-behavior: smooth;
-  background: linear-gradient(180deg, #edf1f8 0%, #f5f7fc 100%);
+  background: #f5f6fb;
 }
 
 body {
@@ -105,9 +103,12 @@ body {
   color: var(--text-primary);
   color-scheme: light;
   background:
-    radial-gradient(circle at top left, rgba(109, 76, 255, 0.1), transparent 28%),
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 24%),
-    linear-gradient(180deg, #f5f7fc 0%, #eef2f8 100%);
+    radial-gradient(
+      circle at top left,
+      rgba(109, 76, 255, 0.08),
+      transparent 24%
+    ),
+    linear-gradient(180deg, #f8f9fd 0%, #f4f6fb 100%);
 }
 
 ::selection {
@@ -163,11 +164,8 @@ textarea::placeholder {
 .sectionhub-card {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-card);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.86) 100%);
-  box-shadow:
-    var(--shadow-soft),
-    inset 0 1px 0 rgba(255, 255, 255, 0.76);
-  backdrop-filter: blur(14px);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .sh-input,
@@ -178,11 +176,11 @@ textarea::placeholder {
 .sectionhub-textarea {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-input);
-  background: rgba(255, 255, 255, 0.82);
+  background: #fbfcff;
   color: var(--text-primary);
   outline: none;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  font-size: 13px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -201,7 +199,7 @@ textarea::placeholder {
 .sectionhub-textarea:disabled {
   cursor: not-allowed;
   color: var(--text-tertiary);
-  background: rgba(239, 242, 250, 0.9);
+  background: #f1f3f9;
   box-shadow: none;
 }
 
@@ -224,10 +222,10 @@ textarea::placeholder {
 .sectionhub-select:focus,
 .sh-textarea:focus,
 .sectionhub-textarea:focus {
-  border-color: rgba(109, 76, 255, 0.62);
+  border-color: rgba(109, 76, 255, 0.52);
   box-shadow:
-    0 0 0 4px rgba(109, 76, 255, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 0 0 3px rgba(109, 76, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .sh-select,
@@ -251,7 +249,7 @@ textarea::placeholder {
 .sh-textarea,
 .sectionhub-textarea {
   width: 100%;
-  min-height: 104px;
+  min-height: 94px;
   padding: 10px 12px;
   resize: vertical;
 }
@@ -263,19 +261,21 @@ textarea::placeholder {
 
 .sectionhub-field {
   display: grid;
-  gap: 7px;
+  gap: 6px;
 }
 
 .sectionhub-field-label {
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 10px;
+  line-height: 15px;
   font-weight: 600;
-  color: var(--text-primary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
 .sectionhub-field-helper {
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 10px;
+  line-height: 15px;
   color: var(--text-tertiary);
 }
 
@@ -291,7 +291,7 @@ textarea::placeholder {
   min-height: 40px;
   padding: 0 12px;
   border: 1px solid var(--border-default);
-  background: rgba(247, 248, 253, 0.95);
+  background: #f6f8fd;
   color: var(--text-tertiary);
   font-size: 12px;
   line-height: 1;
@@ -312,12 +312,12 @@ textarea::placeholder {
   appearance: none;
   display: inline-grid;
   place-items: center;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
   border: 1px solid var(--border-strong);
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.88);
+  border-radius: 4px;
+  background: #fff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transition:
     border-color 0.2s ease,
@@ -328,8 +328,8 @@ textarea::placeholder {
 
 .sectionhub-checkbox::after {
   content: "";
-  width: 8px;
-  height: 5px;
+  width: 7px;
+  height: 4px;
   border-left: 2px solid #fff;
   border-bottom: 2px solid #fff;
   transform: rotate(-45deg) scale(0.7);
@@ -363,8 +363,8 @@ textarea::placeholder {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  width: 40px;
-  height: 24px;
+  width: 34px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -390,13 +390,13 @@ textarea::placeholder {
 
 .sectionhub-switch-thumb {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
   border-radius: 999px;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14);
   transition: transform 0.2s ease;
 }
 
@@ -408,8 +408,11 @@ textarea::placeholder {
   background: linear-gradient(135deg, var(--color-primary) 0%, #8572ff 100%);
 }
 
-.sectionhub-switch input:checked + .sectionhub-switch-track .sectionhub-switch-thumb {
-  transform: translateX(16px);
+.sectionhub-switch
+  input:checked
+  + .sectionhub-switch-track
+  .sectionhub-switch-thumb {
+  transform: translateX(14px);
 }
 
 .sectionhub-data-card {
@@ -446,35 +449,37 @@ textarea::placeholder {
 }
 
 .sh-page-title {
-  font-size: 26px;
-  line-height: 32px;
+  font-size: 20px;
+  line-height: 28px;
   font-weight: 700;
   letter-spacing: -0.03em;
 }
 
 .sh-section-title {
-  font-size: 17px;
+  font-size: 16px;
   line-height: 24px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .sh-card-title {
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 15px;
+  line-height: 22px;
   font-weight: 700;
 }
 
 .sh-body-text {
   font-size: 13px;
-  line-height: 20px;
+  line-height: 19px;
   font-weight: 400;
 }
 
 .sh-small-label {
-  font-size: 11px;
+  font-size: 10px;
   line-height: 16px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .sh-tiny-meta {
@@ -492,7 +497,10 @@ textarea::placeholder {
 
 .sectionhub-dot-grid {
   background-color: transparent;
-  background-image: radial-gradient(rgba(138, 146, 175, 0.24) 0.85px, transparent 0.85px);
+  background-image: radial-gradient(
+    rgba(138, 146, 175, 0.24) 0.85px,
+    transparent 0.85px
+  );
   background-size: 22px 22px;
 }
 

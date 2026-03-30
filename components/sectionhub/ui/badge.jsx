@@ -9,7 +9,7 @@ export function Badge({
 }) {
   const tones = {
     default:
-      "border border-[var(--border-default)] bg-white/78 text-[var(--text-secondary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]",
+      "border border-[var(--border-default)] bg-white text-[var(--text-secondary)]",
     success:
       "border border-transparent bg-[var(--success-light)] text-[var(--success)]",
     warning:
@@ -23,7 +23,7 @@ export function Badge({
 
   const variants = {
     default:
-      "border border-transparent bg-[linear-gradient(135deg,var(--primary)_0%,#8572ff_100%)] text-white shadow-[0_10px_24px_rgba(109,76,255,0.18)]",
+      "border border-transparent bg-[var(--primary)] text-white",
     outline:
       "border border-[var(--border-strong)] bg-white/78 text-[var(--text-primary)]",
     success: tones.success,

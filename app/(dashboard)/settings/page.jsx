@@ -87,6 +87,14 @@ export default async function SettingsPage({ searchParams }) {
 
   const settings = await getSettingsData();
   const statusLabel = settings.apiCredential?.status ?? "ACTIVE";
+  const saveButtonFormId =
+    activeTab === "notifications"
+      ? "settings-notifications-form"
+      : activeTab === "advanced"
+        ? "settings-advanced-form"
+        : activeTab === "general"
+          ? "settings-general-form"
+          : "";
 
   return (
     <div className="space-y-8">
@@ -113,6 +121,26 @@ export default async function SettingsPage({ searchParams }) {
           {errorMessage}
         </div>
       ) : null}
+
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-[18px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
+            System Settings
+          </h1>
+          <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+            Manage configuration, credentials, team access, and maintenance controls.
+          </p>
+        </div>
+        {saveButtonFormId ? (
+          <button
+            type="submit"
+            form={saveButtonFormId}
+            className="inline-flex h-10 items-center justify-center rounded-[8px] bg-[var(--color-primary)] px-4 text-[12px] font-semibold text-white"
+          >
+            Save Changes
+          </button>
+        ) : null}
+      </div>
 
       {activeTab === "general" ? (
         <section id="general-settings" className="space-y-4 scroll-mt-24">

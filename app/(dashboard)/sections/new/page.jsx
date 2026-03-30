@@ -39,6 +39,9 @@ export default async function NewSectionPage({ searchParams }) {
       ) : null}
 
       <div className="space-y-1">
+        <div className="text-[12px] text-[var(--text-secondary)]">
+          Sections / Upload New
+        </div>
         <h1 className="text-[20px] font-semibold text-[var(--text-primary)]">
           Upload New Section
         </h1>
@@ -47,7 +50,10 @@ export default async function NewSectionPage({ searchParams }) {
         </p>
       </div>
 
-      <form action={saveSectionAction} className="grid gap-4 xl:grid-cols-[1.75fr_0.9fr]">
+      <form
+        action={saveSectionAction}
+        className="grid gap-4 xl:grid-cols-[1.75fr_0.9fr]"
+      >
         <div className="space-y-4">
           <Card className="p-5">
             <div className="mb-4 flex items-center justify-between">
@@ -66,9 +72,7 @@ export default async function NewSectionPage({ searchParams }) {
                 <input name="name" required className="sectionhub-input" />
               </label>
               <label className="sectionhub-field">
-                <span className="sectionhub-field-label">
-                  Slug
-                </span>
+                <span className="sectionhub-field-label">Slug</span>
                 <div className="sectionhub-input-group">
                   <span className="sectionhub-input-addon sectionhub-input-addon--left font-mono-ui">
                     /s/
@@ -90,7 +94,10 @@ export default async function NewSectionPage({ searchParams }) {
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Full Description
                 </span>
-                <textarea name="fullDescription" className="sectionhub-textarea" />
+                <textarea
+                  name="fullDescription"
+                  className="sectionhub-textarea"
+                />
               </label>
               <label className="space-y-1.5">
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
@@ -125,7 +132,11 @@ export default async function NewSectionPage({ searchParams }) {
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Author
                 </span>
-                <input defaultValue="Admin" disabled className="sectionhub-input" />
+                <input
+                  defaultValue="Admin"
+                  disabled
+                  className="sectionhub-input"
+                />
               </label>
             </div>
           </Card>
@@ -136,8 +147,13 @@ export default async function NewSectionPage({ searchParams }) {
                 Pricing & Access
               </h2>
               <div className="flex items-center gap-2 text-[12px]">
-                <span className="text-[var(--text-secondary)]">Pricing Type</span>
-                <select name="pricingType" className="sectionhub-select min-w-[110px]">
+                <span className="text-[var(--text-secondary)]">
+                  Pricing Type
+                </span>
+                <select
+                  name="pricingType"
+                  className="sectionhub-select min-w-[110px]"
+                >
                   <option value="PAID">Paid</option>
                   <option value="FREE">Free</option>
                 </select>
@@ -193,7 +209,9 @@ export default async function NewSectionPage({ searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">Liquid File</h2>
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
+              Liquid File
+            </h2>
             <div className="mt-4 rounded-[8px] border border-dashed border-[var(--border-strong)] bg-[var(--background-page)] p-8 text-center">
               <div className="text-[14px] font-medium text-[var(--text-primary)]">
                 Click to upload or drag and drop
@@ -201,9 +219,6 @@ export default async function NewSectionPage({ searchParams }) {
               <div className="mt-1 text-[12px] text-[var(--text-tertiary)]">
                 .liquid files only, max 2MB
               </div>
-            </div>
-            <div className="mt-3 rounded-[8px] bg-[#0d1735] px-3 py-2 font-mono text-[12px] text-white">
-              SHA-256: 8f3a...e9b2
             </div>
           </Card>
 
@@ -243,7 +258,10 @@ export default async function NewSectionPage({ searchParams }) {
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Installation Steps
                 </span>
-                <textarea name="installationSteps" className="sectionhub-textarea" />
+                <textarea
+                  name="installationSteps"
+                  className="sectionhub-textarea"
+                />
               </label>
               <label className="space-y-1.5 md:col-span-2">
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
@@ -285,7 +303,9 @@ export default async function NewSectionPage({ searchParams }) {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">SEO Metadata</h2>
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
+              SEO Metadata
+            </h2>
             <div className="mt-4 grid gap-3">
               <label className="space-y-1.5">
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
@@ -297,7 +317,10 @@ export default async function NewSectionPage({ searchParams }) {
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Meta Description
                 </span>
-                <textarea name="metaDescription" className="sectionhub-textarea" />
+                <textarea
+                  name="metaDescription"
+                  className="sectionhub-textarea"
+                />
               </label>
               <label className="space-y-1.5">
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
@@ -314,7 +337,10 @@ export default async function NewSectionPage({ searchParams }) {
                   <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                     Marketplace Subtitle
                   </span>
-                  <input name="marketplaceSubtitle" className="sectionhub-input" />
+                  <input
+                    name="marketplaceSubtitle"
+                    className="sectionhub-input"
+                  />
                 </label>
                 <label className="space-y-1.5">
                   <span className="text-[12px] font-medium text-[var(--text-secondary)]">
@@ -329,7 +355,9 @@ export default async function NewSectionPage({ searchParams }) {
 
         <div className="space-y-4">
           <Card className="p-5">
-            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">Publishing</h2>
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
+              Publishing
+            </h2>
             <div className="mt-4 space-y-3 text-[14px] text-[var(--text-secondary)]">
               <ToggleRow name="featured" label="Featured Section" />
               <ToggleRow
@@ -346,7 +374,11 @@ export default async function NewSectionPage({ searchParams }) {
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Status
                 </span>
-                <select name="status" defaultValue="DRAFT" className="sectionhub-select">
+                <select
+                  name="status"
+                  defaultValue="DRAFT"
+                  className="sectionhub-select"
+                >
                   <option value="DRAFT">Draft</option>
                   <option value="PUBLISHED">Published</option>
                   <option value="ARCHIVED">Archived</option>
@@ -356,7 +388,11 @@ export default async function NewSectionPage({ searchParams }) {
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">
                   Visibility
                 </span>
-                <select name="visibility" defaultValue="MARKETPLACE" className="sectionhub-select">
+                <select
+                  name="visibility"
+                  defaultValue="MARKETPLACE"
+                  className="sectionhub-select"
+                >
                   <option value="MARKETPLACE">Public</option>
                   <option value="INTERNAL">Internal</option>
                   <option value="HIDDEN">Hidden</option>
@@ -411,4 +447,3 @@ export default async function NewSectionPage({ searchParams }) {
     </div>
   );
 }
-

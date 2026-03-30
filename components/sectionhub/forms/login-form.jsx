@@ -15,8 +15,17 @@ export function LoginForm() {
 
   return (
     <form action={formAction} className="space-y-4">
+      <div className="mb-1">
+        <h1 className="text-[20px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
+          Sign In
+        </h1>
+        <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+          Access the SectionHub admin workspace.
+        </p>
+      </div>
+
       <label className="block space-y-2">
-        <span className="text-[14px] font-medium text-[var(--text-primary)]">
+        <span className="text-[12px] font-semibold text-[var(--text-primary)]">
           Email address
         </span>
         <input
@@ -25,12 +34,12 @@ export function LoginForm() {
           autoComplete="email"
           placeholder="admin@sectionhub.io"
           required
-          className="sectionhub-input"
+          className="sectionhub-input h-[40px]"
         />
       </label>
 
       <label className="block space-y-2">
-        <span className="text-[14px] font-medium text-[var(--text-primary)]">
+        <span className="text-[12px] font-semibold text-[var(--text-primary)]">
           Password
         </span>
         <div className="relative">
@@ -40,13 +49,13 @@ export function LoginForm() {
             autoComplete="current-password"
             placeholder="Enter your password"
             required
-            className="sectionhub-input pr-10"
+            className="sectionhub-input h-[40px] pr-10"
           />
           <Eye className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
         </div>
       </label>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-[13px] text-[var(--text-secondary)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-[12px] text-[var(--text-secondary)]">
         <label className="flex items-center gap-2.5">
           <input
             type="checkbox"
@@ -72,15 +81,15 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-[var(--primary)] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[var(--primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-[42px] w-full items-center justify-center gap-2 rounded-[8px] bg-[linear-gradient(90deg,var(--color-primary)_0%,#7b5dff_100%)] px-4 text-[13px] font-semibold text-white shadow-[0_10px_20px_rgba(109,76,255,0.18)] transition-colors hover:brightness-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Signing in..." : "Sign in"}
         {!pending ? <ArrowRight className="h-4 w-4" /> : null}
       </button>
 
-      <div className="flex items-center justify-center gap-2 text-[12px] font-medium text-[var(--text-secondary)]">
+      <div className="flex items-center justify-center gap-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">
         <ShieldCheck className="h-4 w-4 text-[var(--success)]" />
-        2FA PROTECTED
+        2FA Protected
       </div>
     </form>
   );

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,31 +10,31 @@ const SETTINGS_SUGGESTIONS = [
   {
     id: "settings-general",
     label: "General Settings",
-    meta: "Settings section",
+    meta: "Settings",
     href: "/settings?tab=general",
   },
   {
     id: "settings-api",
     label: "API Credentials",
-    meta: "Settings section",
+    meta: "Settings",
     href: "/settings?tab=api-keys",
   },
   {
     id: "settings-team",
     label: "Team Management",
-    meta: "Settings section",
+    meta: "Settings",
     href: "/settings?tab=team",
   },
   {
     id: "settings-notifications",
     label: "Notifications",
-    meta: "Settings section",
+    meta: "Settings",
     href: "/settings?tab=notifications",
   },
   {
     id: "settings-maintenance",
     label: "Advanced Settings",
-    meta: "Settings section",
+    meta: "Settings",
     href: "/settings?tab=advanced",
   },
 ];
@@ -132,8 +132,8 @@ export function SearchBox({
       ? [
           {
             id: "search-sections",
-            label: `Search sections for \"${query}\"`,
-            meta: "Quick action",
+            label: `Search sections for "${query}"`,
+            meta: "Quick Action",
             href: `/sections?search=${encodeURIComponent(query)}`,
           },
         ]
@@ -164,8 +164,8 @@ export function SearchBox({
 
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>
-      <div className="group flex h-[38px] items-center gap-2.5 rounded-[12px] border border-white/80 bg-white/78 px-3 shadow-[0_12px_24px_rgba(15,23,42,0.045)] backdrop-blur-xl transition-all focus-within:border-[rgba(109,76,255,0.4)] focus-within:shadow-[0_16px_28px_rgba(109,76,255,0.12)]">
-        <Search className="h-4 w-4 text-[var(--text-tertiary)] transition-colors group-focus-within:text-[var(--color-primary)]" />
+      <div className="flex h-[36px] items-center gap-2 rounded-[8px] border border-[var(--border-default)] bg-[var(--surface-soft)] px-3">
+        <Search className="h-4 w-4 text-[var(--text-tertiary)]" />
         <input
           value={value}
           onFocus={() => setFocused(true)}
@@ -185,30 +185,25 @@ export function SearchBox({
               setFocused(false);
             }
           }}
-          className="h-full w-full bg-transparent text-[12px] font-medium text-[var(--text-primary)] outline-none placeholder:font-normal placeholder:text-[var(--text-tertiary)]"
+          className="h-full w-full bg-transparent text-[12px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
           placeholder={placeholder}
         />
-        {focused || query ? (
-          <span className="hidden rounded-full border border-[var(--border-default)] bg-white/88 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] md:inline-flex">
-            Enter
-          </span>
-        ) : null}
       </div>
 
       {showDropdown ? (
-        <div className="absolute left-0 right-0 top-[44px] z-50 overflow-hidden rounded-[12px] border border-[var(--border-default)] bg-white/95 p-1.5 shadow-[var(--shadow-strong)] backdrop-blur-xl">
+        <div className="absolute left-0 right-0 top-[40px] z-50 overflow-hidden rounded-[10px] border border-[var(--border-default)] bg-white shadow-[var(--shadow-strong)]">
           <ul className="max-h-[320px] overflow-auto">
             {suggestions.map((item) => (
               <li key={item.id}>
                 <button
                   type="button"
-                  className="flex w-full items-center justify-between gap-3 rounded-[12px] px-3 py-2.5 text-left transition-colors hover:bg-[var(--surface-soft)]"
+                  className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors hover:bg-[var(--surface-soft)]"
                   onClick={() => runNavigation(item.href)}
                 >
                   <span className="min-w-0 flex-1 text-[12px] font-medium text-[var(--text-primary)]">
                     {item.label}
                   </span>
-                  <span className="shrink-0 rounded-full bg-[var(--surface-muted)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)]">
+                  <span className="shrink-0 rounded-full bg-[var(--surface-soft)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
                     {item.meta}
                   </span>
                 </button>
@@ -220,4 +215,3 @@ export function SearchBox({
     </div>
   );
 }
-
