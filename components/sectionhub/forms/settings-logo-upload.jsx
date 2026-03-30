@@ -1,7 +1,8 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { ImagePlus } from "lucide-react";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 
 function toUploadPath(fileName) {
   const normalized = String(fileName ?? "")
@@ -13,6 +14,7 @@ function toUploadPath(fileName) {
 
 export function SettingsLogoUpload({ initialLogo = "" }) {
   const inputId = useId();
+  const inputRef = useRef(null);
   const [siteLogo, setSiteLogo] = useState(initialLogo);
 
   const fileName = siteLogo ? siteLogo.split("/").pop() : "";
@@ -43,18 +45,27 @@ export function SettingsLogoUpload({ initialLogo = "" }) {
             >
               Upload New
             </label>
-            <button
-              type="button"
-              className="inline-flex min-h-9 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)]"
-              onClick={() => setSiteLogo("")}
-            >
-              Remove
-            </button>
+            <ConfirmActionDialog
+              title="Remove the site logo?"
+              description="This clears the current logo selection. After you save settings, the app will fall back to the default SectionHub brand mark."
+              confirmLabel="Remove Logo"
+              triggerLabel="Remove"
+              disabled={!siteLogo}
+              onConfirm={() => {
+                if (inputRef.current) {
+                  inputRef.current.value = "";
+                }
+                setSiteLogo("");
+              }}
+              triggerClassName="inline-flex min-h-9 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white px-4 text-[12px] font-semibold text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+            />
           </div>
 
           <input
+            ref={inputRef}
             id={inputId}
             type="file"
+            name="siteLogoFile"
             accept=".svg,.png,.jpg,.jpeg,.webp"
             className="hidden"
             onChange={(event) => {

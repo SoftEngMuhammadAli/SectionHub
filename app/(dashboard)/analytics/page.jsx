@@ -4,10 +4,13 @@ import { getAnalyticsData } from "@/lib/sectionhub/analytics/service";
 import { formatPrice } from "@/lib/sectionhub/shared/format";
 
 function parseInstallCount(value) {
-  const text = String(value ?? "").trim().toLowerCase();
+  const text = String(value ?? "")
+    .trim()
+    .toLowerCase();
   if (!text) return 0;
   if (text.endsWith("k")) return Math.round(Number(text.slice(0, -1)) * 1000);
-  if (text.endsWith("m")) return Math.round(Number(text.slice(0, -1)) * 1000000);
+  if (text.endsWith("m"))
+    return Math.round(Number(text.slice(0, -1)) * 1000000);
   return Number(text.replace(/[^0-9.]/g, "")) || 0;
 }
 
@@ -55,7 +58,10 @@ export default async function AnalyticsPage() {
     }))
     .sort((a, b) => b.installCount - a.installCount)
     .slice(0, 3);
-  const highestInstall = Math.max(...topSections.map((item) => item.installCount), 1);
+  const highestInstall = Math.max(
+    ...topSections.map((item) => item.installCount),
+    1,
+  );
 
   const categoryBreakdown = data.categories
     .map((category) => {
@@ -89,7 +95,9 @@ export default async function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Metric
           label="Installs"
-          value={new Intl.NumberFormat("en-US").format(successfulInstalls.length)}
+          value={new Intl.NumberFormat("en-US").format(
+            successfulInstalls.length,
+          )}
           delta="+12.5%"
         />
         <Metric
@@ -191,7 +199,9 @@ export default async function AnalyticsPage() {
               return (
                 <div key={section.id}>
                   <div className="mb-1.5 flex items-center justify-between text-[13px]">
-                    <span className="text-[var(--text-primary)]">{section.name}</span>
+                    <span className="text-[var(--text-primary)]">
+                      {section.name}
+                    </span>
                     <span className="font-mono text-[var(--color-primary)]">
                       {section.installs}
                     </span>
@@ -217,7 +227,10 @@ export default async function AnalyticsPage() {
               {categoryBreakdown.map((category, index) => {
                 const percent = Math.round(
                   (category.sectionCount /
-                    categoryBreakdown.reduce((sum, item) => sum + item.sectionCount, 0)) *
+                    categoryBreakdown.reduce(
+                      (sum, item) => sum + item.sectionCount,
+                      0,
+                    )) *
                     100,
                 );
 

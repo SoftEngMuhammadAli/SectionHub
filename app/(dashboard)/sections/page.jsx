@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import { deleteSectionAction } from "@/app/actions";
 import { Card, SectionTitle } from "@/components/sectionhub/ui";
+import { ConfirmActionDialog } from "@/components/shared/confirm-action-dialog";
 import { getCategories } from "@/lib/sectionhub/categories/service";
 import { getSections } from "@/lib/sectionhub/sections/service";
 import { getTags } from "@/lib/sectionhub/tags/service";
@@ -263,15 +264,15 @@ export default async function SectionsPage({ searchParams }) {
               >
                 Edit
               </Link>
-              <form action={deleteSectionAction} className="flex-1">
-                <input type="hidden" name="id" value={section.id} />
-                <button
-                  type="submit"
-                  className="inline-flex min-h-8 w-full items-center justify-center rounded-[10px] border border-[var(--danger)]/25 bg-white px-3 text-[12px] font-semibold text-[var(--danger)]"
-                >
-                  Delete
-                </button>
-              </form>
+              <ConfirmActionDialog
+                title="Delete this section?"
+                description={`"${section.name}" will be permanently removed from the catalog, bundle references, installs, and metrics. This action cannot be undone.`}
+                confirmLabel="Delete Section"
+                triggerLabel="Delete"
+                action={deleteSectionAction}
+                fields={{ id: section.id }}
+                triggerClassName="inline-flex min-h-8 w-full flex-1 items-center justify-center rounded-[10px] border border-[var(--danger)]/25 bg-white px-3 text-[12px] font-semibold text-[var(--danger)]"
+              />
             </div>
           </Card>
         ))}
@@ -300,7 +301,9 @@ export default async function SectionsPage({ searchParams }) {
                 <th className="w-[160px] px-3 py-3">Category</th>
                 <th className="w-[190px] px-3 py-3">Tags</th>
                 <th className="w-[92px] px-3 py-3">Price</th>
-                <th className="w-[96px] px-3 py-3 2xl:table-cell hidden">Version</th>
+                <th className="w-[96px] px-3 py-3 2xl:table-cell hidden">
+                  Version
+                </th>
                 <th className="w-[84px] px-3 py-3">Installs</th>
                 <th className="w-[110px] px-3 py-3">Updated</th>
                 <th className="w-[92px] px-3 py-3">Status</th>
@@ -377,15 +380,15 @@ export default async function SectionsPage({ searchParams }) {
                       >
                         Edit
                       </Link>
-                      <form action={deleteSectionAction}>
-                        <input type="hidden" name="id" value={section.id} />
-                        <button
-                          type="submit"
-                          className="inline-flex min-h-8 items-center justify-center rounded-[10px] border border-[var(--danger)]/25 bg-white px-2.5 text-[11px] font-semibold text-[var(--danger)]"
-                        >
-                          Delete
-                        </button>
-                      </form>
+                      <ConfirmActionDialog
+                        title="Delete this section?"
+                        description={`"${section.name}" will be permanently removed from the catalog, bundle references, installs, and metrics. This action cannot be undone.`}
+                        confirmLabel="Delete Section"
+                        triggerLabel="Delete"
+                        action={deleteSectionAction}
+                        fields={{ id: section.id }}
+                        triggerClassName="inline-flex min-h-8 items-center justify-center rounded-[10px] border border-[var(--danger)]/25 bg-white px-2.5 text-[11px] font-semibold text-[var(--danger)]"
+                      />
                     </div>
                   </td>
                 </tr>
@@ -407,7 +410,8 @@ export default async function SectionsPage({ searchParams }) {
 
       <div className="flex flex-col gap-3 text-[12px] text-[var(--text-secondary)] sm:flex-row sm:items-center sm:justify-between">
         <div>
-          Showing 1-{Math.min(filteredSections.length, 10)} of {filteredSections.length}
+          Showing 1-{Math.min(filteredSections.length, 10)} of{" "}
+          {filteredSections.length}
         </div>
         <div className="flex items-center gap-1">
           <button className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-secondary)]">

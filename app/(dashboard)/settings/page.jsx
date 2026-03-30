@@ -128,7 +128,8 @@ export default async function SettingsPage({ searchParams }) {
             System Settings
           </h1>
           <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-            Manage configuration, credentials, team access, and maintenance controls.
+            Manage configuration, credentials, team access, and maintenance
+            controls.
           </p>
         </div>
         {saveButtonFormId ? (
@@ -516,4 +517,3 @@ export default async function SettingsPage({ searchParams }) {
     </div>
   );
 }
-

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import connectToDatabase from "../lib/db.js";
+import { getConfiguredAdmin } from "../lib/auth/default-admin.js";
 import {
   ActivityLogModel,
   AdminUserModel,
@@ -20,6 +21,7 @@ import {
 
 async function main() {
   await connectToDatabase();
+  const configuredAdmin = getConfiguredAdmin();
   await Promise.all([
     ActivityLogModel.deleteMany({}),
     InstallEventModel.deleteMany({}),
@@ -37,9 +39,9 @@ async function main() {
     AdminUserModel.deleteMany({}),
   ]);
   const admin = await AdminUserModel.create({
-    name: "Muhammad Ali",
-    email: "admin@sectionhub.com",
-    passwordHash: await bcrypt.hash("admin12345", 10),
+    name: configuredAdmin.name,
+    email: configuredAdmin.email,
+    passwordHash: await bcrypt.hash(configuredAdmin.password, 10),
     role: "ADMIN",
     isActive: true,
   });
@@ -527,8 +529,8 @@ async function main() {
     },
   ]);
   console.log("Seed completed.");
-  console.log("Admin email: admin@sectionhub.com");
-  console.log("Admin password: admin12345");
+  console.log(`Admin email: ${configuredAdmin.email}`);
+  console.log(`Admin password: ${configuredAdmin.password}`);
 }
 
 main()

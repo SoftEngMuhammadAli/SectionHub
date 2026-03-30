@@ -44,8 +44,19 @@ function statusMeta(status) {
 
 export default async function DashboardPage() {
   const data = await getDashboardData();
-  const maxInstall = Math.max(...data.installsByDay.map((item) => item.value), 1);
-  const maxCategoryCount = Math.max(...data.categories.map((item) => item.count), 1);
+  const maxInstall = Math.max(
+    ...data.installsByDay.map((item) => item.value),
+    1,
+  );
+  const maxCategoryCount = Math.max(
+    ...data.categories.map((item) => item.count),
+    1,
+  );
+  const weeklyChart = data.installsByDay.map((item) => ({
+    ...item,
+    isActive: item.label.toUpperCase() === "WED",
+    height: Math.max((item.value / maxInstall) * 124, 52),
+  }));
 
   return (
     <div className="space-y-4">
@@ -88,31 +99,35 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 xl:grid-cols-[1.65fr_0.95fr]">
         <Card className="p-5">
-          <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
               Installs this week
             </h2>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+            <div className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-primary)] shadow-[0_0_0_3px_rgba(109,76,255,0.12)]" />
               Daily totals
             </div>
           </div>
-          <div className="grid h-[160px] grid-cols-7 items-end gap-3">
-            {data.installsByDay.map((item, index) => {
-              const active = index === 2;
-              const height = Math.max((item.value / maxInstall) * 110, 24);
+          <div className="flex h-[90%] items-end justify-between gap-3 px-1 sm:gap-4">
+            {weeklyChart.map((item) => {
               return (
-                <div key={item.label} className="flex flex-col items-center gap-2">
-                  <div
-                    className={
-                      active
-                        ? "w-full rounded-t-[8px] bg-[linear-gradient(180deg,var(--color-primary)_0%,#8b77ff_100%)]"
-                        : "w-full rounded-t-[8px] bg-[rgba(109,76,255,0.24)]"
-                    }
-                    style={{ height: `${height}px` }}
-                  />
+                <div
+                  key={item.label}
+                  className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2"
+                >
+                  <div className="flex h-[132px] w-full items-end justify-center">
+                    <div
+                      className={
+                        item.isActive
+                          ? "w-full max-w-[58px] rounded-[2px] bg-[linear-gradient(180deg,#7d5cff_0%,#6847f7_100%)] shadow-[0_10px_20px_rgba(104,71,247,0.14)]"
+                          : "w-full max-w-[58px] rounded-[2px] bg-[#d4cffd]"
+                      }
+                      style={{ height: `${item.height}px` }}
+                    />
+                  </div>
                   <span
                     className={
-                      active
+                      item.isActive
                         ? "text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-primary)]"
                         : "text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]"
                     }
@@ -155,7 +170,10 @@ export default async function DashboardPage() {
             </h2>
             <div className="mt-4 space-y-4">
               {data.activity.slice(0, 4).map((item, index) => (
-                <div key={`${item.actor}-${item.target}-${index}`} className="flex gap-3">
+                <div
+                  key={`${item.actor}-${item.target}-${index}`}
+                  className="flex gap-3"
+                >
                   <span
                     className={`mt-1 inline-flex h-5 w-5 shrink-0 rounded-full border-2 ${
                       index === 0
@@ -245,7 +263,9 @@ export default async function DashboardPage() {
                 $10,250
               </div>
             </div>
-            <div className="text-[12px] font-semibold text-[var(--success)]">+15.2%</div>
+            <div className="text-[12px] font-semibold text-[var(--success)]">
+              +15.2%
+            </div>
           </div>
         </Card>
 
@@ -256,15 +276,23 @@ export default async function DashboardPage() {
           <div className="mt-4 space-y-4">
             <div>
               <div className="mb-1.5 flex items-center justify-between text-[12px]">
-                <span className="text-[var(--text-secondary)]">API Gateway</span>
-                <span className="font-semibold text-[var(--success)]">ONLINE</span>
+                <span className="text-[var(--text-secondary)]">
+                  API Gateway
+                </span>
+                <span className="font-semibold text-[var(--success)]">
+                  ONLINE
+                </span>
               </div>
               <div className="h-1.5 rounded-full bg-[var(--success-light)]" />
             </div>
             <div>
               <div className="mb-1.5 flex items-center justify-between text-[12px]">
-                <span className="text-[var(--text-secondary)]">Storage Usage</span>
-                <span className="font-semibold text-[var(--text-primary)]">64% FULL</span>
+                <span className="text-[var(--text-secondary)]">
+                  Storage Usage
+                </span>
+                <span className="font-semibold text-[var(--text-primary)]">
+                  64% FULL
+                </span>
               </div>
               <div className="h-1.5 rounded-full bg-[var(--surface-soft)]">
                 <div className="h-1.5 w-[64%] rounded-full bg-[var(--color-primary)]" />
@@ -272,8 +300,12 @@ export default async function DashboardPage() {
             </div>
             <div>
               <div className="mb-1.5 flex items-center justify-between text-[12px]">
-                <span className="text-[var(--text-secondary)]">CDN Propagation</span>
-                <span className="font-semibold text-[var(--success)]">HEALTHY</span>
+                <span className="text-[var(--text-secondary)]">
+                  CDN Propagation
+                </span>
+                <span className="font-semibold text-[var(--success)]">
+                  HEALTHY
+                </span>
               </div>
               <div className="h-1.5 rounded-full bg-[var(--success-light)]" />
             </div>
@@ -316,7 +348,9 @@ export default async function DashboardPage() {
                         {item.name}
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-[var(--text-secondary)]">Admin</td>
+                    <td className="px-5 py-4 text-[var(--text-secondary)]">
+                      Admin
+                    </td>
                     <td className="px-5 py-4 text-[var(--text-secondary)]">
                       {item.updatedAt}
                     </td>

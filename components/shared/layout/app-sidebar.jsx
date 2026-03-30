@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Bell, KeyRound, LogOut, Settings, SquareTerminal, UsersRound } from "lucide-react";
+import {
+  Bell,
+  KeyRound,
+  LogOut,
+  Settings,
+  SquareTerminal,
+  UsersRound,
+} from "lucide-react";
 import { logoutAction } from "@/app/actions";
 import { navGroups } from "@/lib/data/navigation/sectionhub-nav";
 import { Icon } from "@/components/sectionhub/ui";
@@ -56,7 +63,9 @@ function getActiveNavHref(pathname) {
 }
 
 function BrandMark({ siteLogo }) {
-  if (siteLogo) {
+  const [brokenLogoSrc, setBrokenLogoSrc] = useState("");
+
+  if (siteLogo && brokenLogoSrc !== siteLogo) {
     return (
       <Image
         src={siteLogo}
@@ -64,6 +73,7 @@ function BrandMark({ siteLogo }) {
         width={32}
         height={32}
         className="h-8 w-8 rounded-[8px] border border-[var(--border-default)] object-cover"
+        onError={() => setBrokenLogoSrc(siteLogo)}
       />
     );
   }
@@ -99,7 +109,9 @@ function SidebarUser({ dark = false }) {
           <div
             className={cn(
               "truncate text-[11px]",
-              dark ? "text-[var(--sidebar-text)]" : "text-[var(--text-secondary)]",
+              dark
+                ? "text-[var(--sidebar-text)]"
+                : "text-[var(--text-secondary)]",
             )}
           >
             {dark ? "Admin Account" : "Admin Access"}
@@ -130,7 +142,9 @@ function SettingsSidebarContent({ activeTab, setDrawerOpen, siteLogo }) {
           <div className="truncate text-[18px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
             <Link href="/dashboard">SectionHub</Link>
           </div>
-          <div className="text-[11px] text-[var(--text-secondary)]">System Admin</div>
+          <div className="text-[11px] text-[var(--text-secondary)]">
+            System Admin
+          </div>
         </div>
       </div>
 
@@ -204,7 +218,9 @@ function GeneralSidebarContent({
       <div
         className={cn(
           "flex h-[76px] items-center gap-3 px-4",
-          isDark ? "border-b border-white/8" : "border-b border-[var(--border-default)]",
+          isDark
+            ? "border-b border-white/8"
+            : "border-b border-[var(--border-default)]",
         )}
       >
         <BrandMark siteLogo={siteLogo} />
@@ -220,7 +236,9 @@ function GeneralSidebarContent({
           <div
             className={cn(
               "text-[11px]",
-              isDark ? "text-[var(--sidebar-text)]" : "text-[var(--text-secondary)]",
+              isDark
+                ? "text-[var(--sidebar-text)]"
+                : "text-[var(--text-secondary)]",
             )}
           >
             {isDark ? "Admin Console" : "Design System Manager"}

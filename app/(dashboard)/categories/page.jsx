@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Boxes,
   Folder,
@@ -9,6 +10,21 @@ import {
 import { saveCategoryAction } from "@/app/actions";
 import { Card } from "@/components/sectionhub/ui";
 import { getCategories } from "@/lib/sectionhub/categories/service";
+
+const ICON_OPTIONS = [
+  { value: "Boxes", icon: Boxes },
+  { value: "Triangle", icon: Triangle },
+  { value: "LayoutGrid", icon: LayoutGrid },
+  { value: "Grid2x2", icon: Grid2x2 },
+];
+
+const CARD_ICON_MAP = {
+  Boxes,
+  Triangle,
+  LayoutGrid,
+  Grid2x2,
+  Folder,
+};
 
 function Toggle({ name, label, description, defaultChecked = false }) {
   return (
@@ -31,9 +47,86 @@ function Toggle({ name, label, description, defaultChecked = false }) {
   );
 }
 
-export default async function CategoriesPage() {
+function CategoryCard({ category }) {
+  const IconComp = CARD_ICON_MAP[category.icon] ?? LayoutGrid;
+
+  return (
+    <Card className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[var(--color-primary-light)] text-[var(--color-primary)]">
+          <IconComp className="h-4 w-4" />
+        </div>
+        <Link
+          href={`/categories?category=${category.id}`}
+          className="rounded-[8px] border border-[var(--border-default)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)]"
+        >
+          Edit
+        </Link>
+      </div>
+
+      <div className="mt-5">
+        <div className="text-[16px] font-semibold text-[var(--text-primary)]">
+          {category.name}
+        </div>
+        <div className="mt-1 text-[12px] text-[var(--text-secondary)]">
+          {category.description ||
+            "Smart category grouping for catalog navigation."}
+        </div>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 gap-4 text-[12px]">
+        <div>
+          <div className="text-[var(--text-tertiary)]">Sections</div>
+          <div className="mt-1 font-semibold text-[var(--text-primary)]">
+            {category.sectionCount}
+          </div>
+        </div>
+        <div>
+          <div className="text-[var(--text-tertiary)]">Sort Order</div>
+          <div className="mt-1 font-semibold text-[var(--text-primary)]">
+            {String(category.sortOrder ?? 0).padStart(2, "0")}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function IconPicker({ selectedIcon }) {
+  return (
+    <div className="sectionhub-field">
+      <span className="sectionhub-field-label">Icon Selection</span>
+      <div className="flex gap-2">
+        {ICON_OPTIONS.map((item) => {
+          const IconComp = item.icon;
+          return (
+            <label key={item.value} className="cursor-pointer">
+              <input
+                type="radio"
+                name="icon"
+                value={item.value}
+                defaultChecked={item.value === selectedIcon}
+                className="peer sr-only"
+              />
+              <span
+                className="inline-flex h-12 w-12 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white text-[var(--text-tertiary)] transition-colors peer-checked:border-[var(--color-primary)] peer-checked:bg-[var(--color-primary)] peer-checked:text-white"
+              >
+                <IconComp className="h-5 w-5" />
+              </span>
+            </label>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export default async function CategoriesPage({ searchParams }) {
+  const params = await searchParams;
+  const categoryId = String(params.category ?? "");
   const categories = await getCategories();
-  const featured = categories[0];
+  const selectedCategory =
+    categories.find((item) => item.id === categoryId) ?? categories[0];
 
   return (
     <div className="space-y-5">
@@ -50,48 +143,8 @@ export default async function CategoriesPage() {
 
       <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
         <div className="grid gap-4 md:grid-cols-2">
-          {categories.map((category, index) => (
-            <Card key={category.id} className="p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[var(--color-primary-light)] text-[var(--color-primary)]">
-                  {index % 2 === 0 ? (
-                    <LayoutGrid className="h-4 w-4" />
-                  ) : (
-                    <Folder className="h-4 w-4" />
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="rounded-[8px] border border-[var(--border-default)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)]"
-                >
-                  Edit
-                </button>
-              </div>
-
-              <div className="mt-5">
-                <div className="text-[16px] font-semibold text-[var(--text-primary)]">
-                  {category.name}
-                </div>
-                <div className="mt-1 text-[12px] text-[var(--text-secondary)]">
-                  {category.description || "Smart category grouping for catalog navigation."}
-                </div>
-              </div>
-
-              <div className="mt-5 grid grid-cols-2 gap-4 text-[12px]">
-                <div>
-                  <div className="text-[var(--text-tertiary)]">Sections</div>
-                  <div className="mt-1 font-semibold text-[var(--text-primary)]">
-                    {category.sectionCount}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-[var(--text-tertiary)]">Sort Order</div>
-                  <div className="mt-1 font-semibold text-[var(--text-primary)]">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                </div>
-              </div>
-            </Card>
+          {categories.map((category) => (
+            <CategoryCard key={category.id} category={category} />
           ))}
         </div>
 
@@ -106,19 +159,19 @@ export default async function CategoriesPage() {
                   Modify properties for storefront navigation groups.
                 </p>
               </div>
-              <button
-                type="button"
+              <Link
+                href="/categories"
                 className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-soft)]"
               >
                 <X className="h-4 w-4" />
-              </button>
+              </Link>
             </div>
 
             <label className="sectionhub-field">
               <span className="sectionhub-field-label">Name</span>
               <input
                 name="name"
-                defaultValue={featured?.name ?? "Navigation Bars"}
+                defaultValue={selectedCategory?.name ?? "Navigation Bars"}
                 className="sectionhub-input"
               />
             </label>
@@ -127,7 +180,7 @@ export default async function CategoriesPage() {
               <span className="sectionhub-field-label">Slug</span>
               <input
                 name="slug"
-                defaultValue={featured?.slug ?? "nav-bars"}
+                defaultValue={selectedCategory?.slug ?? "nav-bars"}
                 className="sectionhub-input font-mono-ui"
               />
             </label>
@@ -137,48 +190,31 @@ export default async function CategoriesPage() {
               <textarea
                 name="description"
                 defaultValue={
-                  featured?.description ??
+                  selectedCategory?.description ??
                   "Standard and sticky navigation components including mega-menus and mobile layouts."
                 }
                 className="sectionhub-textarea"
               />
             </label>
 
-            <div className="sectionhub-field">
-              <span className="sectionhub-field-label">Icon Selection</span>
-              <div className="flex gap-2">
-                {[
-                  { icon: Boxes, active: true },
-                  { icon: Triangle, active: false },
-                  { icon: Grid2x2, active: false },
-                  { icon: LayoutGrid, active: false },
-                ].map((item, index) => {
-                  const IconComp = item.icon;
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      className={`inline-flex h-9 w-9 items-center justify-center rounded-[8px] border ${
-                        item.active
-                          ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
-                          : "border-[var(--border-default)] bg-white text-[var(--text-tertiary)]"
-                      }`}
-                    >
-                      <IconComp className="h-4 w-4" />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <IconPicker selectedIcon={selectedCategory?.icon ?? "LayoutGrid"} />
 
             <div className="grid gap-3 md:grid-cols-2">
               <label className="sectionhub-field">
                 <span className="sectionhub-field-label">Parent Category</span>
-                <select className="sectionhub-select">
-                  <option>None</option>
-                  {categories.slice(1).map((category) => (
-                    <option key={category.id}>{category.name}</option>
-                  ))}
+                <select
+                  name="parentId"
+                  defaultValue={selectedCategory?.parentId ?? ""}
+                  className="sectionhub-select"
+                >
+                  <option value="">None</option>
+                  {categories
+                    .filter((category) => category.id !== selectedCategory?.id)
+                    .map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
                 </select>
               </label>
 
@@ -187,31 +223,32 @@ export default async function CategoriesPage() {
                 <input
                   name="sortOrder"
                   type="number"
-                  defaultValue="2"
+                  defaultValue={String(selectedCategory?.sortOrder ?? 2)}
                   className="sectionhub-input"
                 />
               </label>
             </div>
 
             <Toggle
-              name="categoryVisibilityPreview"
+              name="isVisible"
               label="Visibility"
               description="Enable or disable category on front-end."
-              defaultChecked
+              defaultChecked={selectedCategory?.visibility !== "HIDDEN"}
             />
             <Toggle
               name="featured"
               label="Featured"
               description="Show in recommended categories section."
+              defaultChecked={Boolean(selectedCategory?.featured)}
             />
 
             <div className="flex gap-3 pt-2">
-              <button
-                type="button"
+              <Link
+                href="/categories"
                 className="inline-flex h-10 flex-1 items-center justify-center rounded-[8px] border border-[var(--border-default)] bg-white text-[12px] font-semibold text-[var(--text-primary)]"
               >
                 Discard
-              </button>
+              </Link>
               <button
                 type="submit"
                 className="inline-flex h-10 flex-1 items-center justify-center rounded-[8px] bg-[var(--color-primary)] text-[12px] font-semibold text-white"
@@ -220,10 +257,8 @@ export default async function CategoriesPage() {
               </button>
             </div>
 
-            <input type="hidden" name="id" value={featured?.id ?? ""} />
-            <input type="hidden" name="icon" value="LayoutGrid" />
-            <input type="hidden" name="visibility" value="MARKETPLACE" />
-            <input type="hidden" name="status" value="Active" />
+            <input type="hidden" name="id" value={selectedCategory?.id ?? ""} />
+            <input type="hidden" name="status" value={selectedCategory?.status ?? "Active"} />
           </Card>
         </form>
       </div>
