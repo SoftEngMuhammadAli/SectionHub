@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getDashboardData } from "@/lib/sectionhub/dashboard/service";
 
-function StatCard({ label, value, delta, tone = "success" }) {
+function StatCard({ label, value, delta }) {
   return (
     <Card className="p-5">
       <div className="flex items-start justify-between gap-3">
@@ -12,12 +12,12 @@ function StatCard({ label, value, delta, tone = "success" }) {
         </div>
         <span
           className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-            tone === "danger"
+            delta.tone === "danger"
               ? "bg-[var(--danger-light)] text-[var(--danger)]"
               : "bg-[var(--success-light)] text-[var(--success)]"
           }`}
         >
-          {delta}
+          {delta.label}
         </span>
       </div>
       <div className="mt-3 text-[22px] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
@@ -42,21 +42,45 @@ function statusMeta(status) {
   return { label: "ARCHIVED", tone: "default" };
 }
 
+function buildMiniChartPath(series) {
+  const width = 320;
+  const height = 140;
+  const paddingX = 6;
+  const paddingY = 10;
+  const max = Math.max(...series.map((item) => item.revenueCents), 1);
+  const step = series.length > 1 ? (width - paddingX * 2) / (series.length - 1) : 0;
+
+  const points = series.map((item, index) => {
+    const x = paddingX + step * index;
+    const y =
+      height -
+      paddingY -
+      (item.revenueCents / max) * (height - paddingY * 2);
+
+    return { x, y };
+  });
+
+  const linePath = points
+    .map((point, index) => `${index === 0 ? "M" : "L"}${point.x},${point.y}`)
+    .join(" ");
+  const baseline = height - paddingY;
+  const firstX = points[0]?.x ?? paddingX;
+  const lastX = points[points.length - 1]?.x ?? paddingX;
+  const areaPath = `${linePath} L${lastX},${baseline} L${firstX},${baseline} Z`;
+
+  return { linePath, areaPath };
+}
+
 export default async function DashboardPage() {
   const data = await getDashboardData();
-  const maxInstall = Math.max(
-    ...data.installsByDay.map((item) => item.value),
-    1,
-  );
-  const maxCategoryCount = Math.max(
-    ...data.categories.map((item) => item.count),
-    1,
-  );
+  const maxInstall = Math.max(...data.installsByDay.map((item) => item.value), 1);
   const weeklyChart = data.installsByDay.map((item) => ({
     ...item,
-    isActive: item.label.toUpperCase() === "WED",
-    height: Math.max((item.value / maxInstall) * 124, 52),
+    isActive:
+      item.value === Math.max(...data.installsByDay.map((entry) => entry.value)),
+    height: Math.max((item.value / maxInstall) * 124, item.value > 0 ? 36 : 18),
   }));
+  const revenueChart = buildMiniChartPath(data.revenueTrend);
 
   return (
     <div className="space-y-4">
@@ -66,7 +90,7 @@ export default async function DashboardPage() {
         </h1>
         <div className="inline-flex h-10 items-center gap-2 rounded-[8px] border border-[var(--border-default)] bg-white px-3 text-[12px] text-[var(--text-secondary)]">
           <CalendarDays className="h-4 w-4" />
-          Oct 24, 2023
+          {data.rangeLabel}
         </div>
       </div>
 
@@ -74,7 +98,7 @@ export default async function DashboardPage() {
         <StatCard
           label="Total Sections"
           value={String(data.overview.totalSections)}
-          delta="+4%"
+          delta={data.overview.totalSectionsDelta}
         />
         <StatCard
           label="Total Installs"
@@ -82,18 +106,17 @@ export default async function DashboardPage() {
             notation: "compact",
             maximumFractionDigits: 1,
           }).format(data.overview.totalInstalls)}
-          delta="+12%"
+          delta={data.overview.totalInstallsDelta}
         />
         <StatCard
           label="Revenue This Month"
           value={data.overview.revenueMonth}
-          delta="-5%"
-          tone="danger"
+          delta={data.overview.revenueDelta}
         />
         <StatCard
           label="Active Shops"
           value={String(data.overview.activeShops)}
-          delta="+8%"
+          delta={data.overview.activeShopsDelta}
         />
       </div>
 
@@ -109,34 +132,32 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="flex h-[90%] items-end justify-between gap-3 px-1 sm:gap-4">
-            {weeklyChart.map((item) => {
-              return (
-                <div
-                  key={item.label}
-                  className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2"
-                >
-                  <div className="flex h-[132px] w-full items-end justify-center">
-                    <div
-                      className={
-                        item.isActive
-                          ? "w-full max-w-[58px] rounded-[2px] bg-[linear-gradient(180deg,#7d5cff_0%,#6847f7_100%)] shadow-[0_10px_20px_rgba(104,71,247,0.14)]"
-                          : "w-full max-w-[58px] rounded-[2px] bg-[#d4cffd]"
-                      }
-                      style={{ height: `${item.height}px` }}
-                    />
-                  </div>
-                  <span
+            {weeklyChart.map((item) => (
+              <div
+                key={item.label}
+                className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2"
+              >
+                <div className="flex h-[132px] w-full items-end justify-center">
+                  <div
                     className={
                       item.isActive
-                        ? "text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-primary)]"
-                        : "text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]"
+                        ? "w-full max-w-[58px] rounded-[2px] bg-[linear-gradient(180deg,#7d5cff_0%,#6847f7_100%)] shadow-[0_10px_20px_rgba(104,71,247,0.14)]"
+                        : "w-full max-w-[58px] rounded-[2px] bg-[#d4cffd]"
                     }
-                  >
-                    {item.label}
-                  </span>
+                    style={{ height: `${item.height}px` }}
+                  />
                 </div>
-              );
-            })}
+                <span
+                  className={
+                    item.isActive
+                      ? "text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-primary)]"
+                      : "text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]"
+                  }
+                >
+                  {item.label}
+                </span>
+              </div>
+            ))}
           </div>
         </Card>
 
@@ -228,7 +249,7 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                <div className="text-[var(--text-tertiary)]">↗</div>
+                <div className="text-[var(--text-tertiary)]">-&gt;</div>
               </div>
             ))}
           </div>
@@ -240,31 +261,33 @@ export default async function DashboardPage() {
           </h2>
           <div className="mt-4 rounded-[8px] bg-[linear-gradient(180deg,rgba(109,76,255,0.14)_0%,rgba(109,76,255,0.04)_100%)] p-4">
             <svg viewBox="0 0 320 140" className="h-[120px] w-full">
+              <path d={revenueChart.areaPath} fill="rgba(109,76,255,0.1)" />
               <path
-                d="M0 95 C34 84, 76 88, 108 64 S170 18, 205 54 S262 118, 320 46"
+                d={revenueChart.linePath}
                 fill="none"
                 stroke="var(--color-primary)"
                 strokeWidth="3"
                 strokeLinecap="round"
-              />
-              <path
-                d="M0 115 C34 104, 76 108, 108 84 S170 38, 205 74 S262 138, 320 66"
-                fill="rgba(109,76,255,0.1)"
-                stroke="none"
               />
             </svg>
           </div>
           <div className="mt-3 flex items-end justify-between">
             <div>
               <div className="text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
-                Projected
+                Current 30D
               </div>
               <div className="mt-1 text-[22px] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
-                $10,250
+                {data.overview.revenueMonth}
               </div>
             </div>
-            <div className="text-[12px] font-semibold text-[var(--success)]">
-              +15.2%
+            <div
+              className={`text-[12px] font-semibold ${
+                data.overview.revenueDelta.tone === "danger"
+                  ? "text-[var(--danger)]"
+                  : "text-[var(--success)]"
+              }`}
+            >
+              {data.overview.revenueDelta.label}
             </div>
           </div>
         </Card>

@@ -297,7 +297,7 @@ export default async function BundlesPage({ searchParams }) {
         </div>
       </Card>
 
-      <Card id="new-bundle" className="p-4 sm:p-5">
+      <Card id="new-bundle" className="scroll-mt-24 p-4 sm:p-5">
         <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">
           Create New Bundle
         </h2>
@@ -308,7 +308,11 @@ export default async function BundlesPage({ searchParams }) {
           </label>
           <label className="sectionhub-field">
             <span className="sectionhub-field-label">Slug</span>
-            <input name="slug" className="sectionhub-input font-mono" required />
+            <input
+              name="slug"
+              className="sectionhub-input font-mono"
+              placeholder="starter-pack"
+            />
           </label>
           <label className="sectionhub-field">
             <span className="sectionhub-field-label">Status</span>
@@ -338,6 +342,9 @@ export default async function BundlesPage({ searchParams }) {
               options={sectionOptions}
               emptyText="No sections found."
             />
+            <div className="mt-1 text-[11px] text-[var(--text-secondary)]">
+              Select at least one section to create a bundle.
+            </div>
           </div>
           <div className="md:col-span-2 xl:col-span-4">
             <button

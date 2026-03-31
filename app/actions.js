@@ -131,30 +131,53 @@ export async function resetPasswordAction(formData) {
 export async function saveCategoryAction(formData) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const category = await upsertCategory({
-    id: String(formData.get("id") || "") || undefined,
-    name: String(formData.get("name") || ""),
-    slug: String(formData.get("slug") || ""),
-    description: String(formData.get("description") || ""),
-    icon: String(formData.get("icon") || "LayoutGrid"),
-    sortOrder: Number(formData.get("sortOrder") || 0),
-    visibility: String(formData.get("visibility") || "MARKETPLACE"),
-    featured: asBool(formData.get("featured")),
-    status: String(formData.get("status") || "Active"),
-  });
-  await createActivityLog({
-    actorId: String(user._id),
-    actorName: user.name,
-    action:
-      category?.createdAt?.getTime?.() === category?.updatedAt?.getTime?.()
-        ? "created"
-        : "updated",
-    entityType: "category",
-    entityId: String(category?._id),
-    entityLabel: category?.name ?? "Category",
-  });
-  revalidatePath("/categories");
-  redirect("/categories?saved=1");
+
+  const id = String(formData.get("id") || "") || undefined;
+  const name = String(formData.get("name") || "").trim();
+  const slug = toSlug(String(formData.get("slug") || "").trim() || name);
+
+  if (!name) {
+    redirect("/categories?error=Category+name+is+required");
+  }
+
+  if (!slug) {
+    redirect("/categories?error=Category+slug+is+required");
+  }
+
+  try {
+    const category = await upsertCategory({
+      id,
+      name,
+      slug,
+      description: String(formData.get("description") || ""),
+      icon: String(formData.get("icon") || "LayoutGrid"),
+      parentId: String(formData.get("parentId") || "") || null,
+      sortOrder: Number(formData.get("sortOrder") || 0),
+      visibility: asBool(formData.get("isVisible")) ? "MARKETPLACE" : "HIDDEN",
+      featured: asBool(formData.get("featured")),
+      status: String(formData.get("status") || "Active"),
+    });
+
+    await createActivityLog({
+      actorId: String(user._id),
+      actorName: user.name,
+      action:
+        category?.createdAt?.getTime?.() === category?.updatedAt?.getTime?.()
+          ? "created"
+          : "updated",
+      entityType: "category",
+      entityId: String(category?._id),
+      entityLabel: category?.name ?? "Category",
+    });
+
+    revalidatePath("/categories");
+    redirect(`/categories?category=${String(category?._id)}&saved=1`);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to save category.";
+    const query = id ? `?category=${id}&error=${encodeURIComponent(message)}` : `?error=${encodeURIComponent(message)}`;
+    redirect(`/categories${query}`);
+  }
 }
 export async function saveTagAction(formData) {
   const user = await getCurrentUser();
@@ -179,36 +202,71 @@ export async function saveTagAction(formData) {
 export async function saveBundleAction(formData) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const sectionIds = String(formData.get("sectionIds") || "")
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean);
-  const bundle = await upsertBundle({
-    id: String(formData.get("id") || "") || undefined,
-    name: String(formData.get("name") || ""),
-    slug: String(formData.get("slug") || ""),
-    shortDescription: String(formData.get("shortDescription") || ""),
-    niche: String(formData.get("niche") || ""),
-    accessType: String(formData.get("accessType") || "BUNDLE"),
-    visibility: String(formData.get("visibility") || "MARKETPLACE"),
-    status: String(formData.get("status") || "DRAFT"),
-    priceCents: Math.round(Number(formData.get("price") || 0) * 100),
-    compareAtPriceCents: Math.round(
-      Number(formData.get("compareAtPrice") || 0) * 100,
+  const id = String(formData.get("id") || "") || undefined;
+  const name = String(formData.get("name") || "").trim();
+  const slugInput = String(formData.get("slug") || "").trim();
+  const slug = toSlug(slugInput || name);
+  const sectionIds = Array.from(
+    new Set(
+      String(formData.get("sectionIds") || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
     ),
-    sectionIds,
-  });
-  if (bundle)
-    await createActivityLog({
-      actorId: String(user._id),
-      actorName: user.name,
-      action: "saved",
-      entityType: "bundle",
-      entityId: String(bundle._id),
-      entityLabel: bundle.name,
+  );
+
+  if (!name) {
+    redirect("/bundles?error=Bundle+name+is+required#new-bundle");
+  }
+
+  if (!slug) {
+    redirect("/bundles?error=Bundle+slug+is+required#new-bundle");
+  }
+
+  if (!sectionIds.length) {
+    redirect("/bundles?error=Select+at+least+one+section+for+the+bundle#new-bundle");
+  }
+
+  try {
+    const bundle = await upsertBundle({
+      id,
+      name,
+      slug,
+      shortDescription: String(formData.get("shortDescription") || ""),
+      niche: String(formData.get("niche") || ""),
+      accessType: String(formData.get("accessType") || "BUNDLE"),
+      visibility: String(formData.get("visibility") || "MARKETPLACE"),
+      status: String(formData.get("status") || "DRAFT"),
+      priceCents: Math.round(Number(formData.get("price") || 0) * 100),
+      compareAtPriceCents: Math.round(
+        Number(formData.get("compareAtPrice") || 0) * 100,
+      ),
+      sectionIds,
     });
-  revalidatePath("/bundles");
-  redirect("/bundles?saved=1");
+
+    if (bundle) {
+      await createActivityLog({
+        actorId: String(user._id),
+        actorName: user.name,
+        action: id ? "updated" : "created",
+        entityType: "bundle",
+        entityId: String(bundle._id),
+        entityLabel: bundle.name,
+      });
+    }
+
+    revalidatePath("/bundles");
+    redirect("/bundles?saved=1");
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to save bundle.";
+    const friendlyMessage = message.includes("E11000")
+      ? "Bundle slug already exists."
+      : message;
+    redirect(
+      `/bundles?error=${encodeURIComponent(friendlyMessage)}#new-bundle`,
+    );
+  }
 }
 
 export async function setBundleStatusAction(formData) {

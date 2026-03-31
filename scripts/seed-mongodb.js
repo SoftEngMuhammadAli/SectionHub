@@ -38,6 +38,7 @@ async function main() {
     SessionModel.deleteMany({}),
     AdminUserModel.deleteMany({}),
   ]);
+  console.log("Database cleared. Seeding with sample data...");
   const admin = await AdminUserModel.create({
     name: configuredAdmin.name,
     email: configuredAdmin.email,
@@ -115,6 +116,13 @@ async function main() {
   const categoryMap = new Map(
     categories.map((category) => [category.slug, category._id]),
   );
+  const now = new Date();
+  function daysAgo(days, hour = 11) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - days);
+    date.setHours(hour, 0, 0, 0);
+    return date;
+  }
   async function createSection(input) {
     return SectionModel.create({
       name: input.name,
@@ -310,50 +318,119 @@ async function main() {
     installs: 121,
     sectionIds: [sticky._id, megaFooter._id, showcase._id],
   });
-  const customers = await CustomerModel.insertMany([
-    { name: "Olive & Ivory", email: "ops@oliveandivory.co" },
-    { name: "Nord Studios", email: "team@nordstudios.shop" },
-    { name: "Luma Home", email: "support@lumahome.store" },
-    { name: "Atelier Form", email: "owner@atelierform.com" },
-  ]);
-  const [customerA, customerB, customerC, customerD] = customers;
-  const shops = await ShopModel.insertMany([
+  const storefrontProfiles = [
     {
-      domain: "oliveandivory.co",
-      customerId: customerA._id,
+      key: "luxe",
+      name: "Luxe Beauty",
+      email: "team@luxe-beauty.com",
+      domain: "luxe-beauty.myshopify.com",
       planType: "Shopify",
       status: "Active",
+      createdAt: daysAgo(120),
     },
     {
-      domain: "nordstudios.shop",
-      customerId: customerB._id,
+      key: "retro",
+      name: "Retro Kickz",
+      email: "ops@retro-kickz.com",
+      domain: "retro-kickz.com",
       planType: "Advanced",
       status: "Active",
+      createdAt: daysAgo(96),
     },
     {
-      domain: "lumahome.store",
-      customerId: customerC._id,
+      key: "urban",
+      name: "Urban Flora",
+      email: "hello@urban-flora.store",
+      domain: "urban-flora.store",
+      planType: "Shopify",
+      status: "Active",
+      createdAt: daysAgo(82),
+    },
+    {
+      key: "tech",
+      name: "Tech Minimal",
+      email: "team@tech-minimal.io",
+      domain: "tech-minimal.io",
+      planType: "Advanced",
+      status: "Active",
+      createdAt: daysAgo(63),
+    },
+    {
+      key: "velvet",
+      name: "Velvet Decor",
+      email: "support@velvet-decor.com",
+      domain: "velvet-decor.com",
+      planType: "Basic",
+      status: "Active",
+      createdAt: daysAgo(44),
+    },
+    {
+      key: "olive",
+      name: "Olive & Ivory",
+      email: "ops@oliveandivory.co",
+      domain: "oliveandivory.co",
+      planType: "Shopify",
+      status: "Active",
+      createdAt: daysAgo(20),
+    },
+    {
+      key: "nord",
+      name: "Nord Studios",
+      email: "team@nordstudios.shop",
+      domain: "nordstudios.shop",
       planType: "Starter",
       status: "Trial",
+      createdAt: daysAgo(12),
     },
     {
+      key: "atelier",
+      name: "Atelier Form",
+      email: "owner@atelierform.com",
       domain: "atelierform.com",
-      customerId: customerD._id,
       planType: "Basic",
       status: "Churned",
+      createdAt: daysAgo(74),
     },
-  ]);
-  const [shopA, shopB, shopC, shopD] = shops;
+  ];
+  const customers = await CustomerModel.insertMany(
+    storefrontProfiles.map((profile) => ({
+      name: profile.name,
+      email: profile.email,
+    })),
+  );
+  const customerMap = new Map(
+    storefrontProfiles.map((profile, index) => [profile.key, customers[index]]),
+  );
+  const shops = await ShopModel.insertMany(
+    storefrontProfiles.map((profile) => ({
+      domain: profile.domain,
+      customerId: customerMap.get(profile.key)._id,
+      planType: profile.planType,
+      status: profile.status,
+      createdAt: profile.createdAt,
+    })),
+  );
+  const shopMap = new Map(
+    storefrontProfiles.map((profile, index) => [profile.key, shops[index]]),
+  );
+  const sectionMap = {
+    hero,
+    sticky,
+    showcase,
+    megaFooter,
+    popup,
+    testimonial,
+  };
   await OrderModel.insertMany([
     {
-      orderNumber: "ORD-40291",
-      customerId: customerA._id,
-      shopId: shopA._id,
+      orderNumber: "ORD-51091",
+      customerId: customerMap.get("luxe")._id,
+      shopId: shopMap.get("luxe")._id,
       totalAmountCents: 8900,
       currency: "USD",
       status: "PAID",
       paymentProvider: "Stripe",
-      purchasedAt: new Date(),
+      purchasedAt: daysAgo(14),
       items: [
         {
           itemType: "bundle",
@@ -365,14 +442,14 @@ async function main() {
       ],
     },
     {
-      orderNumber: "ORD-40277",
-      customerId: customerB._id,
-      shopId: shopB._id,
+      orderNumber: "ORD-51088",
+      customerId: customerMap.get("retro")._id,
+      shopId: shopMap.get("retro")._id,
       totalAmountCents: 3900,
       currency: "USD",
       status: "PAID",
       paymentProvider: "Stripe",
-      purchasedAt: new Date(),
+      purchasedAt: daysAgo(10),
       items: [
         {
           itemType: "section",
@@ -384,33 +461,52 @@ async function main() {
       ],
     },
     {
-      orderNumber: "ORD-40264",
-      customerId: customerC._id,
-      shopId: shopC._id,
-      totalAmountCents: 12900,
+      orderNumber: "ORD-51074",
+      customerId: customerMap.get("urban")._id,
+      shopId: shopMap.get("urban")._id,
+      totalAmountCents: 4900,
       currency: "USD",
-      status: "PENDING",
-      paymentProvider: "Manual",
-      purchasedAt: new Date(),
+      status: "PAID",
+      paymentProvider: "Stripe",
+      purchasedAt: daysAgo(7),
       items: [
         {
-          itemType: "bundle",
-          bundleId: bundleTwo._id,
-          titleSnapshot: bundleTwo.name,
-          unitPriceCents: 12900,
+          itemType: "section",
+          sectionId: showcase._id,
+          titleSnapshot: showcase.name,
+          unitPriceCents: 4900,
           quantity: 1,
         },
       ],
     },
     {
-      orderNumber: "ORD-40231",
-      customerId: customerD._id,
-      shopId: shopD._id,
+      orderNumber: "ORD-51061",
+      customerId: customerMap.get("tech")._id,
+      shopId: shopMap.get("tech")._id,
+      totalAmountCents: 2400,
+      currency: "USD",
+      status: "PAID",
+      paymentProvider: "Stripe",
+      purchasedAt: daysAgo(5),
+      items: [
+        {
+          itemType: "section",
+          sectionId: sticky._id,
+          titleSnapshot: sticky.name,
+          unitPriceCents: 2400,
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderNumber: "ORD-51057",
+      customerId: customerMap.get("velvet")._id,
+      shopId: shopMap.get("velvet")._id,
       totalAmountCents: 2900,
       currency: "USD",
-      status: "REFUNDED",
+      status: "PAID",
       paymentProvider: "Stripe",
-      purchasedAt: new Date(),
+      purchasedAt: daysAgo(3),
       items: [
         {
           itemType: "section",
@@ -421,37 +517,253 @@ async function main() {
         },
       ],
     },
+    {
+      orderNumber: "ORD-51049",
+      customerId: customerMap.get("olive")._id,
+      shopId: shopMap.get("olive")._id,
+      totalAmountCents: 3900,
+      currency: "USD",
+      status: "PAID",
+      paymentProvider: "Stripe",
+      purchasedAt: daysAgo(1),
+      items: [
+        {
+          itemType: "section",
+          sectionId: hero._id,
+          titleSnapshot: hero.name,
+          unitPriceCents: 3900,
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderNumber: "ORD-50988",
+      customerId: customerMap.get("olive")._id,
+      shopId: shopMap.get("olive")._id,
+      totalAmountCents: 3900,
+      currency: "USD",
+      status: "PAID",
+      paymentProvider: "Stripe",
+      purchasedAt: daysAgo(36),
+      items: [
+        {
+          itemType: "section",
+          sectionId: hero._id,
+          titleSnapshot: hero.name,
+          unitPriceCents: 3900,
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderNumber: "ORD-50972",
+      customerId: customerMap.get("nord")._id,
+      shopId: shopMap.get("nord")._id,
+      totalAmountCents: 8900,
+      currency: "USD",
+      status: "PAID",
+      paymentProvider: "Stripe",
+      purchasedAt: daysAgo(42),
+      items: [
+        {
+          itemType: "bundle",
+          bundleId: bundleOne._id,
+          titleSnapshot: bundleOne.name,
+          unitPriceCents: 8900,
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderNumber: "ORD-50941",
+      customerId: customerMap.get("urban")._id,
+      shopId: shopMap.get("urban")._id,
+      totalAmountCents: 2900,
+      currency: "USD",
+      status: "PAID",
+      paymentProvider: "Stripe",
+      purchasedAt: daysAgo(50),
+      items: [
+        {
+          itemType: "section",
+          sectionId: popup._id,
+          titleSnapshot: popup.name,
+          unitPriceCents: 2900,
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderNumber: "ORD-51044",
+      customerId: customerMap.get("atelier")._id,
+      shopId: shopMap.get("atelier")._id,
+      totalAmountCents: 2900,
+      currency: "USD",
+      status: "REFUNDED",
+      paymentProvider: "Stripe",
+      purchasedAt: daysAgo(2),
+      items: [
+        {
+          itemType: "section",
+          sectionId: popup._id,
+          titleSnapshot: popup.name,
+          unitPriceCents: 2900,
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderNumber: "ORD-51039",
+      customerId: customerMap.get("nord")._id,
+      shopId: shopMap.get("nord")._id,
+      totalAmountCents: 12900,
+      currency: "USD",
+      status: "PENDING",
+      paymentProvider: "Manual",
+      purchasedAt: daysAgo(8),
+      items: [
+        {
+          itemType: "bundle",
+          bundleId: bundleTwo._id,
+          titleSnapshot: bundleTwo.name,
+          unitPriceCents: 12900,
+          quantity: 1,
+        },
+      ],
+    },
   ]);
   await InstallEventModel.insertMany([
     {
-      sectionId: hero._id,
-      shopId: shopA._id,
+      sectionId: sectionMap.hero._id,
+      shopId: shopMap.get("olive")._id,
       status: "SUCCESS",
-      installedAt: new Date(),
+      installedAt: daysAgo(1, 15),
     },
     {
-      sectionId: hero._id,
-      shopId: shopB._id,
+      sectionId: sectionMap.popup._id,
+      shopId: shopMap.get("velvet")._id,
       status: "SUCCESS",
-      installedAt: new Date(),
+      installedAt: daysAgo(2, 14),
     },
     {
-      sectionId: showcase._id,
-      shopId: shopA._id,
+      sectionId: sectionMap.showcase._id,
+      shopId: shopMap.get("nord")._id,
       status: "SUCCESS",
-      installedAt: new Date(),
+      installedAt: daysAgo(3, 13),
     },
     {
-      sectionId: popup._id,
-      shopId: shopD._id,
+      sectionId: sectionMap.hero._id,
+      shopId: shopMap.get("tech")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(4, 16),
+    },
+    {
+      sectionId: sectionMap.showcase._id,
+      shopId: shopMap.get("urban")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(6, 12),
+    },
+    {
+      sectionId: sectionMap.sticky._id,
+      shopId: shopMap.get("retro")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(8, 11),
+    },
+    {
+      sectionId: sectionMap.popup._id,
+      shopId: shopMap.get("velvet")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(11, 10),
+    },
+    {
+      sectionId: sectionMap.sticky._id,
+      shopId: shopMap.get("tech")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(12, 9),
+    },
+    {
+      sectionId: sectionMap.hero._id,
+      shopId: shopMap.get("luxe")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(14, 15),
+    },
+    {
+      sectionId: sectionMap.showcase._id,
+      shopId: shopMap.get("urban")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(18, 14),
+    },
+    {
+      sectionId: sectionMap.showcase._id,
+      shopId: shopMap.get("luxe")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(21, 13),
+    },
+    {
+      sectionId: sectionMap.hero._id,
+      shopId: shopMap.get("retro")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(24, 12),
+    },
+    {
+      sectionId: sectionMap.popup._id,
+      shopId: shopMap.get("olive")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(27, 11),
+    },
+    {
+      sectionId: sectionMap.hero._id,
+      shopId: shopMap.get("olive")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(29, 10),
+    },
+    {
+      sectionId: sectionMap.hero._id,
+      shopId: shopMap.get("luxe")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(35, 15),
+    },
+    {
+      sectionId: sectionMap.popup._id,
+      shopId: shopMap.get("atelier")._id,
       status: "FAILED",
-      installedAt: new Date(),
+      installedAt: daysAgo(37, 14),
     },
     {
-      sectionId: megaFooter._id,
-      shopId: shopC._id,
+      sectionId: sectionMap.hero._id,
+      shopId: shopMap.get("urban")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(38, 13),
+    },
+    {
+      sectionId: sectionMap.popup._id,
+      shopId: shopMap.get("tech")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(40, 12),
+    },
+    {
+      sectionId: sectionMap.showcase._id,
+      shopId: shopMap.get("nord")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(45, 11),
+    },
+    {
+      sectionId: sectionMap.sticky._id,
+      shopId: shopMap.get("retro")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(47, 10),
+    },
+    {
+      sectionId: sectionMap.showcase._id,
+      shopId: shopMap.get("luxe")._id,
+      status: "SUCCESS",
+      installedAt: daysAgo(55, 9),
+    },
+    {
+      sectionId: sectionMap.megaFooter._id,
+      shopId: shopMap.get("atelier")._id,
       status: "FAILED",
-      installedAt: new Date(),
+      installedAt: daysAgo(9, 8),
     },
   ]);
   await SettingModel.insertMany([

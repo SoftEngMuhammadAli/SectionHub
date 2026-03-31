@@ -124,12 +124,25 @@ function IconPicker({ selectedIcon }) {
 export default async function CategoriesPage({ searchParams }) {
   const params = await searchParams;
   const categoryId = String(params.category ?? "");
+  const saved = params.saved === "1";
+  const error = String(params.error ?? "");
   const categories = await getCategories();
   const selectedCategory =
     categories.find((item) => item.id === categoryId) ?? categories[0];
 
   return (
     <div className="space-y-5">
+      {saved ? (
+        <div className="rounded-[10px] border border-[var(--success)]/20 bg-[var(--success-light)] px-4 py-2.5 text-[12px] font-medium text-[var(--success)]">
+          Category updated successfully.
+        </div>
+      ) : null}
+      {error ? (
+        <div className="rounded-[10px] border border-[var(--danger)]/20 bg-[var(--danger-light)] px-4 py-2.5 text-[12px] font-medium text-[var(--danger)]">
+          {error}
+        </div>
+      ) : null}
+
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-[18px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">

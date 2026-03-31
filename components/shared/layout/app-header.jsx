@@ -91,7 +91,10 @@ export function AppHeader({ setDrawerOpen, search, setSearch }) {
     <header className="sticky top-0 z-20 border-b border-[var(--border-default)] bg-white/95 backdrop-blur-sm">
       <div className="flex h-[56px] items-center justify-between gap-3 px-4 md:px-6">
         <div className="flex items-center gap-3 md:min-w-[160px]">
-          <SurfaceIconButton className="md:hidden" onClick={() => setDrawerOpen(true)}>
+          <SurfaceIconButton
+            className="md:hidden"
+            onClick={() => setDrawerOpen(true)}
+          >
             <Icon name="menu" className="h-4 w-4" />
           </SurfaceIconButton>
           <div className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--text-primary)] md:hidden">
